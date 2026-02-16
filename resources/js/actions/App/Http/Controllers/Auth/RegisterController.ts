@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition } from './../../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Auth\RegisterController::register
-* @see app/Http/Controllers/Auth/RegisterController.php:12
+* @see app/Http/Controllers/Auth/RegisterController.php:13
 * @route '/register'
 */
 export const register = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ register.definition = {
 
 /**
 * @see \App\Http\Controllers\Auth\RegisterController::register
-* @see app/Http/Controllers/Auth/RegisterController.php:12
+* @see app/Http/Controllers/Auth/RegisterController.php:13
 * @route '/register'
 */
 register.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ register.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Auth\RegisterController::register
-* @see app/Http/Controllers/Auth/RegisterController.php:12
+* @see app/Http/Controllers/Auth/RegisterController.php:13
 * @route '/register'
 */
 register.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -35,7 +35,7 @@ register.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\Auth\RegisterController::register
-* @see app/Http/Controllers/Auth/RegisterController.php:12
+* @see app/Http/Controllers/Auth/RegisterController.php:13
 * @route '/register'
 */
 register.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -45,7 +45,7 @@ register.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\Auth\RegisterController::register
-* @see app/Http/Controllers/Auth/RegisterController.php:12
+* @see app/Http/Controllers/Auth/RegisterController.php:13
 * @route '/register'
 */
 const registerForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -55,7 +55,7 @@ const registerForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> =
 
 /**
 * @see \App\Http\Controllers\Auth\RegisterController::register
-* @see app/Http/Controllers/Auth/RegisterController.php:12
+* @see app/Http/Controllers/Auth/RegisterController.php:13
 * @route '/register'
 */
 registerForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -65,7 +65,7 @@ registerForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => 
 
 /**
 * @see \App\Http\Controllers\Auth\RegisterController::register
-* @see app/Http/Controllers/Auth/RegisterController.php:12
+* @see app/Http/Controllers/Auth/RegisterController.php:13
 * @route '/register'
 */
 registerForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -82,7 +82,7 @@ register.form = registerForm
 
 /**
 * @see \App\Http\Controllers\Auth\RegisterController::store
-* @see app/Http/Controllers/Auth/RegisterController.php:17
+* @see app/Http/Controllers/Auth/RegisterController.php:18
 * @route '/register'
 */
 export const store = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -97,7 +97,7 @@ store.definition = {
 
 /**
 * @see \App\Http\Controllers\Auth\RegisterController::store
-* @see app/Http/Controllers/Auth/RegisterController.php:17
+* @see app/Http/Controllers/Auth/RegisterController.php:18
 * @route '/register'
 */
 store.url = (options?: RouteQueryOptions) => {
@@ -106,7 +106,7 @@ store.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Auth\RegisterController::store
-* @see app/Http/Controllers/Auth/RegisterController.php:17
+* @see app/Http/Controllers/Auth/RegisterController.php:18
 * @route '/register'
 */
 store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -116,7 +116,7 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \App\Http\Controllers\Auth\RegisterController::store
-* @see app/Http/Controllers/Auth/RegisterController.php:17
+* @see app/Http/Controllers/Auth/RegisterController.php:18
 * @route '/register'
 */
 const storeForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -126,7 +126,7 @@ const storeForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => 
 
 /**
 * @see \App\Http\Controllers\Auth\RegisterController::store
-* @see app/Http/Controllers/Auth/RegisterController.php:17
+* @see app/Http/Controllers/Auth/RegisterController.php:18
 * @route '/register'
 */
 storeForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({

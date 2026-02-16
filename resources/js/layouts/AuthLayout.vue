@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Link } from "@inertiajs/vue3";
 import IndexController from "@/actions/App/Http/Controllers/IndexController";
+import AppLogoIcon from "@/components/AppLogoIcon.vue";
 defineProps<{
     title?: string;
     description?: string;
@@ -20,13 +21,18 @@ defineProps<{
                         <div
                             class="mb-1 flex h-9 w-9 items-center justify-center rounded-md"
                         >
-                            Logo Here
+                            <AppLogoIcon
+                                class="size-9 fill-current text-[var(--foreground)] dark:text-white"
+                            />
                         </div>
                         <span class="sr-only">{{ title }}</span>
                     </Link>
                     <div class="space-y-2 text-center">
                         <h1 class="text-xl font-medium">{{ title }}</h1>
-                        <p v-if="description" class="text-center text-sm text-muted-foreground">
+                        <p
+                            v-if="description"
+                            class="text-center text-sm text-muted-foreground"
+                        >
                             {{ description }}
                         </p>
                     </div>
