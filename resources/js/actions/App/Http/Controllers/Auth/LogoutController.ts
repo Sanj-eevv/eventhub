@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition } from './../../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Auth\LogoutController::__invoke
-* @see app/Http/Controllers/Auth/LogoutController.php:12
+* @see app/Http/Controllers/Auth/LogoutController.php:14
 * @route '/logout'
 */
 const LogoutController = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -16,7 +16,7 @@ LogoutController.definition = {
 
 /**
 * @see \App\Http\Controllers\Auth\LogoutController::__invoke
-* @see app/Http/Controllers/Auth/LogoutController.php:12
+* @see app/Http/Controllers/Auth/LogoutController.php:14
 * @route '/logout'
 */
 LogoutController.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ LogoutController.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Auth\LogoutController::__invoke
-* @see app/Http/Controllers/Auth/LogoutController.php:12
+* @see app/Http/Controllers/Auth/LogoutController.php:14
 * @route '/logout'
 */
 LogoutController.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -35,7 +35,7 @@ LogoutController.post = (options?: RouteQueryOptions): RouteDefinition<'post'> =
 
 /**
 * @see \App\Http\Controllers\Auth\LogoutController::__invoke
-* @see app/Http/Controllers/Auth/LogoutController.php:12
+* @see app/Http/Controllers/Auth/LogoutController.php:14
 * @route '/logout'
 */
 const LogoutControllerForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -45,7 +45,7 @@ const LogoutControllerForm = (options?: RouteQueryOptions): RouteFormDefinition<
 
 /**
 * @see \App\Http\Controllers\Auth\LogoutController::__invoke
-* @see app/Http/Controllers/Auth/LogoutController.php:12
+* @see app/Http/Controllers/Auth/LogoutController.php:14
 * @route '/logout'
 */
 LogoutControllerForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({

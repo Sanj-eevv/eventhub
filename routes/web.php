@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\RegisterController;
@@ -24,8 +25,11 @@ Route::middleware('guest')->group(function (): void {
 Route::middleware('auth')->group(function (): void {
     Route::as('auth.')->group(function (): void {
         Route::post('logout', LogoutController::class)->name('logout');
+        Route::get('email/verify', [EmailVerificationController::class, 'index'])->name('verification.notice');
+        Route::get('email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])->middleware(['signed', 'throttle:10,1'])->name('verification.verify');
+        Route::post('email/verification-notification', [EmailVerificationController::class, 'resend'])->middleware('throttle:5,1')->name('verification.send');
     });
-    Route::as('dashboard.')->group(function (): void {
+    Route::middleware('verified:auth.verification.notice')->as('dashboard.')->group(function (): void {
         Route::get('dashboard', DashboardController::class)->name('index');
-    })->middleware('verified');
+    });
 });

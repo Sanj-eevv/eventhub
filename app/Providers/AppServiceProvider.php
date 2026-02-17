@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Middleware\Authenticate;
+use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\RedirectResponse;
@@ -56,7 +58,15 @@ final class AppServiceProvider extends ServiceProvider
     private function configureUrls(): void
     {
         URL::forceScheme('https');
-        Authenticate::redirectUsing(fn() => route('auth.login'));
+        VerifyEmail::createUrlUsing(fn(User $notifiable): string => URL::temporarySignedRoute(
+            'auth.verification.verify',
+            now()->addMinutes(60),
+            [
+                'id' => $notifiable->getKey(),
+                'hash' => sha1($notifiable->getEmailForVerification()),
+            ],
+        ));
+        Authenticate::redirectUsing(fn() => route('auth.login', absolute: false));
     }
 
     private function configureVite(): void

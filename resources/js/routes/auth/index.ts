@@ -1,9 +1,10 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition } from './../../wayfinder'
 import register702019 from './register'
 import loginDf2c2a from './login'
+import verification from './verification'
 /**
 * @see \App\Http\Controllers\Auth\RegisterController::register
-* @see app/Http/Controllers/Auth/RegisterController.php:13
+* @see app/Http/Controllers/Auth/RegisterController.php:20
 * @route '/register'
 */
 export const register = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -18,7 +19,7 @@ register.definition = {
 
 /**
 * @see \App\Http\Controllers\Auth\RegisterController::register
-* @see app/Http/Controllers/Auth/RegisterController.php:13
+* @see app/Http/Controllers/Auth/RegisterController.php:20
 * @route '/register'
 */
 register.url = (options?: RouteQueryOptions) => {
@@ -27,7 +28,7 @@ register.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Auth\RegisterController::register
-* @see app/Http/Controllers/Auth/RegisterController.php:13
+* @see app/Http/Controllers/Auth/RegisterController.php:20
 * @route '/register'
 */
 register.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -37,7 +38,7 @@ register.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\Auth\RegisterController::register
-* @see app/Http/Controllers/Auth/RegisterController.php:13
+* @see app/Http/Controllers/Auth/RegisterController.php:20
 * @route '/register'
 */
 register.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -47,7 +48,7 @@ register.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\Auth\RegisterController::register
-* @see app/Http/Controllers/Auth/RegisterController.php:13
+* @see app/Http/Controllers/Auth/RegisterController.php:20
 * @route '/register'
 */
 const registerForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -57,7 +58,7 @@ const registerForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> =
 
 /**
 * @see \App\Http\Controllers\Auth\RegisterController::register
-* @see app/Http/Controllers/Auth/RegisterController.php:13
+* @see app/Http/Controllers/Auth/RegisterController.php:20
 * @route '/register'
 */
 registerForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -67,7 +68,7 @@ registerForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => 
 
 /**
 * @see \App\Http\Controllers\Auth\RegisterController::register
-* @see app/Http/Controllers/Auth/RegisterController.php:13
+* @see app/Http/Controllers/Auth/RegisterController.php:20
 * @route '/register'
 */
 registerForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -165,7 +166,7 @@ login.form = loginForm
 
 /**
 * @see \App\Http\Controllers\Auth\LogoutController::__invoke
-* @see app/Http/Controllers/Auth/LogoutController.php:12
+* @see app/Http/Controllers/Auth/LogoutController.php:14
 * @route '/logout'
 */
 export const logout = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -180,7 +181,7 @@ logout.definition = {
 
 /**
 * @see \App\Http\Controllers\Auth\LogoutController::__invoke
-* @see app/Http/Controllers/Auth/LogoutController.php:12
+* @see app/Http/Controllers/Auth/LogoutController.php:14
 * @route '/logout'
 */
 logout.url = (options?: RouteQueryOptions) => {
@@ -189,7 +190,7 @@ logout.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Auth\LogoutController::__invoke
-* @see app/Http/Controllers/Auth/LogoutController.php:12
+* @see app/Http/Controllers/Auth/LogoutController.php:14
 * @route '/logout'
 */
 logout.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -199,7 +200,7 @@ logout.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \App\Http\Controllers\Auth\LogoutController::__invoke
-* @see app/Http/Controllers/Auth/LogoutController.php:12
+* @see app/Http/Controllers/Auth/LogoutController.php:14
 * @route '/logout'
 */
 const logoutForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -209,7 +210,7 @@ const logoutForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> =>
 
 /**
 * @see \App\Http\Controllers\Auth\LogoutController::__invoke
-* @see app/Http/Controllers/Auth/LogoutController.php:12
+* @see app/Http/Controllers/Auth/LogoutController.php:14
 * @route '/logout'
 */
 logoutForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -223,6 +224,7 @@ const auth = {
     register: Object.assign(register, register702019),
     login: Object.assign(login, loginDf2c2a),
     logout: Object.assign(logout, logout),
+    verification: Object.assign(verification, verification),
 }
 
 export default auth

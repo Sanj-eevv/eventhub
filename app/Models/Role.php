@@ -12,11 +12,19 @@ final class Role extends Model
 {
     use HasFactory;
 
+    /**
+     * @var list<string>
+     */
     protected $fillable = [
         'name',
         'slug',
         'description',
     ];
+
+    public static function defaultRole(): ?Role
+    {
+        return Role::query()->where('slug', 'user')->first();
+    }
 
     public function users(): BelongsToMany
     {

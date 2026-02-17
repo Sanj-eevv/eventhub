@@ -22,7 +22,7 @@ final class LoginController extends Controller
     {
         if (Auth::attempt($loginRequest->validated(), $loginRequest->boolean('remember'))) {
             $loginRequest->session()->regenerate();
-            return redirect()->intended(route('dashboard.index'));
+            return redirect()->intended(route('dashboard.index', absolute: false));
         }
         return back()->withErrors([
             'email' => 'These credentials do not match our records.',
