@@ -10,6 +10,7 @@ import { Spinner } from "@/components/ui/spinner";
 import AuthLayout from "@/layouts/AuthLayout.vue";
 import { register } from "@/routes/auth";
 import { store } from "@/routes/auth/login";
+import { request } from "@/routes/auth/password";
 
 defineProps<{
     status?: string;
@@ -51,7 +52,11 @@ defineProps<{
                 <div class="grid gap-2">
                     <div class="flex items-center justify-between">
                         <Label for="password">Password</Label>
-                        <TextLink href="test" class="text-sm" :tabindex="5">
+                        <TextLink
+                            :href="request()"
+                            class="text-sm"
+                            :tabindex="5"
+                        >
                             Forgot password?
                         </TextLink>
                     </div>

@@ -7,6 +7,7 @@ namespace App\Providers;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Middleware\Authenticate;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
@@ -58,6 +59,7 @@ final class AppServiceProvider extends ServiceProvider
     private function configureUrls(): void
     {
         URL::forceScheme('https');
+        ResetPassword::createUrlUsing(fn(User $user, string $token) => route('auth.password.reset', ['token' => $token, 'email' => $user->email]));
         VerifyEmail::createUrlUsing(fn(User $notifiable): string => URL::temporarySignedRoute(
             'auth.verification.verify',
             now()->addMinutes(60),
@@ -96,9 +98,13 @@ final class AppServiceProvider extends ServiceProvider
             'email' => ['Too many login attempts. Please try again later.'],
         ])->withInput($request->except('password'));
 
-        RateLimiter::for('login', fn(Request $request) => [
-            Limit::perMinute(100)->by($request->ip())->response($loginRateLimitedResponse),
-            Limit::perMinute(5)->by($request->input('email'))->response($loginRateLimitedResponse),
+        RateLimiter::for('password-reset-request', fn(Request $request) => [
+            Limit::perHour(10)->by($request->ip()),
+            Limit::perMinute(3)->by($request->input('email')),
+        ]);
+        RateLimiter::for('password-reset', fn(Request $request) => [
+            Limit::perHour(5)->by($request->ip()),
+            Limit::perHour(3)->by($request->input('email')),
         ]);
 
     }

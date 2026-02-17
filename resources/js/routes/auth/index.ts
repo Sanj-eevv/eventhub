@@ -1,6 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition } from './../../wayfinder'
 import register702019 from './register'
 import loginDf2c2a from './login'
+import password from './password'
 import verification from './verification'
 /**
 * @see \App\Http\Controllers\Auth\RegisterController::register
@@ -223,6 +224,7 @@ logout.form = logoutForm
 const auth = {
     register: Object.assign(register, register702019),
     login: Object.assign(login, loginDf2c2a),
+    password: Object.assign(password, password),
     logout: Object.assign(logout, logout),
     verification: Object.assign(verification, verification),
 }

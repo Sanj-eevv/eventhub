@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { Form } from "@inertiajs/vue3";
+import { Form, Head } from "@inertiajs/vue3";
 import InputError from "@/components/InputError.vue";
 import TextLink from "@/components/TextLink.vue";
 import { Button } from "@/components/ui/button";
