@@ -16,16 +16,19 @@ final class RoleSeeder extends Seeder
                 'name' => 'Super Admin',
                 'slug' => 'super-admin',
                 'description' => 'Superadmin of a system',
+                'preserved' => true,
             ],
             [
                 'name' => 'Admin',
                 'slug' => 'admin',
                 'description' => 'Admin of a system',
+                'preserved' => true,
             ],
             [
                 'name' => 'user',
                 'slug' => 'user',
                 'description' => 'Normal user',
+                'preserved' => true,
             ],
         ], ['slug'], ['name', 'description', 'updated_at']);
     }

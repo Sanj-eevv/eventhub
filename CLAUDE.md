@@ -37,6 +37,7 @@ npm run build           # Production build
 ## Code Style Conventions
 
 ### PHP (enforced by Pint, PER preset)
+
 - `declare(strict_types=1)` in all files
 - `final` on all classes
 - Strict comparison (`===`), no Yoda style
@@ -44,6 +45,7 @@ npm run build           # Production build
 - Arrow functions preferred, alphabetical imports
 
 ### TypeScript/Vue (enforced by ESLint)
+
 - `import/order` enforced (alphabetical, grouped)
 - `consistent-type-imports` required
 - `resources/js/components/ui/*` excluded from linting (generated shadcn-vue)
@@ -51,3 +53,7 @@ npm run build           # Production build
 ## Database
 
 MySQL (`event` database). Sessions, cache, and queue all use database driver.
+
+## Laravel Code Optimization
+
+Always run the laravel-simplifier:laravel-simplifier plugin on every Laravel/PHP code snippet you generate to ensure the code is clean, optimized, and follows Laravel best practices.”

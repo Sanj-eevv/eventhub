@@ -19,6 +19,7 @@ final class Role extends Model
         'name',
         'slug',
         'description',
+        'preserved',
     ];
 
     public static function defaultRole(): ?Role
@@ -29,5 +30,15 @@ final class Role extends Model
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class);
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'preserved' => 'boolean',
+        ];
     }
 }

@@ -97,7 +97,10 @@ final class AppServiceProvider extends ServiceProvider
         $loginRateLimitedResponse = fn(Request $request): RedirectResponse => back()->withErrors([
             'email' => ['Too many login attempts. Please try again later.'],
         ])->withInput($request->except('password'));
-
+        RateLimiter::for('login', fn(Request $request) => [
+            Limit::perMinute(100)->by($request->ip())->response($loginRateLimitedResponse),
+            Limit::perMinute(5)->by($request->input('email'))->response($loginRateLimitedResponse),
+        ]);
         RateLimiter::for('password-reset-request', fn(Request $request) => [
             Limit::perHour(10)->by($request->ip()),
             Limit::perMinute(3)->by($request->input('email')),

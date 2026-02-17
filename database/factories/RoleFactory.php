@@ -25,6 +25,7 @@ final class RoleFactory extends Factory
             'name' => $name,
             'email' => $slug,
             'description' => fake()->sentence(),
+            'preserved' => false,
         ];
     }
 }
