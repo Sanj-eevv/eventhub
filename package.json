@@ -22,6 +22,7 @@
     },
     "dependencies": {
         "@inertiajs/vue3": "^2.3.14",
+        "@tanstack/vue-table": "^8.21.3",
         "@vue/eslint-config-typescript": "^14.6.0",
         "@vueuse/core": "^14.2.1",
         "class-variance-authority": "^0.7.1",
