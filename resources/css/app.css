@@ -124,3 +124,10 @@
         @apply bg-background text-foreground;
     }
 }
+
+@layer utilities {
+    label.required::after {
+        content: "*";
+        @apply text-destructive;
+    }
+}

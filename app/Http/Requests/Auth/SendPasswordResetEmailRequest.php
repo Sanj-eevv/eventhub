@@ -19,7 +19,7 @@ final class SendPasswordResetEmailRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'email', 'max:191']
+            'email' => ['required', 'email', 'max:191'],
         ];
     }
 }

@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 import AuthLayout from "@/layouts/AuthLayout.vue";
 import { login } from "@/routes/auth";
-import { store } from "@/routes/auth/register";
+import { organization, store } from "@/routes/auth/register";
 </script>
 <template>
     <AuthLayout
@@ -89,11 +89,20 @@ import { store } from "@/routes/auth/register";
                 </Button>
             </div>
             <div class="text-center text-sm text-muted-foreground">
+                Want to organize events?
+                <TextLink
+                    :href="organization()"
+                    class="underline underline-offset-4"
+                    :tabindex="6"
+                    >Register as an organizer</TextLink
+                >
+            </div>
+            <div class="text-center text-sm text-muted-foreground">
                 Already have an account?
                 <TextLink
                     :href="login()"
                     class="underline underline-offset-4"
-                    :tabindex="6"
+                    :tabindex="7"
                     >Log in</TextLink
                 >
             </div>

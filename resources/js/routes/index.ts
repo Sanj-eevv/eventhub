@@ -4,12 +4,12 @@ import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFo
 * @see app/Http/Controllers/IndexController.php:12
 * @route '/'
 */
-export const index = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
-    url: index.url(options),
+export const home = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: home.url(options),
     method: 'get',
 })
 
-index.definition = {
+home.definition = {
     methods: ["get","head"],
     url: '/',
 } satisfies RouteDefinition<["get","head"]>
@@ -19,8 +19,8 @@ index.definition = {
 * @see app/Http/Controllers/IndexController.php:12
 * @route '/'
 */
-index.url = (options?: RouteQueryOptions) => {
-    return index.definition.url + queryParams(options)
+home.url = (options?: RouteQueryOptions) => {
+    return home.definition.url + queryParams(options)
 }
 
 /**
@@ -28,8 +28,8 @@ index.url = (options?: RouteQueryOptions) => {
 * @see app/Http/Controllers/IndexController.php:12
 * @route '/'
 */
-index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
-    url: index.url(options),
+home.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: home.url(options),
     method: 'get',
 })
 
@@ -38,8 +38,8 @@ index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 * @see app/Http/Controllers/IndexController.php:12
 * @route '/'
 */
-index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
-    url: index.url(options),
+home.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: home.url(options),
     method: 'head',
 })
 
@@ -48,8 +48,8 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 * @see app/Http/Controllers/IndexController.php:12
 * @route '/'
 */
-const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-    action: index.url(options),
+const homeForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: home.url(options),
     method: 'get',
 })
 
@@ -58,8 +58,8 @@ const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => (
 * @see app/Http/Controllers/IndexController.php:12
 * @route '/'
 */
-indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-    action: index.url(options),
+homeForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: home.url(options),
     method: 'get',
 })
 
@@ -68,8 +68,8 @@ indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
 * @see app/Http/Controllers/IndexController.php:12
 * @route '/'
 */
-indexForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-    action: index.url({
+homeForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: home.url({
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'HEAD',
             ...(options?.query ?? options?.mergeQuery ?? {}),
@@ -78,4 +78,4 @@ indexForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
     method: 'get',
 })
 
-index.form = indexForm
+home.form = homeForm

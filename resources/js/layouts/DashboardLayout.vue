@@ -3,6 +3,8 @@ import { usePage } from "@inertiajs/vue3";
 import AppSidebar from "@/components/AppSidebar.vue";
 import Breadcrumbs from "@/components/Breadcrumbs.vue";
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
+import { Toaster } from "@/components/ui/sonner";
+import 'vue-sonner/style.css'
 import type { BreadcrumbItem } from "@/types";
 
 withDefaults(
@@ -36,4 +38,5 @@ const sidebarOpen = page.props.sidebarOpen;
             <slot />
         </sidebarInset>
     </SidebarProvider>
+    <Toaster/>
 </template>

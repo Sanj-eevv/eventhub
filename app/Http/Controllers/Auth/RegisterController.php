@@ -11,7 +11,6 @@ use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -25,15 +24,15 @@ final class RegisterController extends Controller
     public function store(RegisterRequest $registerRequest): RedirectResponse
     {
         $validated = $registerRequest->validated();
-        $defaultRole = Role::defaultRole();
+        $userRole = Role::UserRole();
         $user = User::query()->create([
-            'role_id' => $defaultRole->id,
+            'role_id' => $userRole->id,
             'name' => $validated['name'],
             'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
+            'password' => $validated['password'],
         ]);
         event(new Registered($user));
         Auth::login($user);
-        return redirect()->intended(route('dashboard.index', absolute: false));
+        return redirect()->intended(route('home', absolute: false));
     }
 }

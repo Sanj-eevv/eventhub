@@ -26,12 +26,12 @@ import {
     SidebarGroupLabel,
 } from "@/components/ui/sidebar";
 import { useCurrentUrl } from "@/composables/useCurrentUrl";
+import { useInitials } from "@/composables/useInitials";
 import { logout } from "@/routes/auth";
 import { index } from "@/routes/dashboard";
 import type { NavItem } from "@/types";
 import AppLogo from "./AppLogo.vue";
 import { Avatar, AvatarFallback } from "./ui/avatar";
-import { useInitials } from "@/composables/useInitials";
 
 const mainNavItems: NavItem[] = [
     {

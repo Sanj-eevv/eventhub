@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Enums\PreservedRoleList;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Middleware\Authenticate;
@@ -15,6 +16,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\URL;
@@ -36,6 +38,7 @@ final class AppServiceProvider extends ServiceProvider
 
         $this->configureRateLimit();
         $this->configurePasswordRules();
+        $this->configureGates();
         Schema::defaultStringLength(191);
     }
 
@@ -110,5 +113,15 @@ final class AppServiceProvider extends ServiceProvider
             Limit::perHour(3)->by($request->input('email')),
         ]);
 
+    }
+
+    private function configureGates(): void
+    {
+        Gate::before(function (User $user, string $ability) {
+            if (in_array($user->role->slug, [PreservedRoleList::SUPER_ADMIN->value, PreservedRoleList::ADMIN->value], true)) {
+                return true;
+            }
+        });
+        Gate::define('view-dashboard', fn(User $user): bool => in_array($user->role->slug, [PreservedRoleList::ORGANIZATION_ADMIN->value], true));
     }
 }

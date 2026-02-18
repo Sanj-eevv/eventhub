@@ -56,4 +56,5 @@ MySQL (`event` database). Sessions, cache, and queue all use database driver.
 
 ## Laravel Code Optimization
 
-Always run the laravel-simplifier:laravel-simplifier plugin on every Laravel/PHP code snippet you generate to ensure the code is clean, optimized, and follows Laravel best practices.”
+- Always run the **laravel-simplifier:laravel-simplifier** plugin on every Laravel/PHP code snippet you generate to ensure the code is clean, optimized, and follows Laravel best practices.”
+- Do not write any comments in the generated code. No comments are required under any circumstances.

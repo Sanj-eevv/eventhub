@@ -2,6 +2,8 @@
 import { Link } from "@inertiajs/vue3";
 import IndexController from "@/actions/App/Http/Controllers/IndexController";
 import AppLogoIcon from "@/components/AppLogoIcon.vue";
+import 'vue-sonner/style.css'
+import { Toaster } from "@/components/ui/sonner";
 defineProps<{
     title?: string;
     description?: string;
@@ -41,4 +43,5 @@ defineProps<{
             </div>
         </div>
     </div>
+    <Toaster/>
 </template>
