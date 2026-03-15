@@ -1,9 +1,16 @@
 <script setup lang="ts">
 import { Link, router } from "@inertiajs/vue3";
 import { usePage } from "@inertiajs/vue3";
-import { LayoutGrid } from "lucide-vue-next";
-import { LogOut } from "lucide-vue-next";
-import { ChevronsUpDown } from "lucide-vue-next";
+import {
+    Building2,
+    CalendarDays,
+    ChevronsUpDown,
+    LayoutGrid,
+    LogOut,
+    ShieldCheck,
+    Users,
+} from "lucide-vue-next";
+import { computed } from "vue";
 import {
     DropdownMenu,
     DropdownMenuLabel,
@@ -27,30 +34,79 @@ import {
 } from "@/components/ui/sidebar";
 import { useCurrentUrl } from "@/composables/useCurrentUrl";
 import { useInitials } from "@/composables/useInitials";
-import { logout } from "@/routes/auth";
-import { index } from "@/routes/dashboard";
+import { usePermission } from "@/composables/usePermission";
+import { toUrl } from "@/lib/utils";
 import type { NavItem } from "@/types";
+import { logout } from "@/wayfinder/routes/auth";
+import { index } from "@/wayfinder/routes/dashboard";
+import { index as eventsIndex } from "@/wayfinder/routes/dashboard/events";
+import { index as orgsIndex } from "@/wayfinder/routes/dashboard/organizations";
+import { index as rolesIndex } from "@/wayfinder/routes/dashboard/roles";
+import { index as usersIndex } from "@/wayfinder/routes/dashboard/users";
 import AppLogo from "./AppLogo.vue";
 import { Avatar, AvatarFallback } from "./ui/avatar";
+
+const pageProps = usePage<{
+    auth: { user: { name: string; email: string } };
+}>().props;
 
 const mainNavItems: NavItem[] = [
     {
         title: "Dashboard",
         href: index(),
         icon: LayoutGrid,
+        show: true,
+    },
+    {
+        title: "Organizations",
+        href: orgsIndex(),
+        icon: Building2,
+        matchPrefix: true,
+        show: usePermission("organization")("viewAny"),
+    },
+    {
+        title: "Users",
+        href: usersIndex(),
+        icon: Users,
+        matchPrefix: true,
+        show: usePermission("user")("viewAny"),
+    },
+    {
+        title: "Events",
+        href: eventsIndex(),
+        icon: CalendarDays,
+        matchPrefix: true,
+        show: usePermission("event")("viewAny"),
+    },
+    {
+        title: "Roles",
+        href: rolesIndex(),
+        icon: ShieldCheck,
+        matchPrefix: true,
+        show: usePermission("role")("viewAny"),
     },
 ];
+const visibleNavItems = computed(() =>
+    mainNavItems.filter((item) => item.show),
+);
 
-const pageProps = usePage<{
-    auth: {
-        user: {
-            name: string;
-            email: string;
-        };
-    };
-}>().props;
+const { isCurrentUrl, currentUrl } = useCurrentUrl();
 
-const { isCurrentUrl } = useCurrentUrl();
+function isNavItemActive(item: NavItem): boolean {
+    if (item.matchPrefix) {
+        const urlString = toUrl(item.href);
+        try {
+            const pathname = urlString.startsWith("http")
+                ? new URL(urlString).pathname
+                : urlString;
+            return currentUrl.value.startsWith(pathname);
+        } catch {
+            return false;
+        }
+    }
+    return isCurrentUrl(item.href);
+}
+
 const user = pageProps.auth.user;
 const { isMobile, state } = useSidebar();
 const { getInitials } = useInitials();
@@ -79,12 +135,12 @@ const handleLogout = () => {
                 <SidebarGroupLabel>Platform</SidebarGroupLabel>
                 <SidebarMenu>
                     <SidebarMenuItem
-                        v-for="item in mainNavItems"
+                        v-for="item in visibleNavItems"
                         :key="item.title"
                     >
                         <SidebarMenuButton
                             as-child
-                            :is-active="isCurrentUrl(item.href)"
+                            :is-active="isNavItemActive(item)"
                             :tooltip="item.title"
                         >
                             <Link :href="item.href">

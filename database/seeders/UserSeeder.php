@@ -12,11 +12,19 @@ final class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        $superAdmin = Role::SuperAdminRole();
+        $superAdmin = Role::superAdminRole();
+        $admin = Role::adminRole();
         User::query()->create([
             'role_id' => $superAdmin->id,
             'name' => 'Sanjeev',
             'email' => 'sanjeevvsanjeev1@gmail.com',
+            'password' => 'password',
+            'email_verified_at' => now(),
+        ]);
+        User::query()->create([
+            'role_id' => $admin->id,
+            'name' => 'Sanjeev Admin',
+            'email' => 'sanjeevvsanjeev11@gmail.com',
             'password' => 'password',
             'email_verified_at' => now(),
         ]);

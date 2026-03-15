@@ -4,28 +4,32 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Auth;
 
+use App\Actions\LoginAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Auth;
-use Inertia\Inertia;
+use Illuminate\Routing\Redirector;
+use Illuminate\Routing\UrlGenerator;
 use Inertia\Response;
+use Inertia\ResponseFactory;
 
 final class LoginController extends Controller
 {
+    public function __construct(private readonly LoginAction $loginAction, private readonly Redirector $redirector, private readonly UrlGenerator $urlGenerator, private readonly ResponseFactory $inertiaResponse) {}
+
     public function create(): Response
     {
-        return Inertia::render('Auth/Login');
+        return $this->inertiaResponse->render('Auth/Login');
     }
 
     public function store(LoginRequest $loginRequest): RedirectResponse
     {
-        if (Auth::attempt($loginRequest->validated(), $loginRequest->boolean('remember'))) {
-            $loginRequest->session()->regenerate();
-            return redirect()->intended(route('home', absolute: false));
+        if ($this->loginAction->execute($loginRequest)) {
+            return $this->redirector->intended(
+                $this->urlGenerator->route('home', absolute: false),
+            );
         }
-        return back()->withErrors([
-            'email' => 'These credentials do not match our records.',
-        ])->withInput($loginRequest->except('password'));
+
+        return $this->redirector->back()->withErrors(['email' => 'These credentials do not match our records.'])->withInput($loginRequest->except('password'));
     }
 }

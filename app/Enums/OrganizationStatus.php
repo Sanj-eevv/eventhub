@@ -7,6 +7,17 @@ namespace App\Enums;
 enum OrganizationStatus: string
 {
     case Pending = 'pending';
-    case Active = 'active';
+    case Approved = 'approved';
+    case Rejected = 'rejected';
     case Suspended = 'suspended';
+
+    public function label(): string
+    {
+        return match ($this) {
+            self::Pending => 'Pending',
+            self::Approved => 'Approved',
+            self::Suspended => 'Suspended',
+            self::Rejected => 'Rejected',
+        };
+    }
 }

@@ -4,22 +4,51 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Builders\RoleBuilder;
 use App\Enums\PreservedRoleList;
-use App\Traits\HasAppUuid;
 use App\Traits\HasSlug;
+use Carbon\CarbonImmutable;
+use Illuminate\Database\Eloquent\Attributes\UseEloquentBuilder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
+#[UseEloquentBuilder(RoleBuilder::class)]
+/**
+ * @property int $id
+ * @property string $name
+ * @property string $slug
+ * @property string $description
+ * @property bool $preserved
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
+ * @property-read Collection<int, Permission> $permissions
+ * @property-read int|null $permissions_count
+ * @property-read Collection<int, User> $users
+ * @property-read int|null $users_count
+ *
+ * @method static \Database\Factories\RoleFactory factory($count = null, $state = [])
+ * @method static RoleBuilder<static>|Role newModelQuery()
+ * @method static RoleBuilder<static>|Role newQuery()
+ * @method static RoleBuilder<static>|Role query()
+ * @method static RoleBuilder<static>|Role search(?string $search)
+ * @method static RoleBuilder<static>|Role sortBy(?array $columns)
+ * @method static RoleBuilder<static>|Role whereCreatedAt($value)
+ * @method static RoleBuilder<static>|Role whereDescription($value)
+ * @method static RoleBuilder<static>|Role whereId($value)
+ * @method static RoleBuilder<static>|Role whereName($value)
+ * @method static RoleBuilder<static>|Role wherePreserved($value)
+ * @method static RoleBuilder<static>|Role whereSlug($value)
+ * @method static RoleBuilder<static>|Role whereUpdatedAt($value)
+ *
+ * @mixin \Eloquent
+ */
 final class Role extends Model
 {
-    use HasAppUuid;
     use HasFactory;
     use HasSlug;
 
-    /**
-     * @var list<string>
-     */
     protected $fillable = [
         'name',
         'slug',
@@ -27,14 +56,24 @@ final class Role extends Model
         'preserved',
     ];
 
-    public static function SuperAdminRole(): ?Role
+    public static function superAdminRole(): ?self
     {
-        return Role::query()->where('slug', PreservedRoleList::SUPER_ADMIN->value)->first();
+        return self::query()->where('slug', PreservedRoleList::SUPER_ADMIN->value)->first();
     }
 
-    public static function UserRole(): ?Role
+    public static function userRole(): ?self
     {
-        return Role::query()->where('slug', PreservedRoleList::USER->value)->first();
+        return self::query()->where('slug', PreservedRoleList::USER->value)->first();
+    }
+
+    public static function organizationAdminRole(): ?self
+    {
+        return self::query()->where('slug', PreservedRoleList::ORGANIZATION_ADMIN->value)->first();
+    }
+
+    public static function adminRole(): ?self
+    {
+        return self::query()->where('slug', PreservedRoleList::ADMIN->value)->first();
     }
 
     public static function getSluggableColumn(): string
@@ -42,9 +81,9 @@ final class Role extends Model
         return 'name';
     }
 
-    public static function organizationAdminRole(): ?Role
+    public function getRouteKeyName(): string
     {
-        return Role::query()->where('slug', PreservedRoleList::ORGANIZATION_ADMIN->value)->first();
+        return 'slug';
     }
 
     public function users(): BelongsToMany
@@ -52,14 +91,15 @@ final class Role extends Model
         return $this->belongsToMany(User::class);
     }
 
-    /**
-     * @return array<string, string>
-     */
+    public function permissions(): BelongsToMany
+    {
+        return $this->belongsToMany(Permission::class, 'roles_permissions');
+    }
+
     protected function casts(): array
     {
         return [
             'preserved' => 'boolean',
         ];
     }
-
 }

@@ -10,17 +10,20 @@ export type QueryParams = {
 };
 
 type Method = "get" | "post" | "put" | "delete" | "patch" | "head" | "options";
+type ParamValue = string | number | boolean;
 type UrlDefaults = Record<string, unknown>;
 
 let urlDefaults: () => UrlDefaults = () => ({});
 
 export type RouteDefinition<TMethod extends Method | Method[]> = {
     url: string;
+    component?: string | Record<string, string>;
 } & (TMethod extends Method[] ? { methods: TMethod } : { method: TMethod });
 
 export type RouteFormDefinition<TMethod extends Method> = {
     action: string;
     method: TMethod;
+    component?: string | Record<string, string>;
 };
 
 export type RouteQueryOptions = {
@@ -28,7 +31,17 @@ export type RouteQueryOptions = {
     mergeQuery?: QueryParams;
 };
 
-const getValue = (value: string | number | boolean) => {
+export const formSafeOptions = (
+    method: Method,
+    options?: RouteQueryOptions,
+): RouteQueryOptions => ({
+    [options?.mergeQuery ? "mergeQuery" : "query"]: {
+        _method: method.toUpperCase(),
+        ...(options?.query ?? options?.mergeQuery),
+    },
+});
+
+const getValue = (value: ParamValue) => {
     if (value === true) {
         return "1";
     }
@@ -46,7 +59,9 @@ const addNestedParams = (
     params: URLSearchParams,
 ) => {
     Object.entries(obj).forEach(([subKey, value]) => {
-        if (value === undefined) return;
+        if (value === undefined) {
+            return;
+        }
 
         const paramKey = `${prefix}[${subKey}]`;
 
@@ -108,6 +123,22 @@ export const queryParams = (options?: RouteQueryOptions) => {
     return str.length > 0 ? `?${str}` : "";
 };
 
+export const validateParameters = (
+    args: Record<string, unknown> | undefined,
+    optional: string[],
+) => {
+    const missing = optional.filter((key) => !args?.[key]);
+    const expectedMissing = optional.slice(missing.length * -1);
+
+    for (let i = 0; i < missing.length; i++) {
+        if (missing[i] !== expectedMissing[i]) {
+            throw Error(
+                "Unexpected optional parameters missing. Unable to generate a URL.",
+            );
+        }
+    }
+};
+
 export const setUrlDefaults = (params: UrlDefaults | (() => UrlDefaults)) => {
     urlDefaults = typeof params === "function" ? params : () => params;
 };
@@ -116,10 +147,10 @@ export const addUrlDefault = (
     key: string,
     value: string | number | boolean,
 ) => {
-    const params = urlDefaults();
-    params[key] = value;
-
-    urlDefaults = () => params;
+    urlDefaults = () => ({
+        ...urlDefaults(),
+        [key]: value,
+    });
 };
 
 export const applyUrlDefaults = <T extends UrlDefaults | undefined>(
@@ -139,20 +170,4 @@ export const applyUrlDefaults = <T extends UrlDefaults | undefined>(
     }
 
     return existingParams as T;
-};
-
-export const validateParameters = (
-    args: Record<string, unknown> | undefined,
-    optional: string[],
-) => {
-    const missing = optional.filter((key) => !args?.[key]);
-    const expectedMissing = optional.slice(missing.length * -1);
-
-    for (let i = 0; i < missing.length; i++) {
-        if (missing[i] !== expectedMissing[i]) {
-            throw Error(
-                "Unexpected optional parameters missing. Unable to generate a URL.",
-            );
-        }
-    }
 };

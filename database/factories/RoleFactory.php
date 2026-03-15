@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Models\Role;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Role>
+ * @extends Factory<Role>
  */
 final class RoleFactory extends Factory
 {
@@ -17,12 +18,13 @@ final class RoleFactory extends Factory
      */
     public function definition(): array
     {
-        $name = fake()->unique()->name();
+        $name = $this->faker->unique()->name;
         $slug = Str::slug($name);
+
         return [
             'name' => $name,
             'email' => $slug,
-            'description' => fake()->sentence(),
+            'description' => $this->faker->sentence,
             'preserved' => false,
         ];
     }

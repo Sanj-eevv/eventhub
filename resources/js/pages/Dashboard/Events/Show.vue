@@ -1,0 +1,131 @@
+<script setup lang="ts">
+import { Head } from "@inertiajs/vue3";
+import { ArrowLeftIcon } from "lucide-vue-next";
+import EventStatusBadge from "@/components/Dashboard/Events/EventStatusBadge.vue";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import DashboardLayout from "@/layouts/DashboardLayout.vue";
+import type { BreadcrumbItem } from "@/types";
+import type { Event } from "@/types/event";
+import { index as dashboardIndex } from "@/wayfinder/routes/dashboard";
+import {
+    index as eventsIndex,
+    show as eventsShow,
+} from "@/wayfinder/routes/dashboard/events";
+import { show as orgsShow } from "@/wayfinder/routes/dashboard/organizations";
+import { show as usersShow } from "@/wayfinder/routes/dashboard/users";
+
+const props = defineProps<{
+    event: Event;
+}>();
+
+const goBack = () => window.history.back();
+
+const breadcrumbs: BreadcrumbItem[] = [
+    { title: "Dashboard", href: dashboardIndex().url },
+    { title: "Events", href: eventsIndex().url },
+    {
+        title: props.event.title,
+        href: eventsShow({ event: props.event.uuid }).url,
+    },
+];
+</script>
+
+<template>
+    <DashboardLayout :breadcrumbs="breadcrumbs">
+        <Head :title="event.title" />
+        <div class="space-y-6 p-6">
+            <div class="flex items-center gap-4">
+                <Button variant="outline" size="sm" @click="goBack">
+                    <ArrowLeftIcon class="size-4" />
+                    Back
+                </Button>
+                <h1 class="text-2xl font-bold">{{ event.title }}</h1>
+            </div>
+
+            <div class="grid gap-6 md:grid-cols-2">
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Details</CardTitle>
+                    </CardHeader>
+                    <CardContent class="space-y-4">
+                        <div v-if="event.description">
+                            <p class="text-sm text-muted-foreground">
+                                Description
+                            </p>
+                            <p class="font-medium">{{ event.description }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-muted-foreground">
+                                Starts At
+                            </p>
+                            <p class="font-medium">{{ event.starts_at }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-muted-foreground">Ends At</p>
+                            <p class="font-medium">{{ event.ends_at }}</p>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Status & Dates</CardTitle>
+                    </CardHeader>
+                    <CardContent class="space-y-4">
+                        <div>
+                            <p class="text-sm text-muted-foreground">Status</p>
+                            <EventStatusBadge :status="event.status" />
+                        </div>
+                        <div>
+                            <p class="text-sm text-muted-foreground">Created</p>
+                            <p class="font-medium">{{ event.created_at }}</p>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <Card v-if="event.organization">
+                    <CardHeader>
+                        <CardTitle>Organization</CardTitle>
+                    </CardHeader>
+                    <CardContent class="space-y-4">
+                        <div>
+                            <p class="text-sm text-muted-foreground">Name</p>
+                            <a
+                                :href="
+                                    orgsShow({
+                                        organization: event.organization.uuid,
+                                    }).url
+                                "
+                                class="font-medium text-blue-600 hover:underline"
+                            >
+                                {{ event.organization.title }}
+                            </a>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <Card v-if="event.user">
+                    <CardHeader>
+                        <CardTitle>Created By</CardTitle>
+                    </CardHeader>
+                    <CardContent class="space-y-4">
+                        <div>
+                            <p class="text-sm text-muted-foreground">Name</p>
+                            <a
+                                :href="
+                                    usersShow({
+                                        user: event.user.uuid,
+                                    }).url
+                                "
+                                class="font-medium text-blue-600 hover:underline"
+                            >
+                                {{ event.user.name }}
+                            </a>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+        </div>
+    </DashboardLayout>
+</template>

@@ -4,8 +4,8 @@ import TextLink from "@/components/TextLink.vue";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import AuthLayout from "@/layouts/AuthLayout.vue";
-import { logout } from "@/routes/auth";
-import { send } from "@/routes/auth/verification";
+import { logout } from "@/wayfinder/routes/auth";
+import { send } from "@/wayfinder/routes/auth/verification";
 
 defineProps<{
     status?: string;

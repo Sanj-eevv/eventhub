@@ -14,6 +14,7 @@ trait HasAppUuid
     {
         return 'uuid';
     }
+
     public function uniqueIds(): array
     {
         return ['uuid'];

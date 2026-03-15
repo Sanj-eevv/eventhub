@@ -6,8 +6,8 @@ import Step2 from "@/components/Auth/Organization/Register/Step2.vue";
 import StepCount from "@/components/Auth/Organization/Register/StepCount.vue";
 import TextLink from "@/components/TextLink.vue";
 import AuthLayout from "@/layouts/AuthLayout.vue";
-import { login, register } from "@/routes/auth";
-import { store } from "@/routes/auth/register/organization";
+import { login, register } from "@/wayfinder/routes/auth";
+import { store } from "@/wayfinder/routes/auth/register/organization";
 
 const totalSteps = 2;
 const activeStep = ref(1);

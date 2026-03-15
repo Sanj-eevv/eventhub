@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Enums\PreservedRoleList;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Middleware\Authenticate;
@@ -14,9 +13,9 @@ use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\URL;
@@ -38,20 +37,27 @@ final class AppServiceProvider extends ServiceProvider
 
         $this->configureRateLimit();
         $this->configurePasswordRules();
-        $this->configureGates();
+        $this->configureDatabase();
+        JsonResource::withoutWrapping();
+    }
+
+    private function configureDatabase(): void
+    {
+
         Schema::defaultStringLength(191);
     }
 
     private function configureCommands(): void
     {
         DB::prohibitDestructiveCommands(
-            $this->app->environment('production'),
+            app()->isProduction(),
         );
     }
 
     private function configureModels(): void
     {
         Model::shouldBeStrict();
+        Model::preventLazyLoading( ! app()->isProduction());
     }
 
     private function configureDates(): void
@@ -62,8 +68,8 @@ final class AppServiceProvider extends ServiceProvider
     private function configureUrls(): void
     {
         URL::forceScheme('https');
-        ResetPassword::createUrlUsing(fn(User $user, string $token) => route('auth.password.reset', ['token' => $token, 'email' => $user->email]));
-        VerifyEmail::createUrlUsing(fn(User $notifiable): string => URL::temporarySignedRoute(
+        ResetPassword::createUrlUsing(fn (User $user, string $token) => route('auth.password.reset', ['token' => $token, 'email' => $user->email]));
+        VerifyEmail::createUrlUsing(fn (User $notifiable): string => URL::temporarySignedRoute(
             'auth.verification.verify',
             now()->addMinutes(60),
             [
@@ -71,7 +77,7 @@ final class AppServiceProvider extends ServiceProvider
                 'hash' => sha1($notifiable->getEmailForVerification()),
             ],
         ));
-        Authenticate::redirectUsing(fn() => route('auth.login', absolute: false));
+        Authenticate::redirectUsing(fn () => route('auth.login', absolute: false));
     }
 
     private function configureVite(): void
@@ -82,11 +88,12 @@ final class AppServiceProvider extends ServiceProvider
     private function configurePasswordRules(): void
     {
         Password::defaults(function (): Password {
-            if ( ! $this->app->environment('production')) {
+            if ( ! app()->isProduction()) {
                 return Password::min(8);
             }
+
             return Password::min(8)
-                -> mixedCase()
+                ->mixedCase()
                 ->letters()
                 ->numbers()
                 ->symbols()
@@ -94,34 +101,23 @@ final class AppServiceProvider extends ServiceProvider
         });
     }
 
-
     private function configureRateLimit(): void
     {
-        $loginRateLimitedResponse = fn(Request $request): RedirectResponse => back()->withErrors([
+        $loginRateLimitedResponse = fn (Request $request): RedirectResponse => back()->withErrors([
             'email' => ['Too many login attempts. Please try again later.'],
         ])->withInput($request->except('password'));
-        RateLimiter::for('login', fn(Request $request) => [
+        RateLimiter::for('login', fn (Request $request) => [
             Limit::perMinute(100)->by($request->ip())->response($loginRateLimitedResponse),
             Limit::perMinute(5)->by($request->input('email'))->response($loginRateLimitedResponse),
         ]);
-        RateLimiter::for('password-reset-request', fn(Request $request) => [
+        RateLimiter::for('password-reset-request', fn (Request $request) => [
             Limit::perHour(10)->by($request->ip()),
             Limit::perMinute(3)->by($request->input('email')),
         ]);
-        RateLimiter::for('password-reset', fn(Request $request) => [
+        RateLimiter::for('password-reset', fn (Request $request) => [
             Limit::perHour(5)->by($request->ip()),
             Limit::perHour(3)->by($request->input('email')),
         ]);
 
-    }
-
-    private function configureGates(): void
-    {
-        Gate::before(function (User $user, string $ability) {
-            if (in_array($user->role->slug, [PreservedRoleList::SUPER_ADMIN->value, PreservedRoleList::ADMIN->value], true)) {
-                return true;
-            }
-        });
-        Gate::define('view-dashboard', fn(User $user): bool => in_array($user->role->slug, [PreservedRoleList::ORGANIZATION_ADMIN->value], true));
     }
 }

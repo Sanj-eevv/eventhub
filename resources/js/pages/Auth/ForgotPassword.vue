@@ -7,8 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 import AuthLayout from "@/layouts/AuthLayout.vue";
-import { login } from "@/routes/auth";
-import { email } from "@/routes/auth/password";
+import { login } from "@/wayfinder/routes/auth";
+import { email } from "@/wayfinder/routes/auth/password";
 
 defineProps<{
     status?: string;

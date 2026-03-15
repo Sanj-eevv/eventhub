@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
+use App\Http\Resources\SharedPermissionResource;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
 final class HandleInertiaRequests extends Middleware
 {
     /**
-     * The root template that's loaded on the first page visit.
-     *
      * @see https://inertiajs.com/server-side-setup#root-template
      *
      * @var string
@@ -19,8 +18,6 @@ final class HandleInertiaRequests extends Middleware
     protected $rootView = 'app';
 
     /**
-     * Determines the current asset version.
-     *
      * @see https://inertiajs.com/asset-versioning
      */
     public function version(Request $request): ?string
@@ -29,8 +26,6 @@ final class HandleInertiaRequests extends Middleware
     }
 
     /**
-     * Define the props that are shared by default.
-     *
      * @see https://inertiajs.com/shared-data
      *
      * @return array<string, mixed>
@@ -44,6 +39,14 @@ final class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || 'true' === $request->cookie('sidebar_state'),
+            'flash' => [
+                'toastSuccess' => fn () => $request->session()->get('toastSuccess'),
+                'toastWarning' => fn () => $request->session()->get('toast.warning'),
+                'toastInfo' => fn () => $request->session()->get('toast.info'),
+                'toastError' => fn () => $request->session()->get('toast.error'),
+            ],
+            'can' => SharedPermissionResource::make($request->user()),
+
         ];
     }
 }

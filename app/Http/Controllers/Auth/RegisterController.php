@@ -4,35 +4,70 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Auth;
 
+use App\Actions\CreateOrganizationAction;
+use App\Actions\CreateUserAction;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\Organization\RegisterRequest as OrganizationRegisterRequest;
 use App\Http\Requests\Auth\RegisterRequest;
-use App\Models\Role;
 use App\Models\User;
+use Illuminate\Auth\AuthManager;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Database\DatabaseManager;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Auth;
-use Inertia\Inertia;
+use Illuminate\Routing\Redirector;
+use Illuminate\Routing\UrlGenerator;
 use Inertia\Response;
+use Inertia\ResponseFactory;
 
 final class RegisterController extends Controller
 {
+    public function __construct(
+        private readonly CreateOrganizationAction $createOrganizationAction,
+        private readonly CreateUserAction $createUserAction,
+        private readonly AuthManager $authManager,
+        private readonly Redirector $redirector,
+        private readonly UrlGenerator $urlGenerator,
+        private readonly ResponseFactory $inertiaResponse,
+        private readonly DatabaseManager $databaseManager,
+        private readonly Dispatcher $dispatcher,
+    ) {}
+
     public function register(): Response
     {
-        return Inertia::render('Auth/Register');
+        return $this->inertiaResponse->render('Auth/Register');
     }
 
-    public function store(RegisterRequest $registerRequest): RedirectResponse
+    public function store(RegisterRequest $request): RedirectResponse
     {
-        $validated = $registerRequest->validated();
-        $userRole = Role::UserRole();
-        $user = User::query()->create([
-            'role_id' => $userRole->id,
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => $validated['password'],
-        ]);
-        event(new Registered($user));
-        Auth::login($user);
-        return redirect()->intended(route('home', absolute: false));
+        $user = $this->createUserAction->execute($request->toDto());
+
+        $this->dispatcher->dispatch(new Registered($user));
+
+        $this->authManager->login($user);
+
+        return $this->redirector->intended($this->urlGenerator->route('home', absolute: false));
+    }
+
+    public function registerOrganization(): Response
+    {
+        return $this->inertiaResponse->render('Auth/Organization/RegisterForm/Register');
+    }
+
+    public function storeOrganization(OrganizationRegisterRequest $request): RedirectResponse
+    {
+        $organizationData = $request->toOrganizationDto();
+
+        $user = $this->databaseManager->transaction(function () use ($organizationData): User {
+            $organization = $this->createOrganizationAction->execute($organizationData);
+
+            return $this->createUserAction->execute($organizationData->user->withOrganizationId($organization->id));
+        });
+
+        $this->dispatcher->dispatch(new Registered($user));
+
+        $this->authManager->login($user);
+
+        return $this->redirector->intended($this->urlGenerator->route('dashboard.index', absolute: false));
     }
 }

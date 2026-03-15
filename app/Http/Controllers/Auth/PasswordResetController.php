@@ -31,6 +31,7 @@ final class PasswordResetController extends Controller
     {
         $email = $sendPasswordResetEmailRequest->input('email');
         Password::sendResetLink(['email' => $email]);
+
         return back()->with('status', 'If an account with that email exists, we will send a password reset link.');
     }
 
@@ -57,6 +58,7 @@ final class PasswordResetController extends Controller
         if (Password::PASSWORD_RESET === $status) {
             return redirect()->route('auth.login')->with('status', __($status));
         }
+
         return back()->withInput($resetPasswordRequest->only('email'))->withErrors(['email' => 'Failed to reset your password.']);
     }
 }
