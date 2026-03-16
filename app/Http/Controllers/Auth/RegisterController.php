@@ -4,15 +4,13 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Auth;
 
-use App\Actions\CreateOrganizationAction;
 use App\Actions\CreateUserAction;
+use App\Actions\RegisterOrganizationAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\Organization\RegisterRequest as OrganizationRegisterRequest;
 use App\Http\Requests\Auth\RegisterRequest;
-use App\Models\User;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Auth\Events\Registered;
-use Illuminate\Database\DatabaseManager;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Redirector;
@@ -23,13 +21,12 @@ use Inertia\ResponseFactory;
 final class RegisterController extends Controller
 {
     public function __construct(
-        private readonly CreateOrganizationAction $createOrganizationAction,
         private readonly CreateUserAction $createUserAction,
+        private readonly RegisterOrganizationAction $registerOrganizationAction,
         private readonly AuthManager $authManager,
         private readonly Redirector $redirector,
         private readonly UrlGenerator $urlGenerator,
         private readonly ResponseFactory $inertiaResponse,
-        private readonly DatabaseManager $databaseManager,
         private readonly Dispatcher $dispatcher,
     ) {}
 
@@ -56,13 +53,7 @@ final class RegisterController extends Controller
 
     public function storeOrganization(OrganizationRegisterRequest $request): RedirectResponse
     {
-        $organizationData = $request->toOrganizationDto();
-
-        $user = $this->databaseManager->transaction(function () use ($organizationData): User {
-            $organization = $this->createOrganizationAction->execute($organizationData);
-
-            return $this->createUserAction->execute($organizationData->user->withOrganizationId($organization->id));
-        });
+        $user = $this->registerOrganizationAction->execute($request->toOrganizationDto());
 
         $this->dispatcher->dispatch(new Registered($user));
 

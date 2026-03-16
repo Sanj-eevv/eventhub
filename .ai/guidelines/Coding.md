@@ -4,6 +4,13 @@
 - Do not write inline or block comments in generated code.
 - Only include DocBlock comments when strictly necessary (e.g., for type hints, generics, or framework conventions).
 
+## Guard Placement in Actions vs Controllers
+
+When a conditional check (guard) exists before calling an action, decide where it belongs based on whether it affects the HTTP response:
+
+- **Guard goes in the action** — when it only determines whether the action should do its work, with no effect on the controller's response. The controller calls the action unconditionally.
+- **Guard stays in the controller** — when it produces a different redirect or response (e.g. early return to a different route). The guard is part of the response logic, not the action's concern.
+
 ## Stateless by Design
 
 Favor explicitness over hidden state.

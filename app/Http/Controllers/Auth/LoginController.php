@@ -15,7 +15,12 @@ use Inertia\ResponseFactory;
 
 final class LoginController extends Controller
 {
-    public function __construct(private readonly LoginAction $loginAction, private readonly Redirector $redirector, private readonly UrlGenerator $urlGenerator, private readonly ResponseFactory $inertiaResponse) {}
+    public function __construct(
+        private readonly LoginAction $loginAction,
+        private readonly Redirector $redirector,
+        private readonly UrlGenerator $urlGenerator,
+        private readonly ResponseFactory $inertiaResponse,
+    ) {}
 
     public function create(): Response
     {
@@ -24,10 +29,10 @@ final class LoginController extends Controller
 
     public function store(LoginRequest $loginRequest): RedirectResponse
     {
-        if ($this->loginAction->execute($loginRequest)) {
-            return $this->redirector->intended(
-                $this->urlGenerator->route('home', absolute: false),
-            );
+        if ($this->loginAction->execute($loginRequest->validated(), $loginRequest->boolean('remember'))) {
+            $loginRequest->session()->regenerate();
+
+            return $this->redirector->intended($this->urlGenerator->route('home', absolute: false));
         }
 
         return $this->redirector->back()->withErrors(['email' => 'These credentials do not match our records.'])->withInput($loginRequest->except('password'));

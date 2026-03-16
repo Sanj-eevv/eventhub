@@ -6,11 +6,11 @@ namespace App\Actions;
 
 use App\DataTransferObjects\UserData;
 use App\Models\User;
-use Illuminate\Hashing\HashManager;
+use Illuminate\Contracts\Hashing\Hasher;
 
 final class CreateUserAction
 {
-    public function __construct(private HashManager $hash) {}
+    public function __construct(private readonly Hasher $hash) {}
 
     public function execute(UserData $userData): User
     {

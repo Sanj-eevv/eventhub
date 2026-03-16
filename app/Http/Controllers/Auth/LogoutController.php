@@ -16,7 +16,9 @@ final class LogoutController extends Controller
 
     public function __invoke(Request $request): RedirectResponse
     {
-        $this->logoutAction->execute($request);
+        $this->logoutAction->execute();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
         return $this->redirector->route('home');
     }

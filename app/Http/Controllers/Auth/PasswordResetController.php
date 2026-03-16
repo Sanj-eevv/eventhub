@@ -4,40 +4,45 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Auth;
 
+use App\Actions\ResetPasswordAction;
+use App\Actions\SendPasswordResetEmailAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\ResetPasswordRequest;
 use App\Http\Requests\Auth\SendPasswordResetEmailRequest;
-use App\Models\User;
-use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Contracts\Auth\PasswordBroker;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Str;
-use Inertia\Inertia;
+use Illuminate\Routing\Redirector;
 use Inertia\Response;
+use Inertia\ResponseFactory;
 use SensitiveParameter;
 
 final class PasswordResetController extends Controller
 {
+    public function __construct(
+        private readonly SendPasswordResetEmailAction $sendPasswordResetEmailAction,
+        private readonly ResetPasswordAction $resetPasswordAction,
+        private readonly Redirector $redirector,
+        private readonly ResponseFactory $inertiaResponse,
+    ) {}
+
     public function showPasswordResetRequestForm(Request $request): Response
     {
-        return Inertia::render('Auth/ForgotPassword', [
+        return $this->inertiaResponse->render('Auth/ForgotPassword', [
             'status' => $request->session()->get('status'),
         ]);
     }
 
     public function sendPasswordResetEmail(SendPasswordResetEmailRequest $sendPasswordResetEmailRequest): RedirectResponse
     {
-        $email = $sendPasswordResetEmailRequest->input('email');
-        Password::sendResetLink(['email' => $email]);
+        $this->sendPasswordResetEmailAction->execute($sendPasswordResetEmailRequest->input('email'));
 
-        return back()->with('status', 'If an account with that email exists, we will send a password reset link.');
+        return $this->redirector->back()->with('status', 'If an account with that email exists, we will send a password reset link.');
     }
 
     public function showPasswordResetForm(Request $request, #[SensitiveParameter] string $token): Response
     {
-        return Inertia::render('Auth/ResetPassword', [
+        return $this->inertiaResponse->render('Auth/ResetPassword', [
             'token' => $token,
             'email' => $request->input('email'),
         ]);
@@ -45,20 +50,12 @@ final class PasswordResetController extends Controller
 
     public function resetPassword(ResetPasswordRequest $resetPasswordRequest): RedirectResponse
     {
-        $requestData = $resetPasswordRequest->validated();
-        $status = Password::reset(
-            $requestData,
-            function (User $user, #[SensitiveParameter] string $newPassword): void {
-                $user->password = Hash::make($newPassword);
-                $user->remember_token = Str::random(60);
-                $user->save();
-                event(new PasswordReset($user));
-            },
-        );
-        if (Password::PASSWORD_RESET === $status) {
-            return redirect()->route('auth.login')->with('status', __($status));
+        $status = $this->resetPasswordAction->execute($resetPasswordRequest->validated());
+
+        if (PasswordBroker::PASSWORD_RESET === $status) {
+            return $this->redirector->route('auth.login')->with('status', __($status));
         }
 
-        return back()->withInput($resetPasswordRequest->only('email'))->withErrors(['email' => 'Failed to reset your password.']);
+        return $this->redirector->back()->withInput($resetPasswordRequest->only('email'))->withErrors(['email' => 'Failed to reset your password.']);
     }
 }

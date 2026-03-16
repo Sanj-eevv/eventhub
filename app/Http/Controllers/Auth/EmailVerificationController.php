@@ -4,41 +4,65 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Auth;
 
+use App\Actions\ResendVerificationEmailAction;
+use App\Actions\VerifyEmailAction;
 use App\Http\Controllers\Controller;
+use App\Models\User;
+use Illuminate\Auth\AuthManager;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Inertia\Inertia;
+use Illuminate\Routing\Redirector;
+use Illuminate\Routing\UrlGenerator;
 use Inertia\Response;
+use Inertia\ResponseFactory;
 
 final class EmailVerificationController extends Controller
 {
+    public function __construct(
+        private readonly VerifyEmailAction $verifyEmailAction,
+        private readonly ResendVerificationEmailAction $resendVerificationEmailAction,
+        private readonly AuthManager $authManager,
+        private readonly Redirector $redirector,
+        private readonly UrlGenerator $urlGenerator,
+        private readonly ResponseFactory $inertiaResponse,
+    ) {}
+
     public function index(Request $request): RedirectResponse|Response
     {
-        if (Auth::user()->hasVerifiedEmail()) {
-            return redirect()->intended(route('home', absolute: false));
+        /** @var User $user */
+        $user = $this->authManager->user();
+
+        if ($user->hasVerifiedEmail()) {
+            return $this->redirector->intended($this->urlGenerator->route('home', absolute: false));
         }
 
-        return Inertia::render('Auth/VerifyEmail', [
+        return $this->inertiaResponse->render('Auth/VerifyEmail', [
             'status' => $request->session()->get('status'),
         ]);
     }
 
     public function verify(EmailVerificationRequest $verificationRequest): RedirectResponse
     {
-        $verificationRequest->fulfill();
+        /** @var User $user */
+        $user = $verificationRequest->user();
 
-        return redirect()->intended(route('home', absolute: false));
+        $this->verifyEmailAction->execute($user);
+
+        return $this->redirector->intended($this->urlGenerator->route('home', absolute: false));
     }
 
     public function resend(): RedirectResponse
     {
-        if (Auth::user()->hasVerifiedEmail()) {
-            return redirect()->intended(route('home', absolute: false));
-        }
-        Auth::user()->sendEmailVerificationNotification();
+        /** @var User $user */
+        $user = $this->authManager->user();
 
-        return back()->with('status', 'verification-link-sent');
+        if ($user->hasVerifiedEmail()) {
+            return $this->redirector->intended($this->urlGenerator->route('home', absolute: false));
+        }
+
+        $this->resendVerificationEmailAction->execute($user);
+
+        return $this->redirector->back()->with('status', 'verification-link-sent');
     }
 }
