@@ -23,8 +23,6 @@ Homestead.json
 Homestead.yaml
 Thumbs.db
 /resources/js/wayfinder
-.claude/
-CLAUDE.md
 .mcp.json
 boost.json
 _ide_helper.php

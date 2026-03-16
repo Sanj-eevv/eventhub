@@ -2,66 +2,103 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Project
-
-Laravel 12 event management app using Inertia.js v2, Vue 3 (Composition API, `<script setup>`), TypeScript, and Tailwind CSS v4. UI components from shadcn-vue (new-york style, reka-ui primitives, lucide-vue-next icons).
-
 ## Commands
 
+### Backend
 ```bash
-composer setup          # Full project setup (install, env, key, migrate, npm install, build)
-composer dev            # Dev server (artisan serve + queue + pail + vite HMR)
-composer test           # Clear config cache + run tests
-./vendor/bin/pest --filter=name  # Run a single test
-./vendor/bin/pint       # Fix PHP code style
-npx eslint resources/   # Lint frontend
-npm run build           # Production build
+php artisan test              # Run all tests
+php artisan test --filter=TestName  # Run a single test
+composer test                 # Alias for php artisan test
+./vendor/bin/pest             # Run Pest directly
+./vendor/bin/pint             # Fix PHP code style
+php artisan ide-helper:generate  # Regenerate IDE helper files
+```
+
+### Frontend
+```bash
+npm run dev    # Start Vite dev server
+npm run build  # Production build
+npx eslint .   # Lint frontend code
+```
+
+### Wayfinder (after adding/changing routes)
+```bash
+php artisan wayfinder:generate  # Regenerate type-safe route bindings in resources/js/wayfinder/
 ```
 
 ## Architecture
 
-- **No Kernel.php** — Laravel 12 uses functional bootstrap in `bootstrap/app.php` for middleware and routing
-- **Inertia SPA pattern** — controllers return `Inertia::render('PageName')`, no separate API routes
-- **Wayfinder** — auto-generates typed TypeScript route actions in `resources/js/actions/` and `resources/js/routes/` from Laravel routes. Vue components import these instead of using magic URL strings
-- **Page resolution** — `resources/js/app.ts` resolves Vue pages from `resources/js/pages/**/*.vue`
-- **Shared props** — `HandleInertiaRequests` middleware shares global data to all Inertia pages
-- **Path alias** — `@/*` maps to `resources/js/*`
-- **Tailwind v4** — uses Vite plugin (`@tailwindcss/vite`), no `tailwind.config.js`
+This is a **Laravel 12 + Vue 3 + Inertia.js** application. The backend serves as an API-like layer using Inertia rather than REST/JSON endpoints.
 
-## Testing
+### Backend Layers
 
-- **Pest v4** with Laravel plugin
-- SQLite in-memory for tests (configured in `phpunit.xml`)
-- `RefreshDatabase` trait is available but not enabled by default in `tests/Pest.php`
+**Request flow:** Route → Middleware → Controller → Service → Model → Resource (for response)
 
-## Code Style Conventions
+- **Actions** (`app/Actions/`) — single-responsibility classes for discrete operations (CreateUserAction, LoginAction, etc.)
+- **Services** (`app/Services/`) — business logic (UserService, RoleService, PermissionService, OrganizationService, EventService)
+- **DTOs** (`app/DataTransferObjects/`) — typed data transfer between layers
+- **Resources** (`app/Http/Resources/`) — transform Eloquent models for Inertia responses; each entity has `IndexResource` and `ShowResource` variants
+- **Policies** (`app/Policies/`) — authorization; registered in AppServiceProvider
 
-### PHP (enforced by Pint, PER preset)
+### RBAC System
 
-- `declare(strict_types=1)` in all files
-- `final` on all classes
-- Strict comparison (`===`), no Yoda style
-- Single-action controllers use `__invoke()`
-- Arrow functions preferred, alphabetical imports
+Three preserved system roles defined in `PreservedRoleList` enum: `SUPER_ADMIN`, `ADMIN`, `ORGANIZATION_ADMIN`. Permissions follow a `entity:action` format (e.g., `user:create`, `event:edit`) and are defined in enums under `app/Enums/` (EventPermissions, UserPermissions, etc.).
 
-### TypeScript/Vue (enforced by ESLint)
+Permission loading: `LoadPermissionsMiddleware` caches permissions per request; `HandleInertiaRequests` shares them with the frontend via `SharedPermissionResource`. User model has `hasPermission()`, `hasAnyPermission()`, `hasAnyRole()`, and `getAllPermissions()` methods.
 
-- `import/order` enforced (alphabetical, grouped)
-- `consistent-type-imports` required
-- `resources/js/components/ui/*` excluded from linting (generated shadcn-vue)
+### Frontend Architecture
 
-## Database
+Pages live in `resources/js/pages/` and map directly to Inertia responses. Components are organized as:
+- `resources/js/components/ui/` — Shadcn-Vue primitives (built on Reka UI), never modified directly
+- `resources/js/components/Dashboard/` — feature-specific components
+- `resources/js/composables/` — Vue composables organized by domain (events/, organizations/, users/, roles/)
 
-MySQL (`event` database). Sessions, cache, and queue all use database driver.
+**Routing:** Use Wayfinder (`resources/js/wayfinder/`) for type-safe route references in frontend code. Import from `@/wayfinder` or `@/actions`.
 
-## Laravel Code Optimization
+**Forms:** Use `useForm` from `@inertiajs/vue3`. Precognitive validation is used on registration forms.
 
-- Always run the **laravel-simplifier:laravel-simplifier** plugin on every Laravel/PHP code snippet you generate to ensure the code is clean, optimized, and follows Laravel best practices.”
-- Do not write any comments in the generated code. No comments are required under any circumstances.
+**Tables:** Use the `DataTable.vue` component built on TanStack Vue Table with `@tanstack/vue-table`.
+
+**Toasts:** Use `vue-sonner` for notifications; flash messages from Inertia shared data trigger toasts automatically.
+
+### Key Middleware
+
+- `HandleInertiaRequests` — shares auth user, permissions, sidebar state, and flash messages with all Inertia responses
+- `RoleAccessMiddleware` — restricts dashboard routes to allowed roles
+- `LoadPermissionsMiddleware` — loads and caches user permissions
+
+### Testing
+
+Tests use Pest 4 with the Laravel plugin. The test database is SQLite in-memory. Feature tests are in `tests/Feature/`, unit tests in `tests/Unit/`.
+
+### Models & Traits
+
+All primary models use `HasAppUuid` (UUID primary keys) and relevant models use `HasSlug`. Models have strict mode enabled and lazy loading is disabled globally (set in AppServiceProvider).
+
+Rate limiting is configured centrally in `AppServiceProvider::boot()`.
 
 ===
 
 <laravel-boost-guidelines>
+=== .ai/Coding rules ===
+
+## Mandatory Laravel Code Simplification
+
+- Always run the laravel-simplifier plugin on every Laravel/PHP code snippet you generate to ensure the code is clean, optimized, and follows Laravel best practices.
+- Do not write inline or block comments in generated code.
+- Only include DocBlock comments when strictly necessary (e.g., for type hints, generics, or framework conventions).
+
+## Stateless by Design
+
+Favor explicitness over hidden state.
+
+- Avoid hidden dependencies in models, services, actions, and helpers.
+- Pass required data explicitly through DTOs, method parameters, and return values.
+- Avoid implicit context, magic side effects, and stateful behavior that is not visible at the call site.
+- Prefer explicit query building over implicit scopes when business constraints or filters matter.
+- Make inputs, outputs, and state transitions easy to trace.
+- Optimize for predictability, readability, and testability.
+
 === foundation rules ===
 
 # Laravel Boost Guidelines
@@ -97,6 +134,17 @@ This project has domain-specific skills available. You MUST activate the relevan
 - `pest-testing` — Tests applications using the Pest 4 PHP framework. Activates when writing tests, creating unit or feature tests, adding assertions, testing Livewire components, browser testing, debugging test failures, working with datasets or mocking; or when the user mentions test, spec, TDD, expects, assertion, coverage, or needs to verify functionality works.
 - `inertia-vue-development` — Develops Inertia.js v2 Vue client-side applications. Activates when creating Vue pages, forms, or navigation; using <Link>, <Form>, useForm, or router; working with deferred props, prefetching, or polling; or when user mentions Vue with Inertia, Vue pages, Vue forms, or Vue navigation.
 - `tailwindcss-development` — Styles applications using Tailwind CSS v4 utilities. Activates when adding styles, restyling components, working with gradients, spacing, layout, flex, grid, responsive design, dark mode, colors, typography, or borders; or when the user mentions CSS, styling, classes, Tailwind, restyle, hero section, cards, buttons, or any visual/UI changes.
+- `design-an-interface` — Generate multiple radically different interface designs for a module using parallel sub-agents. Use when user wants to design an API, explore interface options, compare module shapes, or mentions "design it twice".
+- `frontend-design` — Create distinctive, production-grade frontend interfaces with high design quality. Use this skill when the user asks to build web components, pages, artifacts, posters, or applications (examples include websites, landing pages, dashboards, React components, HTML/CSS layouts, or when styling/beautifying any web UI). Generates creative, polished code and UI design that avoids generic AI aesthetics.
+- `grill-me` — Interview the user relentlessly about a plan or design until reaching shared understanding, resolving each branch of the decision tree. Use when user wants to stress-test a plan, get grilled on their design, or mentions "grill me".
+- `improve-codebase-architecture` — Explore a codebase to find opportunities for architectural improvement, focusing on making the codebase more testable by deepening shallow modules. Use when user wants to improve architecture, find refactoring opportunities, consolidate tightly-coupled modules, or make a codebase more AI-navigable.
+- `laravel-actions` — Action-oriented architecture for Laravel. Invokable classes that contain domain logic. Use when working with business logic, domain operations, or when user mentions actions, invokable classes, or needs to organize domain logic outside controllers.
+- `laravel-architecture` — High-level architecture decisions, patterns, and project structure. Use when user asks about architecture decisions, project structure, pattern selection, or mentions how to organize, which pattern to use, best practices, architecture.
+- `laravel-enums` — Backed enums with labels and business logic. Use when working with enums, status values, fixed sets of options, or when user mentions enums, backed enums, enum cases, status enums.
+- `laravel-query-builders` — Custom query builders for type-safe, composable database queries. Use when working with database queries, query scoping, or when user mentions query builders, custom query builder, query objects, query scopes, database queries.
+- `laravel-routes-best-practices` — Keep routes clean and focused on mapping requests to controllers; avoid business logic, validation, or database operations in route files
+- `laravel-specialist` — Build and configure Laravel 10+ applications, including creating Eloquent models and relationships, implementing Sanctum authentication, configuring Horizon queues, designing RESTful APIs with API resources, and building reactive interfaces with Livewire. Use when creating Laravel models, setting up queue workers, implementing Sanctum auth flows, building Livewire components, optimising Eloquent queries, or writing Pest/PHPUnit tests for Laravel features.
+- `php-guidelines-from-spatie` — Describes PHP and Laravel guidelines provided by Spatie. These rules result in more maintainable, and readable code.
 
 ## Conventions
 
