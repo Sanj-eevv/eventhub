@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Builders\EventBuilder;
 use App\Enums\EventStatus;
 use App\Traits\HasAppUuid;
 use App\Traits\HasSlug;
 use Carbon\CarbonImmutable;
 use Database\Factories\EventFactory;
 use Eloquent;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Attributes\UseEloquentBuilder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -35,6 +36,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property CarbonImmutable|null $updated_at
  * @property-read Organization $organization
  * @property-read User $user
+ *
  * @method static EventFactory factory($count = null, $state = [])
  * @method static Builder<static>|Event newModelQuery()
  * @method static Builder<static>|Event newQuery()
@@ -58,8 +60,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static Builder<static>|Event whereUuid($value)
  * @method static Builder<static>|Event withTrashed(bool $withTrashed = true)
  * @method static Builder<static>|Event withoutTrashed()
+ *
  * @mixin Eloquent
  */
+#[UseEloquentBuilder(EventBuilder::class)]
 final class Event extends Model
 {
     use HasAppUuid;

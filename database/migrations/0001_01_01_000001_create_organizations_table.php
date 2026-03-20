@@ -20,14 +20,8 @@ return new class() extends Migration
             $table->string('contact_address');
             $table->string('contact_email')->unique();
             $table->string('status')->default(OrganizationStatus::Pending);
-            $table->timestamp('verified_at')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });
-    }
-
-    public function down(): void
-    {
-        Schema::dropIfExists('organizations');
     }
 };

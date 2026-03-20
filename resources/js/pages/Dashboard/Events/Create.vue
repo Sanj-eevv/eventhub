@@ -3,7 +3,7 @@ import { router, useForm } from "@inertiajs/vue3";
 import EventForm from "@/components/Dashboard/Events/EventForm.vue";
 import DashboardLayout from "@/layouts/DashboardLayout.vue";
 import type { BreadcrumbItem } from "@/types";
-import type { Organization } from "@/types/organization";
+import type { OrganizationPicker } from "@/types/organization";
 import { index as dashboardIndex } from "@/wayfinder/routes/dashboard";
 import {
     create as eventsCreate,
@@ -12,7 +12,7 @@ import {
 } from "@/wayfinder/routes/dashboard/events";
 
 defineProps<{
-    organizations: Organization[];
+    organizations: OrganizationPicker[];
 }>();
 
 const breadcrumbs: BreadcrumbItem[] = [

@@ -37,9 +37,9 @@ final class PermissionSeeder extends Seeder
 
         $adminPermissionNames = array_column($permissionData, 'name');
         $matrix = [
-            PreservedRoleList::SUPER_ADMIN->value => $adminPermissionNames,
-            PreservedRoleList::ADMIN->value => $adminPermissionNames,
-            PreservedRoleList::ORGANIZATION_ADMIN->value => [
+            PreservedRoleList::SuperAdmin->value => $adminPermissionNames,
+            PreservedRoleList::Admin->value => $adminPermissionNames,
+            PreservedRoleList::OrganizationAdmin->value => [
                 'event:create',
                 'event:update',
                 'event:delete',

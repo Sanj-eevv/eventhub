@@ -25,7 +25,6 @@ final class OrganizationFactory extends Factory
             'contact_address' => $this->faker->address,
             'contact_email' => $this->faker->unique()->companyEmail,
             'status' => OrganizationStatus::Pending,
-            'verified_at' => null,
         ];
     }
 
@@ -33,7 +32,6 @@ final class OrganizationFactory extends Factory
     {
         return $this->state(fn () => [
             'status' => OrganizationStatus::Approved,
-            'verified_at' => now(),
         ]);
     }
 
@@ -41,7 +39,6 @@ final class OrganizationFactory extends Factory
     {
         return $this->state(fn () => [
             'status' => OrganizationStatus::Suspended,
-            'verified_at' => null,
         ]);
     }
 }

@@ -15,7 +15,7 @@ final class IndexResource extends JsonResource
             'uuid' => $this->uuid,
             'title' => $this->title,
             'contact_email' => $this->contact_email,
-            'status' => $this->status,
+            'status' => ['value' => $this->status->value, 'label' => $this->status->label()],
             'created_at' => formatUserTime($this->created_at, 'd M Y'),
         ];
     }

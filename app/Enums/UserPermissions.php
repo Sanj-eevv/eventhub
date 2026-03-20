@@ -6,7 +6,7 @@ namespace App\Enums;
 
 enum UserPermissions: string
 {
-    case ALLOW_CREATE = 'user:create';
-    case ALLOW_DELETE = 'user:delete';
-    case ALLOW_UPDATE = 'user:update';
+    case AllowCreate = 'user:create';
+    case AllowDelete = 'user:delete';
+    case AllowUpdate = 'user:update';
 }

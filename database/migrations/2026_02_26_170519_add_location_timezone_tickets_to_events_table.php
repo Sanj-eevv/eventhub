@@ -17,12 +17,4 @@ return new class() extends Migration
             $table->json('tickets')->nullable()->after('location');
         });
     }
-
-    public function down(): void
-    {
-        Schema::table('events', function (Blueprint $table): void {
-            $table->dropColumn(['timezone', 'location', 'tickets']);
-            $table->dateTime('ends_at')->nullable(false)->change();
-        });
-    }
 };

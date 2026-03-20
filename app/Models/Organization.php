@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Builders\OrganizationBuilder;
 use App\Enums\OrganizationStatus;
 use App\Traits\HasAppUuid;
 use App\Traits\HasSlug;
 use Carbon\CarbonImmutable;
 use Database\Factories\OrganizationFactory;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Attributes\UseEloquentBuilder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -25,12 +26,14 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $contact_address
  * @property string $contact_email
  * @property OrganizationStatus $status
- * @property CarbonImmutable|null $verified_at
  * @property CarbonImmutable|null $deleted_at
  * @property CarbonImmutable|null $created_at
  * @property CarbonImmutable|null $updated_at
  * @property-read Collection<int, User> $users
  * @property-read int|null $users_count
+ * @property-read Collection<int, Event> $events
+ * @property-read int|null $events_count
+ *
  * @method static OrganizationFactory factory($count = null, $state = [])
  * @method static Builder<static>|Organization newModelQuery()
  * @method static Builder<static>|Organization newQuery()
@@ -47,11 +50,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static Builder<static>|Organization whereTitle($value)
  * @method static Builder<static>|Organization whereUpdatedAt($value)
  * @method static Builder<static>|Organization whereUuid($value)
- * @method static Builder<static>|Organization whereVerifiedAt($value)
  * @method static Builder<static>|Organization withTrashed(bool $withTrashed = true)
  * @method static Builder<static>|Organization withoutTrashed()
+ *
  * @mixin \Eloquent
  */
+#[UseEloquentBuilder(OrganizationBuilder::class)]
 final class Organization extends Model
 {
     use HasAppUuid;
@@ -66,7 +70,6 @@ final class Organization extends Model
         'contact_address',
         'contact_email',
         'status',
-        'verified_at',
     ];
 
     public function users(): HasMany
@@ -74,11 +77,15 @@ final class Organization extends Model
         return $this->hasMany(User::class);
     }
 
+    public function events(): HasMany
+    {
+        return $this->hasMany(Event::class);
+    }
+
     protected function casts(): array
     {
         return [
             'status' => OrganizationStatus::class,
-            'verified_at' => 'datetime',
         ];
     }
 }

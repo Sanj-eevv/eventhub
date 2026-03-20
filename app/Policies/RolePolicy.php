@@ -14,9 +14,9 @@ final class RolePolicy
     public function viewAny(User $user): bool
     {
         return $user->hasAnyPermission([
-            RolePermissions::ALLOW_CREATE,
-            RolePermissions::ALLOW_UPDATE,
-            RolePermissions::ALLOW_DELETE,
+            RolePermissions::AllowCreate,
+            RolePermissions::AllowUpdate,
+            RolePermissions::AllowDelete,
         ]);
     }
 
@@ -27,18 +27,16 @@ final class RolePolicy
 
     public function create(User $user): bool
     {
-        return $user->hasPermission(RolePermissions::ALLOW_CREATE);
+        return $user->hasPermission(RolePermissions::AllowCreate);
     }
 
     public function update(User $user, Role $role): bool
     {
-        dd($role);
-
-        return $user->hasPermission(RolePermissions::ALLOW_UPDATE) && $role->slug !== PreservedRoleList::SUPER_ADMIN->value;
+        return $user->hasPermission(RolePermissions::AllowUpdate) && $role->slug !== PreservedRoleList::SuperAdmin->value;
     }
 
     public function delete(User $user, Role $role): bool
     {
-        return $user->hasPermission(RolePermissions::ALLOW_DELETE) && ! $role->preserved;
+        return $user->hasPermission(RolePermissions::AllowDelete) && ! $role->preserved;
     }
 }

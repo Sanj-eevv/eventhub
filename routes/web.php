@@ -8,9 +8,14 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Dashboard\ApproveOrganizationController;
+use App\Http\Controllers\Dashboard\CancelEventController;
 use App\Http\Controllers\Dashboard\EventController;
 use App\Http\Controllers\Dashboard\OrganizationController;
+use App\Http\Controllers\Dashboard\PublishEventController;
+use App\Http\Controllers\Dashboard\RejectOrganizationController;
 use App\Http\Controllers\Dashboard\RoleController;
+use App\Http\Controllers\Dashboard\UnpublishEventController;
 use App\Http\Controllers\Dashboard\UserController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\IndexController;
@@ -43,16 +48,16 @@ Route::middleware('auth')->group(function (): void {
         Route::get('email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])->middleware(['signed', 'throttle:10,1'])->name('verification.verify');
         Route::post('email/verification-notification', [EmailVerificationController::class, 'resend'])->middleware('throttle:5,1')->name('verification.send');
     });
-    $preservedAdminRolesStr = implode(',', [PreservedRoleList::SUPER_ADMIN->value, PreservedRoleList::ADMIN->value, PreservedRoleList::ORGANIZATION_ADMIN->value]);
-    Route::middleware(["role:{$preservedAdminRolesStr}", 'verified:auth.verification.notice'])->prefix('dashboard')->as('dashboard.')->group(function (): void {
+    Route::middleware(['role:'.PreservedRoleList::adminRolesString(), 'verified:auth.verification.notice'])->prefix('dashboard')->as('dashboard.')->group(function (): void {
         Route::get('/', DashboardController::class)->name('index');
         Route::resource('users', UserController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
         Route::resource('roles', RoleController::class);
         Route::resource('organizations', OrganizationController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
-        Route::post('organizations/{organization}/{action}', [OrganizationController::class, 'confirmStatus'])->name('organizations.confirm-status');
+        Route::post('organizations/{organization}/approve', ApproveOrganizationController::class)->name('organizations.approve');
+        Route::post('organizations/{organization}/reject', RejectOrganizationController::class)->name('organizations.reject');
         Route::resource('events', EventController::class)->only(['index', 'show', 'create', 'store', 'edit', 'update', 'destroy']);
-        Route::post('events/{event}/publish', [EventController::class, 'publish'])->name('events.publish');
-        Route::post('events/{event}/unpublish', [EventController::class, 'unpublish'])->name('events.unpublish');
-        Route::post('events/{event}/cancel', [EventController::class, 'cancel'])->name('events.cancel');
+        Route::post('events/{event}/publish', PublishEventController::class)->name('events.publish');
+        Route::post('events/{event}/unpublish', UnpublishEventController::class)->name('events.unpublish');
+        Route::post('events/{event}/cancel', CancelEventController::class)->name('events.cancel');
     });
 });

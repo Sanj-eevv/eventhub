@@ -15,25 +15,25 @@ final class RoleSeeder extends Seeder
         Role::query()->upsert([
             [
                 'name' => 'Super Admin',
-                'slug' => PreservedRoleList::SUPER_ADMIN->value,
+                'slug' => PreservedRoleList::SuperAdmin->value,
                 'description' => 'Superadmin of a system',
                 'preserved' => true,
             ],
             [
                 'name' => 'Admin',
-                'slug' => PreservedRoleList::ADMIN->value,
+                'slug' => PreservedRoleList::Admin->value,
                 'description' => 'Admin of a system',
                 'preserved' => true,
             ],
             [
                 'name' => 'Organization Admin',
-                'slug' => PreservedRoleList::ORGANIZATION_ADMIN->value,
+                'slug' => PreservedRoleList::OrganizationAdmin->value,
                 'description' => 'Admin of an organization',
                 'preserved' => true,
             ],
             [
                 'name' => 'User',
-                'slug' => PreservedRoleList::USER->value,
+                'slug' => PreservedRoleList::User->value,
                 'description' => 'Normal user',
                 'preserved' => true,
             ],

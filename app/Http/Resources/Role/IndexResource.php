@@ -12,10 +12,6 @@ final class IndexResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
-        if (2 === $this->id) {
-            dd($this->resource);
-        }
-
         return [
             'slug' => $this->slug,
             'name' => $this->name,

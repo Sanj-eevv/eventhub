@@ -1,8 +1,8 @@
-import type { VariantProps } from "class-variance-authority";
-import type { badgeVariants } from "@/components/ui/badge";
 import type { PaginatedResponse } from "@/types";
+import type { App } from "@/wayfinder/types";
 
-export type EventStatus = "draft" | "published" | "cancelled";
+export type EventStatus = App.Enums.EventStatus;
+export type EventStatusData = { value: EventStatus; label: string };
 
 export type EventLocation = {
     venue_name?: string | null;
@@ -24,32 +24,11 @@ export type EventTicket = {
     sale_ends_at: string | null;
 };
 
-export type Event = {
-    id: number;
-    uuid: string;
-    user_id: number;
-    organization_id: number;
-    title: string;
-    slug: string;
-    description: string;
-    starts_at: string;
-    ends_at: string | null;
-    timezone: string;
+export type Event = Omit<App.Models.Event, "status" | "location" | "tickets"> & {
+    status: EventStatusData;
     location: EventLocation | null;
     tickets: Omit<EventTicket, "_key">[] | null;
-    status: EventStatus;
-    created_at: string | null;
-    updated_at: string | null;
-    organization?: { id: number; uuid: string; title: string } | null;
-    user?: { id: number; uuid: string; name: string } | null;
 };
-
-type BadgeVariants = VariantProps<typeof badgeVariants>;
-
-export type EventStatusConfig = Record<
-    EventStatus,
-    { variant: BadgeVariants["variant"]; class: string; label: string }
->;
 
 export type EventFilterProps = {
     search: string;

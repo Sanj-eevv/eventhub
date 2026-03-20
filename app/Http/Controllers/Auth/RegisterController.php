@@ -7,7 +7,7 @@ namespace App\Http\Controllers\Auth;
 use App\Actions\CreateUserAction;
 use App\Actions\RegisterOrganizationAction;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Auth\Organization\RegisterRequest as OrganizationRegisterRequest;
+use App\Http\Requests\Auth\OrganizationRegisterRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Auth\Events\Registered;

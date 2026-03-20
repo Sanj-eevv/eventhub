@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Policies;
 
 use App\Enums\OrganizationPermissions;
-use App\Enums\OrganizationStatus;
 use App\Models\Organization;
 use App\Models\User;
 
@@ -14,9 +13,9 @@ final class OrganizationPolicy
     public function viewAny(User $user): bool
     {
         return $user->hasAnyPermission([
-            OrganizationPermissions::ALLOW_CREATE,
-            OrganizationPermissions::ALLOW_UPDATE,
-            OrganizationPermissions::ALLOW_DELETE,
+            OrganizationPermissions::AllowCreate,
+            OrganizationPermissions::AllowUpdate,
+            OrganizationPermissions::AllowDelete,
         ]);
     }
 
@@ -27,26 +26,26 @@ final class OrganizationPolicy
 
     public function create(User $user): bool
     {
-        return $user->hasPermission(OrganizationPermissions::ALLOW_CREATE);
+        return $user->hasPermission(OrganizationPermissions::AllowCreate);
     }
 
     public function update(User $user): bool
     {
-        return $user->hasPermission(OrganizationPermissions::ALLOW_UPDATE);
+        return $user->hasPermission(OrganizationPermissions::AllowUpdate);
     }
 
     public function approve(User $user, Organization $organization): bool
     {
-        return OrganizationStatus::Pending === $organization->status;
+        return $user->hasPermission(OrganizationPermissions::AllowUpdate);
     }
 
     public function reject(User $user, Organization $organization): bool
     {
-        return OrganizationStatus::Pending === $organization->status;
+        return $user->hasPermission(OrganizationPermissions::AllowUpdate);
     }
 
     public function delete(User $user): bool
     {
-        return $user->hasPermission(OrganizationPermissions::ALLOW_DELETE);
+        return $user->hasPermission(OrganizationPermissions::AllowDelete);
     }
 }

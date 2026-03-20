@@ -9,6 +9,7 @@ use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
  * @property int $id
@@ -18,6 +19,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property CarbonImmutable|null $updated_at
  * @property-read Collection<int, Role> $roles
  * @property-read int|null $roles_count
+ *
  * @method static Builder<static>|Permission newModelQuery()
  * @method static Builder<static>|Permission newQuery()
  * @method static Builder<static>|Permission query()
@@ -26,13 +28,14 @@ use Illuminate\Database\Eloquent\Model;
  * @method static Builder<static>|Permission whereId($value)
  * @method static Builder<static>|Permission whereName($value)
  * @method static Builder<static>|Permission whereUpdatedAt($value)
+ *
  * @mixin Eloquent
  */
 final class Permission extends Model
 {
     protected $fillable = ['name', 'description'];
 
-    public function roles()
+    public function roles(): BelongsToMany
     {
         return $this->belongsToMany(Role::class, 'roles_permissions');
     }

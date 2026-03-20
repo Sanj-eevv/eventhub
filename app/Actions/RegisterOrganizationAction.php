@@ -27,7 +27,7 @@ final class RegisterOrganizationAction
                 'status' => $organizationData->status->value,
             ]);
 
-            return $this->createUserAction->execute($organizationData->user->withOrganizationId($organization->id));
+            return $this->createUserAction->execute($organizationData->user->withOrganizationUuid($organization->uuid));
         });
     }
 }

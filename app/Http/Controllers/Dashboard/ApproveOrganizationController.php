@@ -1,0 +1,34 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Http\Controllers\Dashboard;
+
+use App\Actions\ConfirmOrganizationStatusAction;
+use App\Enums\OrganizationStatus;
+use App\Http\Controllers\Controller;
+use App\Models\Organization;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Redirector;
+
+final class ApproveOrganizationController extends Controller
+{
+    public function __construct(
+        private readonly ConfirmOrganizationStatusAction $confirmOrganizationStatusAction,
+        private readonly Redirector $redirector,
+    ) {}
+
+    public function __invoke(Request $request, Organization $organization): RedirectResponse
+    {
+        $this->authorize('approve', $organization);
+
+        $this->confirmOrganizationStatusAction->execute(
+            $organization,
+            OrganizationStatus::Approved,
+            ! $request->boolean('send_notification', true),
+        );
+
+        return $this->redirector->back()->with('toastSuccess', 'Organization approved successfully.');
+    }
+}

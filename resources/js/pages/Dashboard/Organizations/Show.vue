@@ -81,14 +81,6 @@ const breadcrumbs: BreadcrumbItem[] = [
                                 :status="organization.status"
                             />
                         </div>
-                        <div v-if="organization.verified_at">
-                            <p class="text-sm text-muted-foreground">
-                                Verified
-                            </p>
-                            <p class="font-medium">
-                                {{ organization.verified_at }}
-                            </p>
-                        </div>
                         <div>
                             <p class="text-sm text-muted-foreground">Created</p>
                             <p class="font-medium">

@@ -8,7 +8,6 @@ description: Action-oriented architecture for Laravel. Invokable classes that co
 Actions are the **heart of your domain logic**. Every business operation lives in an action.
 
 **Related guides:**
-- [DTOs](../laravel-dtos/SKILL.md) - DTOs for passing data to actions
 - [Controllers](../laravel-controllers/SKILL.md) - Controllers delegate to actions
 - [Models](../laravel-models/SKILL.md) - Models accessed by actions
 - [Testing](../laravel-testing/SKILL.md) - Testing with triple-A pattern

@@ -14,7 +14,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import type { Organization } from "@/types/organization";
-import { confirmStatus } from "@/wayfinder/routes/dashboard/organizations";
+import { approve, reject } from "@/wayfinder/routes/dashboard/organizations";
 
 const props = defineProps<{
     open: boolean;
@@ -30,11 +30,12 @@ const processing = ref(false);
 const sendNotification = ref(true);
 
 const handleConfirm = () => {
+    const route = props.action === "approve"
+        ? approve({ organization: props.organization.uuid })
+        : reject({ organization: props.organization.uuid });
+
     router.post(
-        confirmStatus({
-            organization: props.organization.uuid,
-            action: props.action,
-        }),
+        route.url,
         { send_notification: sendNotification.value },
         {
             preserveScroll: true,

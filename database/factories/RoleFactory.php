@@ -23,7 +23,7 @@ final class RoleFactory extends Factory
 
         return [
             'name' => $name,
-            'email' => $slug,
+            'slug' => $slug,
             'description' => $this->faker->sentence,
             'preserved' => false,
         ];

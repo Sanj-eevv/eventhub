@@ -31,7 +31,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { useEventSections } from "@/composables/events/useEventSections";
 import type { EventTicket } from "@/types/event";
-import type { Organization } from "@/types/organization";
+import type { OrganizationPicker } from "@/types/organization";
 
 type FormErrors = Partial<Record<string, string>>;
 
@@ -59,7 +59,7 @@ type FormState = {
 
 const props = defineProps<{
     form: FormState;
-    organizations: Organization[];
+    organizations: OrganizationPicker[];
     isEditing?: boolean;
 }>();
 

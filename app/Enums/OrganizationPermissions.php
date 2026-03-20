@@ -6,7 +6,7 @@ namespace App\Enums;
 
 enum OrganizationPermissions: string
 {
-    case ALLOW_CREATE = 'organization:create';
-    case ALLOW_DELETE = 'organization:delete';
-    case ALLOW_UPDATE = 'organization:update';
+    case AllowCreate = 'organization:create';
+    case AllowDelete = 'organization:delete';
+    case AllowUpdate = 'organization:update';
 }

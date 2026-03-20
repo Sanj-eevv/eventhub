@@ -8,9 +8,8 @@ description: Backed enums with labels and business logic. Use when working with 
 Enums provide type-safe, finite sets of values.
 
 **Related guides:**
-- [State Machines](../laravel-state-machines/SKILL.md) - For complex state transitions
+
 - [Models](../laravel-models/SKILL.md) - Model casts to enums
-- [DTOs](../laravel-dtos/SKILL.md) - DTOs with enum properties
 - [form-requests.md](../laravel-validation/references/form-requests.md) - Enum validation
 
 ## Always Use Backed Enums
@@ -290,11 +289,13 @@ app/Enums/
 ## When to Use Enums vs State Machines
 
 **Use Enums:**
+
 - Simple status fields
 - No transition logic
 - No side effects
 
 **Use State Machines:**
+
 - Complex state transitions with rules
 - State-specific behavior
 - Transition side effects
@@ -304,6 +305,7 @@ See [State Machines](../laravel-state-machines/SKILL.md) for state machines.
 ## Summary
 
 **Enums provide:**
+
 - Type safety
 - Finite value sets
 - Business logic encapsulation

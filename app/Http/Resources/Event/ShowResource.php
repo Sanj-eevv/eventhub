@@ -18,12 +18,12 @@ final class ShowResource extends JsonResource
             'starts_at' => formatUserTime($this->starts_at, 'd M Y H:i'),
             'ends_at' => $this->ends_at ? formatUserTime($this->ends_at, 'd M Y H:i') : null,
             'timezone' => $this->timezone,
-            'status' => $this->status->value,
+            'status' => ['value' => $this->status->value, 'label' => $this->status->label()],
             'created_at' => formatUserTime($this->created_at, 'd M Y'),
             'organization' => $this->whenLoaded('organization', fn () => [
                 'uuid' => $this->organization->uuid,
                 'title' => $this->organization->title,
-                'status' => $this->organization->status->value,
+                'status' => ['value' => $this->organization->status->value, 'label' => $this->organization->status->label()],
             ]),
             'user' => $this->whenLoaded('user', fn () => [
                 'uuid' => $this->user->uuid,

@@ -37,8 +37,8 @@ import {
 } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
-import type { Organization } from "@/types/organization";
-import type { Role } from "@/types/role";
+import type { OrganizationPicker } from "@/types/organization";
+import type { RolePicker } from "@/types/role";
 import type { User } from "@/types/user";
 import { store, update } from "@/wayfinder/routes/dashboard/users";
 
@@ -47,8 +47,8 @@ const props = defineProps<{
     user?: Omit<User, "role"> & {
         role: Role;
     };
-    roles: Role[];
-    organizations: Omit<Organization, "id">[];
+    roles: RolePicker[];
+    organizations: OrganizationPicker[];
 }>();
 
 const emit = defineEmits<{

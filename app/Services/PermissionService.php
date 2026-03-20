@@ -9,23 +9,17 @@ use App\Models\Role;
 
 final class PermissionService
 {
-    public function getGrouppedPermissions(Role|string|null $role = null): array
+    /** @return array<string, list<array{id: int, name: string, description: string}>> */
+    public function getGroupedPermissions(?Role $role = null): array
     {
-        if ($role) {
-            $role->loadMissing('permissions:id,name,description');
-            $permissions = $role instanceof Role ? $role->permissions : (Role::query()->with('permissions:id,name,description')->where('slug', $role)->first()?->permissions ?? collect([]));
-        }
-        $permissions ??= Permission::query()->select('id', 'name', 'description')->get();
-        $groupedPermissions = [];
-        $permissions->each(function (Permission $permission) use (&$groupedPermissions): void {
-            [$model, $action] = explode(':', $permission->name, 2);
-            $groupedPermissions[$model][] = [
-                'id' => $permission->id,
-                'name' => $action,
-                'description' => $permission->description,
-            ];
-        });
+        $permissions = $role
+            ? $role->permissions
+            : Permission::query()->select('id', 'name', 'description')->get();
 
-        return $groupedPermissions;
+        return $permissions->mapToGroups(function (Permission $permission): array {
+            [$model, $action] = explode(':', $permission->name, 2);
+
+            return [$model => ['id' => $permission->id, 'name' => $action, 'description' => $permission->description]];
+        })->toArray();
     }
 }

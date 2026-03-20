@@ -8,6 +8,8 @@ use App\Builders\RoleBuilder;
 use App\Enums\PreservedRoleList;
 use App\Traits\HasSlug;
 use Carbon\CarbonImmutable;
+use Database\Factories\RoleFactory;
+use Eloquent;
 use Illuminate\Database\Eloquent\Attributes\UseEloquentBuilder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -28,10 +30,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property-read Collection<int, User> $users
  * @property-read int|null $users_count
  *
- * @method static \Database\Factories\RoleFactory factory($count = null, $state = [])
+ * @method static RoleFactory factory($count = null, $state = [])
  * @method static RoleBuilder<static>|Role newModelQuery()
  * @method static RoleBuilder<static>|Role newQuery()
  * @method static RoleBuilder<static>|Role query()
+ * @method static RoleBuilder<static>|Role forIndex()
  * @method static RoleBuilder<static>|Role search(?string $search)
  * @method static RoleBuilder<static>|Role sortBy(?array $columns)
  * @method static RoleBuilder<static>|Role whereCreatedAt($value)
@@ -42,7 +45,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @method static RoleBuilder<static>|Role whereSlug($value)
  * @method static RoleBuilder<static>|Role whereUpdatedAt($value)
  *
- * @mixin \Eloquent
+ * @mixin Eloquent
  */
 final class Role extends Model
 {
@@ -58,22 +61,22 @@ final class Role extends Model
 
     public static function superAdminRole(): ?self
     {
-        return self::query()->where('slug', PreservedRoleList::SUPER_ADMIN->value)->first();
+        return self::query()->where('slug', PreservedRoleList::SuperAdmin->value)->first();
     }
 
     public static function userRole(): ?self
     {
-        return self::query()->where('slug', PreservedRoleList::USER->value)->first();
+        return self::query()->where('slug', PreservedRoleList::User->value)->first();
     }
 
     public static function organizationAdminRole(): ?self
     {
-        return self::query()->where('slug', PreservedRoleList::ORGANIZATION_ADMIN->value)->first();
+        return self::query()->where('slug', PreservedRoleList::OrganizationAdmin->value)->first();
     }
 
     public static function adminRole(): ?self
     {
-        return self::query()->where('slug', PreservedRoleList::ADMIN->value)->first();
+        return self::query()->where('slug', PreservedRoleList::Admin->value)->first();
     }
 
     public static function getSluggableColumn(): string

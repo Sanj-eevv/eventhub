@@ -4,23 +4,30 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Dashboard;
 
+use App\Actions\CreateRoleAction;
+use App\Actions\DeleteRoleAction;
+use App\Actions\UpdateRoleAction;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Dashboard\Roles\RoleRequest;
+use App\Http\Requests\Dashboard\RoleRequest;
 use App\Http\Resources\Role\IndexResource;
 use App\Http\Resources\Role\ShowResource;
 use App\Models\Role;
 use App\Services\PermissionService;
-use App\Services\RoleService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
+use Illuminate\Routing\Redirector;
 use Inertia\Response;
+use Inertia\ResponseFactory;
 
 final class RoleController extends Controller
 {
     public function __construct(
-        private readonly RoleService $roleService,
+        private readonly CreateRoleAction $createRoleAction,
+        private readonly UpdateRoleAction $updateRoleAction,
+        private readonly DeleteRoleAction $deleteRoleAction,
         private readonly PermissionService $permissionService,
+        private readonly Redirector $redirector,
+        private readonly ResponseFactory $inertiaResponse,
     ) {}
 
     public function index(Request $request): Response
@@ -28,14 +35,14 @@ final class RoleController extends Controller
         $this->authorize('viewAny', Role::class);
 
         $search = $request->input('search');
-        $sortBy = $request->array('sortBy');
+        $sortBy = $request->array('sort_by');
         $roles = Role::query()
-            ->select(['id', 'name', 'slug', 'preserved', 'created_at'])
+            ->forIndex()
             ->search($search)
             ->sortBy($sortBy)
             ->paginate(perPage: $request->integer('per_page', 10), page: $request->integer('page', 1));
 
-        return Inertia::render('Dashboard/Roles/Index', [
+        return $this->inertiaResponse->render('Dashboard/Roles/Index', [
             'roles' => IndexResource::collection($roles)->additional([
                 'meta' => [
                     'sort' => $sortBy,
@@ -51,29 +58,8 @@ final class RoleController extends Controller
     {
         $this->authorize('create', Role::class);
 
-        return Inertia::render('Dashboard/Roles/Create', [
-            'groupedPermissions' => $this->permissionService->getGrouppedPermissions(),
-        ]);
-    }
-
-    public function show(Role $role): Response
-    {
-        $this->authorize('view', $role);
-
-        return Inertia::render('Dashboard/Roles/Show', [
-            'role' => ShowResource::make($role),
-            'groupedPermissions' => $this->permissionService->getGrouppedPermissions($role) ?: null,
-        ]);
-    }
-
-    public function edit(Role $role): Response
-    {
-        $this->authorize('update', $role);
-        $role->load('permissions');
-
-        return Inertia::render('Dashboard/Roles/Edit', [
-            'role' => ShowResource::make($role),
-            'groupedPermissions' => $this->permissionService->getGrouppedPermissions(),
+        return $this->inertiaResponse->render('Dashboard/Roles/Create', [
+            'groupedPermissions' => $this->permissionService->getGroupedPermissions(),
         ]);
     }
 
@@ -81,26 +67,50 @@ final class RoleController extends Controller
     {
         $this->authorize('create', Role::class);
 
-        $this->roleService->create($request->toDto());
+        $this->createRoleAction->execute($request->toDto());
 
-        return redirect()->route('dashboard.roles.index')->with('toastSuccess', 'Role created successfully.');
+        return $this->redirector->route('dashboard.roles.index')->with('toastSuccess', 'Role created successfully.');
+    }
+
+    public function show(Role $role): Response
+    {
+        $this->authorize('view', $role);
+
+        $role->loadMissing('permissions');
+
+        return $this->inertiaResponse->render('Dashboard/Roles/Show', [
+            'role' => ShowResource::make($role),
+            'groupedPermissions' => $this->permissionService->getGroupedPermissions($role) ?: null,
+        ]);
+    }
+
+    public function edit(Role $role): Response
+    {
+        $this->authorize('update', $role);
+
+        $role->loadMissing('permissions');
+
+        return $this->inertiaResponse->render('Dashboard/Roles/Edit', [
+            'role' => ShowResource::make($role),
+            'groupedPermissions' => $this->permissionService->getGroupedPermissions(),
+        ]);
     }
 
     public function update(RoleRequest $request, Role $role): RedirectResponse
     {
         $this->authorize('update', $role);
 
-        $this->roleService->update($role, $request->toDto());
+        $this->updateRoleAction->execute($role, $request->toDto());
 
-        return back()->with('toastSuccess', 'Role updated successfully.');
+        return $this->redirector->back()->with('toastSuccess', 'Role updated successfully.');
     }
 
     public function destroy(Role $role): RedirectResponse
     {
         $this->authorize('delete', $role);
 
-        $this->roleService->delete($role);
+        $this->deleteRoleAction->execute($role);
 
-        return back()->with('toastSuccess', 'Role deleted.');
+        return $this->redirector->back()->with('toastSuccess', 'Role deleted.');
     }
 }

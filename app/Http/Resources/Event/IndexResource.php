@@ -14,7 +14,7 @@ final class IndexResource extends JsonResource
         return [
             'uuid' => $this->uuid,
             'title' => $this->title,
-            'status' => $this->status,
+            'status' => ['value' => $this->status->value, 'label' => $this->status->label()],
             'organization' => $this->organization_title ? ['uuid' => $this->organization_uuid, 'title' => $this->organization_title] : null,
             'starts_at' => formatUserTime($this->starts_at, 'd M Y H:i'),
             'ends_at' => $this->ends_at ? formatUserTime($this->ends_at, 'd M Y H:i') : null,

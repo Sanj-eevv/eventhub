@@ -13,9 +13,9 @@ final class UserPolicy
     {
         return $user->hasAnyPermission(
             [
-                UserPermissions::ALLOW_CREATE,
-                UserPermissions::ALLOW_UPDATE,
-                UserPermissions::ALLOW_DELETE,
+                UserPermissions::AllowCreate,
+                UserPermissions::AllowUpdate,
+                UserPermissions::AllowDelete,
             ],
         );
     }
@@ -27,16 +27,16 @@ final class UserPolicy
 
     public function create(User $user): bool
     {
-        return $user->hasPermission(UserPermissions::ALLOW_CREATE);
+        return $user->hasPermission(UserPermissions::AllowCreate);
     }
 
     public function update(User $user): bool
     {
-        return $user->hasPermission(UserPermissions::ALLOW_UPDATE);
+        return $user->hasPermission(UserPermissions::AllowUpdate);
     }
 
     public function delete(User $user): bool
     {
-        return $user->hasPermission(UserPermissions::ALLOW_DELETE);
+        return $user->hasPermission(UserPermissions::AllowDelete);
     }
 }

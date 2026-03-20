@@ -8,7 +8,7 @@ import { Spinner } from "@/components/ui/spinner";
 import DashboardLayout from "@/layouts/DashboardLayout.vue";
 import type { BreadcrumbItem } from "@/types";
 import type { Event } from "@/types/event";
-import type { Organization } from "@/types/organization";
+import type { OrganizationPicker } from "@/types/organization";
 import { index as dashboardIndex } from "@/wayfinder/routes/dashboard";
 import {
     edit as eventsEdit,
@@ -20,7 +20,7 @@ import {
 
 const props = defineProps<{
     event: Event;
-    organizations: Organization[];
+    organizations: OrganizationPicker[];
 }>();
 
 const breadcrumbs: BreadcrumbItem[] = [
