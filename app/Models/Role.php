@@ -59,24 +59,24 @@ final class Role extends Model
         'preserved',
     ];
 
-    public static function superAdminRole(): ?self
+    public static function superAdminRole(): self
     {
-        return self::query()->where('slug', PreservedRoleList::SuperAdmin->value)->first();
+        return self::query()->where('slug', PreservedRoleList::SuperAdmin->value)->firstOrFail();
     }
 
-    public static function userRole(): ?self
+    public static function adminRole(): self
     {
-        return self::query()->where('slug', PreservedRoleList::User->value)->first();
+        return self::query()->where('slug', PreservedRoleList::Admin->value)->firstOrFail();
     }
 
-    public static function organizationAdminRole(): ?self
+    public static function organizationAdminRole(): self
     {
-        return self::query()->where('slug', PreservedRoleList::OrganizationAdmin->value)->first();
+        return self::query()->where('slug', PreservedRoleList::OrganizationAdmin->value)->firstOrFail();
     }
 
-    public static function adminRole(): ?self
+    public static function userRole(): self
     {
-        return self::query()->where('slug', PreservedRoleList::Admin->value)->first();
+        return self::query()->where('slug', PreservedRoleList::User->value)->firstOrFail();
     }
 
     public static function getSluggableColumn(): string

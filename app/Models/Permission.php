@@ -35,6 +35,20 @@ final class Permission extends Model
 {
     protected $fillable = ['name', 'description'];
 
+    /** @return array<string, list<array{id: int, name: string, description: string}>> */
+    public static function grouped(?Role $role = null): array
+    {
+        $permissions = $role
+            ? $role->permissions
+            : self::query()->select('id', 'name', 'description')->get();
+
+        return $permissions->mapToGroups(function (Permission $permission): array {
+            [$entity, $action] = explode(':', $permission->name, 2);
+
+            return [$entity => ['id' => $permission->id, 'name' => $action, 'description' => $permission->description]];
+        })->toArray();
+    }
+
     public function roles(): BelongsToMany
     {
         return $this->belongsToMany(Role::class, 'roles_permissions');

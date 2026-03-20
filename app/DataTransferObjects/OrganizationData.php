@@ -14,6 +14,5 @@ final readonly class OrganizationData
         public string $contact_address,
         public string $contact_email,
         public OrganizationStatus $status,
-        public ?UserData $user = null,
     ) {}
 }

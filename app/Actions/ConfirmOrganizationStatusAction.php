@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Actions;
 
 use App\Enums\OrganizationStatus;
+use App\Exceptions\InvalidStatusTransitionException;
 use App\Mail\Organizations\StatusApproved;
 use App\Mail\Organizations\StatusRejected;
 use App\Models\Organization;
@@ -14,8 +15,8 @@ final class ConfirmOrganizationStatusAction
 {
     public function execute(Organization $organization, OrganizationStatus $status, bool $silent = false): void
     {
-        if (OrganizationStatus::Pending !== $organization->status) {
-            return;
+        if ( ! $organization->status->canTransitionTo($status)) {
+            throw new InvalidStatusTransitionException($organization->status, $status);
         }
 
         $organization->update([

@@ -18,4 +18,13 @@ enum EventStatus: string
             self::Cancelled => 'Cancelled',
         };
     }
+
+    public function canTransitionTo(self $status): bool
+    {
+        return match ($this) {
+            self::Draft => self::Published === $status,
+            self::Published => in_array($status, [self::Draft, self::Cancelled], true),
+            self::Cancelled => false,
+        };
+    }
 }

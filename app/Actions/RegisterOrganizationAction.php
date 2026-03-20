@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Actions;
 
 use App\DataTransferObjects\OrganizationData;
+use App\DataTransferObjects\UserData;
 use App\Models\Organization;
 use App\Models\User;
 use Illuminate\Database\DatabaseManager;
@@ -16,9 +17,9 @@ final class RegisterOrganizationAction
         private readonly DatabaseManager $databaseManager,
     ) {}
 
-    public function execute(OrganizationData $organizationData): User
+    public function execute(OrganizationData $organizationData, UserData $userData): User
     {
-        return $this->databaseManager->transaction(function () use ($organizationData): User {
+        return $this->databaseManager->transaction(function () use ($organizationData, $userData): User {
             $organization = Organization::query()->create([
                 'title' => $organizationData->title,
                 'description' => $organizationData->description,
@@ -27,7 +28,7 @@ final class RegisterOrganizationAction
                 'status' => $organizationData->status->value,
             ]);
 
-            return $this->createUserAction->execute($organizationData->user->withOrganizationUuid($organization->uuid));
+            return $this->createUserAction->execute($userData->withOrganizationUuid($organization->uuid));
         });
     }
 }

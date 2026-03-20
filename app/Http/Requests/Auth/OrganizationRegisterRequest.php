@@ -36,12 +36,18 @@ final class OrganizationRegisterRequest extends FormRequest
             contact_address: $validated['contact_address'],
             contact_email: $validated['contact_email'],
             status: OrganizationStatus::Pending,
-            user: new UserData(
-                name: $validated['name'],
-                email: $validated['email'],
-                password: $validated['password'],
-                role_slug: PreservedRoleList::OrganizationAdmin->value,
-            ),
+        );
+    }
+
+    public function toUserDto(): UserData
+    {
+        $validated = $this->validated();
+
+        return new UserData(
+            name: $validated['name'],
+            email: $validated['email'],
+            password: $validated['password'],
+            role_slug: PreservedRoleList::OrganizationAdmin->value,
         );
     }
 }
