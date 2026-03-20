@@ -99,15 +99,17 @@ When a conditional check (guard) exists before calling an action, decide where i
 - **Guard goes in the action** — when it only determines whether the action should do its work, with no effect on the controller's response. The controller calls the action unconditionally.
 - **Guard stays in the controller** — when it produces a different redirect or response (e.g. early return to a different route). The guard is part of the response logic, not the action's concern.
 
-## Controllers — No Global Helpers
+## No Global Helpers — Anywhere
 
-Controllers must never use global helper functions for HTTP concerns. Always use the injected dependency instead.
+**All classes** must never use global helper functions. Always inject the dependency explicitly in the constructor and use it via `$this`.
 
 - Use `$this->redirector->back()` not `back()`
 - Use `$this->redirector->route()` not `redirect()->route()`
 - Use `$this->urlGenerator->route()` not `route()`
+- Use `$this->dispatcher->dispatch()` not `event()`
+- Use `$this->mailer->to()->queue()` not `Mail::to()->queue()`
 
-When reviewing controllers, always check for `back()`, `redirect()`, `route()`, and `url()` global calls — these are implicit dependencies and must be replaced.
+When reviewing any class, always check for `back()`, `redirect()`, `route()`, `url()`, `event()`, and facade static calls — these are implicit dependencies and must be replaced with injected instances.
 
 ## Enums
 

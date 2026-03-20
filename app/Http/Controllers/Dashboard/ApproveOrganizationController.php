@@ -26,7 +26,7 @@ final class ApproveOrganizationController extends Controller
         $this->confirmOrganizationStatusAction->execute(
             $organization,
             OrganizationStatus::Approved,
-            ! $request->boolean('send_notification', true),
+            $request->boolean('send_notification', true),
         );
 
         return $this->redirector->back()->with('toastSuccess', 'Organization approved successfully.');

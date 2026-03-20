@@ -5,30 +5,28 @@ declare(strict_types=1);
 namespace App\Actions;
 
 use App\Enums\OrganizationStatus;
+use App\Events\OrganizationApproved;
+use App\Events\OrganizationRejected;
 use App\Exceptions\InvalidStatusTransitionException;
-use App\Mail\Organizations\StatusApproved;
-use App\Mail\Organizations\StatusRejected;
 use App\Models\Organization;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Events\Dispatcher;
 
 final class ConfirmOrganizationStatusAction
 {
-    public function execute(Organization $organization, OrganizationStatus $status, bool $silent = false): void
+    public function __construct(private readonly Dispatcher $dispatcher) {}
+
+    public function execute(Organization $organization, OrganizationStatus $status, bool $notify = true): void
     {
         if ( ! $organization->status->canTransitionTo($status)) {
             throw new InvalidStatusTransitionException($organization->status, $status);
         }
 
-        $organization->update([
-            'status' => $status,
-        ]);
+        $organization->update(['status' => $status]);
 
-        if ( ! $silent) {
-            $mailable = OrganizationStatus::Approved === $status
-                ? new StatusApproved($organization)
-                : new StatusRejected($organization);
+        $event = OrganizationStatus::Approved === $status
+            ? new OrganizationApproved($organization, $notify)
+            : new OrganizationRejected($organization, $notify);
 
-            Mail::to($organization->contact_email)->queue($mailable);
-        }
+        $this->dispatcher->dispatch($event);
     }
 }

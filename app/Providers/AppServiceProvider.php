@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Events\OrganizationApproved;
+use App\Events\OrganizationRejected;
+use App\Listeners\SendOrganizationApprovedMail;
+use App\Listeners\SendOrganizationRejectedMail;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Middleware\Authenticate;
@@ -16,6 +20,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\URL;
@@ -29,6 +34,7 @@ final class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        $this->configureEvents();
         $this->configureCommands();
         $this->configureModels();
         $this->configureDates();
@@ -39,6 +45,12 @@ final class AppServiceProvider extends ServiceProvider
         $this->configurePasswordRules();
         $this->configureDatabase();
         JsonResource::withoutWrapping();
+    }
+
+    private function configureEvents(): void
+    {
+        Event::listen(OrganizationApproved::class, SendOrganizationApprovedMail::class);
+        Event::listen(OrganizationRejected::class, SendOrganizationRejectedMail::class);
     }
 
     private function configureDatabase(): void

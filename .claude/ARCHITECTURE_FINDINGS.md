@@ -23,21 +23,6 @@ inlined in actions. Actions change state; listeners react.
 
 ---
 
-## Medium Priority
-
-### 4. Value objects for unmodelled domain concepts
-`location` and `tickets` on `EventData` are raw arrays. `email` is a raw
-string everywhere. These have invariants that value objects would enforce at
-construction time.
-
-- `Location` — venue name, address, coordinates
-- `Ticket` — label, price (non-negative), quantity, sale window
-- `Email` — format validation at the type level
-
-**Files:** `app/DataTransferObjects/EventData.php`, all DTOs with email fields
-
----
-
 ## Low Priority
 
 ### 9. No audit trail for sensitive operations

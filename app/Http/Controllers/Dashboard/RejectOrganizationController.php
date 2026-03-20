@@ -26,7 +26,7 @@ final class RejectOrganizationController extends Controller
         $this->confirmOrganizationStatusAction->execute(
             $organization,
             OrganizationStatus::Rejected,
-            ! $request->boolean('send_notification', true),
+            $request->boolean('send_notification', true),
         );
 
         return $this->redirector->back()->with('toastSuccess', 'Organization rejected successfully.');
