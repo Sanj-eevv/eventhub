@@ -99,17 +99,15 @@ When a conditional check (guard) exists before calling an action, decide where i
 - **Guard goes in the action** — when it only determines whether the action should do its work, with no effect on the controller's response. The controller calls the action unconditionally.
 - **Guard stays in the controller** — when it produces a different redirect or response (e.g. early return to a different route). The guard is part of the response logic, not the action's concern.
 
-## No Global Helpers — Anywhere
+## Controllers — No Global Helpers
 
-**All classes** must never use global helper functions. Always inject the dependency explicitly in the constructor and use it via `$this`.
+Controllers must never use global helper functions for HTTP concerns. Always use the injected dependency instead.
 
 - Use `$this->redirector->back()` not `back()`
 - Use `$this->redirector->route()` not `redirect()->route()`
 - Use `$this->urlGenerator->route()` not `route()`
-- Use `$this->dispatcher->dispatch()` not `event()`
-- Use `$this->mailer->to()->queue()` not `Mail::to()->queue()`
 
-When reviewing any class, always check for `back()`, `redirect()`, `route()`, `url()`, `event()`, and facade static calls — these are implicit dependencies and must be replaced with injected instances.
+When reviewing controllers, always check for `back()`, `redirect()`, `route()`, and `url()` global calls — these are implicit dependencies and must be replaced.
 
 ## Enums
 
@@ -129,6 +127,12 @@ This project follows Laravel architecture practices. Always ask "What Would Tayl
 ## Conditionals
 
 - Compound `&&` conditions are acceptable in `if` statements, return expressions, and closures. Do not split them into nested `if` blocks.
+
+## Wayfinder Route Imports
+
+- Always import routes from `@/wayfinder/routes/` (named route imports), not from `@/wayfinder/App/Http/Controllers/` (controller imports).
+- Named route imports are domain-grouped and hide controller implementation details from the frontend.
+- Example: `import { approve, reject } from "@/wayfinder/routes/dashboard/organizations"` — not `import ApproveOrganizationController from "@/wayfinder/App/Http/Controllers/Dashboard/ApproveOrganizationController"`.
 
 ## Stateless by Design
 

@@ -17,7 +17,7 @@ abstract class AppBuilder extends Builder
     final public function sortBy(?array $columns): static
     {
         $filtered = collect($columns)
-            ->filter(fn ($sort): bool => isset($sort['id'], $sort['desc']) && in_array($sort['id'], $this->allowedSortColumns, true));
+            ->filter(fn ($sortItem): bool => isset($sortItem['id'], $sortItem['desc']) && in_array($sortItem['id'], $this->allowedSortColumns, true));
 
         if ($filtered->isEmpty()) {
             return $this->defaultSortColumn
@@ -25,9 +25,9 @@ abstract class AppBuilder extends Builder
                 : $this;
         }
 
-        $filtered->each(fn ($sort) => $this->orderBy(
-            $this->sortColumnMap[$sort['id']] ?? $sort['id'],
-            filter_var($sort['desc'], FILTER_VALIDATE_BOOLEAN) ? 'desc' : 'asc',
+        $filtered->each(fn ($sortItem) => $this->orderBy(
+            $this->sortColumnMap[$sortItem['id']] ?? $sortItem['id'],
+            filter_var($sortItem['desc'], FILTER_VALIDATE_BOOLEAN) ? 'desc' : 'asc',
         ));
 
         return $this;

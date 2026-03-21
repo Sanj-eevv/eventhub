@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Auth;
 
+use App\Actions\ResendVerificationEmailAction;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Auth\AuthManager;
@@ -11,19 +12,17 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Routing\UrlGenerator;
-use Inertia\Response;
-use Inertia\ResponseFactory;
 
-final class EmailVerificationController extends Controller
+final class ResendEmailVerificationController extends Controller
 {
     public function __construct(
+        private readonly ResendVerificationEmailAction $resendVerificationEmailAction,
         private readonly AuthManager $authManager,
         private readonly Redirector $redirector,
         private readonly UrlGenerator $urlGenerator,
-        private readonly ResponseFactory $inertiaResponse,
     ) {}
 
-    public function index(Request $request): RedirectResponse|Response
+    public function __invoke(Request $request): RedirectResponse
     {
         /** @var User $user */
         $user = $this->authManager->user();
@@ -32,8 +31,8 @@ final class EmailVerificationController extends Controller
             return $this->redirector->intended($this->urlGenerator->route('home', absolute: false));
         }
 
-        return $this->inertiaResponse->render('Auth/VerifyEmail', [
-            'status' => $request->session()->get('status'),
-        ]);
+        $this->resendVerificationEmailAction->execute($user);
+
+        return $this->redirector->back()->with('status', 'verification-link-sent');
     }
 }

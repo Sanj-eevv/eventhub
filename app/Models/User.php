@@ -130,7 +130,7 @@ final class User extends Authenticatable implements MustVerifyEmail
     public function hasAllPermissions(array $permissions): bool
     {
         $normalised = collect($permissions)
-            ->map(fn ($perm) => $perm instanceof BackedEnum ? $perm->value : $perm);
+            ->map(fn ($permission) => $permission instanceof BackedEnum ? $permission->value : $permission);
 
         return $normalised->diff($this->getAllPermissions())->isEmpty();
     }
@@ -138,7 +138,7 @@ final class User extends Authenticatable implements MustVerifyEmail
     public function hasAnyPermission(array $permissions): bool
     {
         $normalised = collect($permissions)
-            ->map(fn ($perm) => $perm instanceof BackedEnum ? $perm->value : $perm);
+            ->map(fn ($permission) => $permission instanceof BackedEnum ? $permission->value : $permission);
 
         return $this->getAllPermissions()->intersect($normalised)->isNotEmpty();
     }

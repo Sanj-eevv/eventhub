@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Auth;
 
-use App\Actions\CreateUserAction;
+use App\Actions\RegisterOrganizationAction;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Auth\RegisterRequest;
+use App\Http\Requests\Auth\OrganizationRegisterRequest;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Events\Dispatcher;
@@ -16,10 +16,10 @@ use Illuminate\Routing\UrlGenerator;
 use Inertia\Response;
 use Inertia\ResponseFactory;
 
-final class RegisterController extends Controller
+final class OrganizationRegisterController extends Controller
 {
     public function __construct(
-        private readonly CreateUserAction $createUserAction,
+        private readonly RegisterOrganizationAction $registerOrganizationAction,
         private readonly AuthManager $authManager,
         private readonly Redirector $redirector,
         private readonly UrlGenerator $urlGenerator,
@@ -29,17 +29,17 @@ final class RegisterController extends Controller
 
     public function create(): Response
     {
-        return $this->inertiaResponse->render('Auth/Register');
+        return $this->inertiaResponse->render('Auth/Organization/RegisterForm/Register');
     }
 
-    public function store(RegisterRequest $request): RedirectResponse
+    public function store(OrganizationRegisterRequest $request): RedirectResponse
     {
-        $user = $this->createUserAction->execute($request->toDto());
+        $user = $this->registerOrganizationAction->execute($request->toOrganizationDto(), $request->toUserDto());
 
         $this->dispatcher->dispatch(new Registered($user));
 
         $this->authManager->login($user);
 
-        return $this->redirector->intended($this->urlGenerator->route('home', absolute: false));
+        return $this->redirector->intended($this->urlGenerator->route('dashboard.index', absolute: false));
     }
 }

@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
@@ -80,16 +81,16 @@ final class AppServiceProvider extends ServiceProvider
     private function configureUrls(): void
     {
         URL::forceScheme('https');
-        ResetPassword::createUrlUsing(fn (User $user, string $token) => route('auth.password.reset', ['token' => $token, 'email' => $user->email]));
+        ResetPassword::createUrlUsing(fn (User $user, string $token) => URL::route('auth.password.reset', ['token' => $token, 'email' => $user->email]));
         VerifyEmail::createUrlUsing(fn (User $notifiable): string => URL::temporarySignedRoute(
             'auth.verification.verify',
-            now()->addMinutes(60),
+            CarbonImmutable::now()->addMinutes(60),
             [
                 'id' => $notifiable->getKey(),
                 'hash' => sha1($notifiable->getEmailForVerification()),
             ],
         ));
-        Authenticate::redirectUsing(fn () => route('auth.login', absolute: false));
+        Authenticate::redirectUsing(fn () => URL::route('auth.login', absolute: false));
     }
 
     private function configureVite(): void
@@ -115,7 +116,7 @@ final class AppServiceProvider extends ServiceProvider
 
     private function configureRateLimit(): void
     {
-        $loginRateLimitedResponse = fn (Request $request): RedirectResponse => back()->withErrors([
+        $loginRateLimitedResponse = fn (Request $request): RedirectResponse => app(Redirector::class)->back()->withErrors([
             'email' => ['Too many login attempts. Please try again later.'],
         ])->withInput($request->except('password'));
         RateLimiter::for('login', fn (Request $request) => [
