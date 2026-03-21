@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import { Head, Link } from "@inertiajs/vue3";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import HomeLayout from "@/layouts/HomeLayout.vue";
 import type { Order } from "@/types/event";
 import { index as ordersIndex } from "@/wayfinder/routes/orders";
@@ -11,100 +9,121 @@ const props = defineProps<{
     order: Order;
 }>();
 
-const ticketStatusVariantMap: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
-    active: "default",
-    pending: "outline",
-    used: "secondary",
-    cancelled: "destructive",
+const ticketStatusConfig: Record<string, { classes: string }> = {
+    active: { classes: "text-sf-gold border-sf-gold/30 bg-sf-gold/10" },
+    pending: { classes: "text-sf-muted border-sf-border bg-transparent" },
+    used: { classes: "text-sf-muted border-sf-border bg-sf-surface-raised" },
+    cancelled: { classes: "text-sf-ember border-sf-ember/30 bg-sf-ember/10" },
+};
+
+const formatDate = (dateStr: string | null): string => {
+    if (!dateStr) return "";
+    return new Date(dateStr).toLocaleDateString("en-US", { day: "numeric", month: "long", year: "numeric", hour: "numeric", minute: "2-digit" });
 };
 </script>
 
 <template>
     <HomeLayout>
-        <Head :title="`Order #${order.uuid}`" />
-        <div class="mx-auto max-w-2xl px-4 py-10">
-            <div class="mb-6 flex items-center gap-4">
-                <Link
-                    :href="ordersIndex().url"
-                    class="text-sm text-muted-foreground hover:text-foreground"
-                >
-                    ← My Orders
-                </Link>
+        <Head :title="`Order — ${order.event.title}`" />
+
+        <div class="mx-auto max-w-2xl px-5 sm:px-8 py-16">
+
+            <!-- Back -->
+            <Link
+                :href="ordersIndex()"
+                class="inline-flex items-center gap-2 font-body text-sm text-sf-tertiary hover:text-sf-muted transition-colors mb-10"
+            >
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                </svg>
+                My Orders
+            </Link>
+
+            <!-- Header -->
+            <div class="mb-10">
+                <p class="font-code text-xs text-sf-tertiary mb-3 tracking-wider">{{ order.uuid }}</p>
+                <h1 class="font-display font-semibold text-[clamp(1.75rem,4vw,3rem)] text-sf-text leading-tight">
+                    {{ order.event.title }}
+                </h1>
             </div>
 
-            <h1 class="mb-2 text-2xl font-bold">{{ order.event.title }}</h1>
-            <p class="mb-6 font-mono text-sm text-muted-foreground">
-                Order #{{ order.uuid }}
-            </p>
-
-            <Card class="mb-6">
-                <CardHeader>
-                    <CardTitle>Order Details</CardTitle>
-                </CardHeader>
-                <CardContent class="space-y-3">
-                    <div class="flex justify-between text-sm">
-                        <span class="text-muted-foreground">Status</span>
-                        <Badge>{{ order.status.label }}</Badge>
-                    </div>
-                    <div class="flex justify-between text-sm">
-                        <span class="text-muted-foreground">Total</span>
-                        <span class="font-semibold">{{ order.total_formatted }}</span>
-                    </div>
-                    <div v-if="order.paid_at" class="flex justify-between text-sm">
-                        <span class="text-muted-foreground">Paid at</span>
-                        <span>{{ order.paid_at }}</span>
-                    </div>
-                </CardContent>
-            </Card>
-
-            <Card>
-                <CardHeader>
-                    <CardTitle>Tickets</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div class="divide-y">
-                        <div
-                            v-for="ticket in order.tickets"
-                            :key="ticket.uuid"
-                            class="py-4 space-y-3"
+            <!-- Order details -->
+            <div class="bg-sf-surface border border-sf-border-subtle rounded-xl overflow-hidden mb-6 transition-colors duration-200">
+                <div class="px-5 py-4 border-b border-sf-border-subtle flex items-center gap-3">
+                    <span class="h-px w-4 bg-sf-gold" />
+                    <h2 class="font-display text-lg font-medium text-sf-text">Order Details</h2>
+                </div>
+                <div class="px-5 py-4 space-y-3">
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="font-body text-sf-muted">Status</span>
+                        <span
+                            :class="[
+                                'font-body text-xs px-2.5 py-1 rounded border',
+                                order.status.value === 'paid' ? 'text-sf-gold border-sf-gold/30 bg-sf-gold/10' :
+                                order.status.value === 'expired' || order.status.value === 'cancelled' ? 'text-sf-ember border-sf-ember/30 bg-sf-ember/10' :
+                                'text-sf-muted border-sf-border',
+                            ]"
                         >
-                            <div class="flex items-start justify-between">
-                                <div>
-                                    <p class="font-medium text-sm">{{ ticket.ticket_type }}</p>
-                                    <p class="font-mono text-xs text-muted-foreground mt-0.5">
-                                        {{ ticket.booking_reference }}
-                                    </p>
-                                    <p
-                                        v-if="ticket.attendee_name"
-                                        class="text-xs text-muted-foreground mt-0.5"
-                                    >
-                                        {{ ticket.attendee_name }}
-                                    </p>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <Badge
-                                        :variant="ticketStatusVariantMap[ticket.status] ?? 'outline'"
-                                    >
-                                        {{ ticket.status }}
-                                    </Badge>
-                                    <Link
-                                        :href="ticketShow({ ticket: ticket.uuid }).url"
-                                        class="text-xs text-primary hover:underline"
-                                    >
-                                        View
-                                    </Link>
-                                </div>
-                            </div>
-                            <img
-                                v-if="ticket.qr_code_path"
-                                :src="ticket.qr_code_path"
-                                :alt="`QR code for ${ticket.booking_reference}`"
-                                class="h-32 w-32 rounded-md"
-                            />
-                        </div>
+                            {{ order.status.label }}
+                        </span>
                     </div>
-                </CardContent>
-            </Card>
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="font-body text-sf-muted">Total</span>
+                        <span class="font-display text-xl font-medium text-sf-text">{{ order.total_formatted }}</span>
+                    </div>
+                    <div v-if="order.paid_at" class="flex justify-between items-center text-sm">
+                        <span class="font-body text-sf-muted">Paid at</span>
+                        <span class="font-body text-sm text-sf-text">{{ formatDate(order.paid_at) }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tickets -->
+            <div class="bg-sf-surface border border-sf-border-subtle rounded-xl overflow-hidden transition-colors duration-200">
+                <div class="px-5 py-4 border-b border-sf-border-subtle flex items-center gap-3">
+                    <span class="h-px w-4 bg-sf-gold" />
+                    <h2 class="font-display text-lg font-medium text-sf-text">Tickets</h2>
+                </div>
+                <div class="divide-y divide-sf-border-subtle">
+                    <div
+                        v-for="ticket in order.tickets"
+                        :key="ticket.uuid"
+                        class="px-5 py-5 space-y-4"
+                    >
+                        <div class="flex items-start justify-between gap-4">
+                            <div>
+                                <p class="font-body text-sm font-medium text-sf-text">{{ ticket.ticket_type }}</p>
+                                <p class="font-code text-xs text-sf-tertiary mt-1">{{ ticket.booking_reference }}</p>
+                                <p v-if="ticket.attendee_name" class="font-body text-xs text-sf-muted mt-1">
+                                    {{ ticket.attendee_name }}
+                                </p>
+                            </div>
+                            <div class="flex items-center gap-3 shrink-0">
+                                <span
+                                    :class="[
+                                        'font-body text-xs px-2.5 py-1 rounded border',
+                                        ticketStatusConfig[ticket.status]?.classes ?? 'text-sf-muted border-sf-border',
+                                    ]"
+                                >
+                                    {{ ticket.status }}
+                                </span>
+                                <Link
+                                    :href="ticketShow({ ticket: ticket.uuid })"
+                                    class="font-body text-xs text-sf-gold hover:text-sf-text transition-colors"
+                                >
+                                    View ticket →
+                                </Link>
+                            </div>
+                        </div>
+                        <img
+                            v-if="ticket.qr_code_path"
+                            :src="ticket.qr_code_path"
+                            :alt="`QR code for ${ticket.booking_reference}`"
+                            class="h-28 w-28 rounded-lg border border-sf-border"
+                        />
+                    </div>
+                </div>
+            </div>
         </div>
     </HomeLayout>
 </template>

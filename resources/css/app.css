@@ -41,6 +41,19 @@
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-ring: var(--sidebar-ring);
+
+    /* Stagefront public design tokens */
+    --color-sf-bg: var(--sf-bg);
+    --color-sf-surface: var(--sf-surface);
+    --color-sf-surface-raised: var(--sf-surface-raised);
+    --color-sf-border: var(--sf-border);
+    --color-sf-border-subtle: var(--sf-border-subtle);
+    --color-sf-gold: var(--sf-gold);
+    --color-sf-ember: var(--sf-ember);
+    --color-sf-ember-hover: var(--sf-ember-hover);
+    --color-sf-text: var(--sf-text);
+    --color-sf-muted: var(--sf-muted);
+    --color-sf-tertiary: var(--sf-tertiary);
 }
 
 :root {
@@ -76,6 +89,19 @@
     --sidebar-accent-foreground: oklch(0.205 0 0);
     --sidebar-border: oklch(0.922 0 0);
     --sidebar-ring: oklch(0.708 0 0);
+
+    /* Stagefront — light mode */
+    --sf-bg: #f7f4ee;
+    --sf-surface: #eee9df;
+    --sf-surface-raised: #e5dfd3;
+    --sf-border: #d0c9bc;
+    --sf-border-subtle: #ddd8ce;
+    --sf-gold: #8a5c1e;
+    --sf-ember: #bc4520;
+    --sf-ember-hover: #a33b1b;
+    --sf-text: #1c1814;
+    --sf-muted: #6b5c4e;
+    --sf-tertiary: #9a8b7e;
 }
 
 .dark {
@@ -110,6 +136,19 @@
     --sidebar-accent-foreground: oklch(0.985 0 0);
     --sidebar-border: oklch(1 0 0 / 10%);
     --sidebar-ring: oklch(0.556 0 0);
+
+    /* Stagefront — dark mode */
+    --sf-bg: #080907;
+    --sf-surface: #111110;
+    --sf-surface-raised: #1a1816;
+    --sf-border: #2e2c26;
+    --sf-border-subtle: #1c1b19;
+    --sf-gold: #c9a55a;
+    --sf-ember: #d45a2a;
+    --sf-ember-hover: #bf5025;
+    --sf-text: #ece8de;
+    --sf-muted: #7a7668;
+    --sf-tertiary: #4a4840;
 }
 
 @layer base {
@@ -129,5 +168,17 @@
     label.required::after {
         content: "*";
         @apply text-destructive;
+    }
+
+    .font-display {
+        font-family: 'Syne', system-ui, sans-serif;
+    }
+
+    .font-body {
+        font-family: 'Manrope', system-ui, sans-serif;
+    }
+
+    .font-code {
+        font-family: 'Fira Code', ui-monospace, monospace;
     }
 }

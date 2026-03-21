@@ -1,10 +1,9 @@
 <script lang="ts" setup>
-import { Form, Head } from "@inertiajs/vue3";
+import { Form, Head, Link } from "@inertiajs/vue3";
 import { ref } from "vue";
 import Step1 from "@/components/Auth/Organization/Register/Step1.vue";
 import Step2 from "@/components/Auth/Organization/Register/Step2.vue";
 import StepCount from "@/components/Auth/Organization/Register/StepCount.vue";
-import TextLink from "@/components/TextLink.vue";
 import AuthLayout from "@/layouts/AuthLayout.vue";
 import { login, register } from "@/wayfinder/routes/auth";
 import { store } from "@/wayfinder/routes/auth/register/organization";
@@ -37,26 +36,14 @@ const stepDescriptions: Record<number, string> = {
                 v-show="activeStep === 2"
                 @back="activeStep = activeStep - 1"
             />
-            <div class="text-center text-sm text-muted-foreground">
+            <p class="text-center font-body text-sm text-sf-muted">
                 Already have an account?
-                <TextLink
-                    :href="login()"
-                    class="underline underline-offset-4"
-                    :tabindex="7"
-                >
-                    Log in
-                </TextLink>
-            </div>
-            <div class="text-center text-sm text-muted-foreground">
+                <Link :href="login()" :tabindex="7" class="text-sf-gold hover:text-sf-text transition-colors ml-1">Sign in</Link>
+            </p>
+            <p class="text-center font-body text-sm text-sf-muted">
                 Just want a personal account?
-                <TextLink
-                    :href="register()"
-                    class="underline underline-offset-4"
-                    :tabindex="8"
-                >
-                    Register here
-                </TextLink>
-            </div>
+                <Link :href="register()" :tabindex="8" class="text-sf-gold hover:text-sf-text transition-colors ml-1">Register here</Link>
+            </p>
         </Form>
     </AuthLayout>
 </template>

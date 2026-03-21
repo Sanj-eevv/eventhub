@@ -13,10 +13,10 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { useEventTable } from "@/composables/events/useEvents";
+import { eventStatusLabels } from "@/constants/statusLabels";
 import DashboardLayout from "@/layouts/DashboardLayout.vue";
 import type { BreadcrumbItem } from "@/types";
 import type { Event, EventPageProps } from "@/types/event";
-import { eventStatusLabels } from "@/constants/statusLabels";
 import { index as dashboardIndex } from "@/wayfinder/routes/dashboard";
 import {
     create as eventsCreate,
@@ -40,7 +40,6 @@ const {
     activeEvent,
     deleteDialog,
 } = useEventTable(props.events.meta, props.events.filters);
-
 </script>
 
 <template>

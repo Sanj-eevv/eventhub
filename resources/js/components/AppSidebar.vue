@@ -40,6 +40,7 @@ import { toUrl } from "@/lib/utils";
 import type { NavItem } from "@/types";
 import { logout } from "@/wayfinder/routes/auth";
 import { index } from "@/wayfinder/routes/dashboard";
+import { home } from "@/wayfinder/routes";
 import { index as eventsIndex } from "@/wayfinder/routes/dashboard/events";
 import { index as ordersIndex } from "@/wayfinder/routes/dashboard/orders";
 import { index as orgsIndex } from "@/wayfinder/routes/dashboard/organizations";
@@ -130,7 +131,7 @@ const handleLogout = () => {
             <SidebarMenu>
                 <SidebarMenuItem>
                     <SidebarMenuButton size="lg" as-child>
-                        <Link :href="index()">
+                        <Link :href="home()">
                             <AppLogo />
                         </Link>
                     </SidebarMenuButton>
