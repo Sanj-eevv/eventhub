@@ -1,0 +1,28 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Http\Controllers;
+
+use App\Actions\CompleteOrderAction;
+use App\Models\Order;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Redirector;
+
+final class ProcessPaymentController extends Controller
+{
+    public function __construct(
+        private readonly CompleteOrderAction $completeOrderAction,
+        private readonly Redirector $redirector,
+    ) {}
+
+    public function __invoke(Request $request, Order $order): RedirectResponse
+    {
+        abort_if($order->user_id !== $request->user()->id, 403);
+
+        $this->completeOrderAction->execute($order);
+
+        return $this->redirector->route('checkout.confirmation', ['order' => $order->uuid]);
+    }
+}

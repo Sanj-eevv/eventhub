@@ -12,21 +12,33 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ResendEmailVerificationController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\BrowseEventController;
+use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\Dashboard\ApproveOrganizationController;
 use App\Http\Controllers\Dashboard\CancelEventController;
+use App\Http\Controllers\Dashboard\CheckInController;
+use App\Http\Controllers\Dashboard\DashboardOrderController;
 use App\Http\Controllers\Dashboard\EventController;
 use App\Http\Controllers\Dashboard\OrganizationController;
 use App\Http\Controllers\Dashboard\PublishEventController;
 use App\Http\Controllers\Dashboard\RejectOrganizationController;
 use App\Http\Controllers\Dashboard\RoleController;
+use App\Http\Controllers\Dashboard\ScanTicketController;
 use App\Http\Controllers\Dashboard\UnpublishEventController;
 use App\Http\Controllers\Dashboard\UserController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\IndexController;
+use App\Http\Controllers\MyOrderController;
+use App\Http\Controllers\MyTicketController;
+use App\Http\Controllers\ProcessPaymentController;
+use App\Http\Controllers\ReserveTicketsController;
+use App\Http\Controllers\Webhooks\StripeWebhookController;
 use Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', IndexController::class)->name('home');
+
+Route::post('webhooks/stripe', StripeWebhookController::class)->name('webhooks.stripe');
 
 Route::middleware('guest')->group(function (): void {
     Route::as('auth.')->group(function (): void {
@@ -43,6 +55,18 @@ Route::middleware('guest')->group(function (): void {
         Route::get('reset-password/{token}', [ResetPasswordController::class, 'create'])->name('password.reset');
         Route::post('reset-password/update', [ResetPasswordController::class, 'store'])->name('password.store')->middleware('throttle:password-reset');
     });
+});
+
+Route::middleware(['auth', 'verified'])->group(function (): void {
+    Route::get('events', [BrowseEventController::class, 'index'])->name('events.index');
+    Route::get('events/{event:slug}', [BrowseEventController::class, 'show'])->name('events.show');
+    Route::post('events/{event:slug}/reserve', ReserveTicketsController::class)->name('tickets.reserve');
+    Route::get('checkout/{order:uuid}', [CheckoutController::class, 'show'])->name('checkout.show');
+    Route::post('checkout/{order:uuid}/pay', ProcessPaymentController::class)->name('checkout.pay');
+    Route::get('checkout/{order:uuid}/confirmation', [CheckoutController::class, 'confirmation'])->name('checkout.confirmation');
+    Route::get('my/orders', [MyOrderController::class, 'index'])->name('orders.index');
+    Route::get('my/orders/{order:uuid}', [MyOrderController::class, 'show'])->name('orders.show');
+    Route::get('my/tickets/{ticket:uuid}', [MyTicketController::class, 'show'])->name('tickets.show');
 });
 
 Route::middleware('auth')->group(function (): void {
@@ -63,5 +87,8 @@ Route::middleware('auth')->group(function (): void {
         Route::post('events/{event}/publish', PublishEventController::class)->name('events.publish');
         Route::post('events/{event}/unpublish', UnpublishEventController::class)->name('events.unpublish');
         Route::post('events/{event}/cancel', CancelEventController::class)->name('events.cancel');
+        Route::resource('orders', DashboardOrderController::class)->only(['index', 'show']);
+        Route::get('events/{event}/check-in', [CheckInController::class, 'index'])->name('events.check-in');
+        Route::post('events/{event}/check-in', ScanTicketController::class)->name('events.check-in.scan');
     });
 });

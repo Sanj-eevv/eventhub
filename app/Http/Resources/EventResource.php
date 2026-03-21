@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Resources;
 
+use App\Support\DateFormat;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -12,31 +13,35 @@ final class EventResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
             'uuid' => $this->uuid,
-            'user_id' => $this->user_id,
-            'organization_id' => $this->organization_id,
+            'organization_uuid' => $this->organization->uuid,
             'title' => $this->title,
             'slug' => $this->slug,
             'description' => $this->description,
-            'starts_at' => $this->starts_at->toISOString(),
-            'ends_at' => $this->ends_at?->toISOString(),
+            'starts_at' => $this->starts_at->format(DateFormat::DATETIME_LOCAL),
+            'ends_at' => $this->ends_at?->format(DateFormat::DATETIME_LOCAL),
             'timezone' => $this->timezone,
             'location' => $this->location,
-            'tickets' => $this->tickets,
-            'status' => $this->status->value,
+            'status' => ['value' => $this->status->value, 'label' => $this->status->label()],
             'created_at' => $this->created_at->toISOString(),
             'updated_at' => $this->updated_at->toISOString(),
             'organization' => $this->whenLoaded('organization', fn () => [
-                'id' => $this->organization->id,
                 'uuid' => $this->organization->uuid,
                 'title' => $this->organization->title,
             ]),
             'user' => $this->whenLoaded('user', fn () => [
-                'id' => $this->user->id,
                 'uuid' => $this->user->uuid,
                 'name' => $this->user->name,
             ]),
+            'ticket_types' => $this->whenLoaded('ticketTypes', fn () => $this->ticketTypes->map(fn ($ticketType) => [
+                'uuid' => $ticketType->uuid,
+                'name' => $ticketType->name,
+                'price' => $ticketType->price / 100,
+                'capacity' => $ticketType->capacity,
+                'max_per_user' => $ticketType->max_per_user,
+                'sale_starts_at' => $ticketType->sale_starts_at?->format(DateFormat::DATETIME_LOCAL),
+                'sale_ends_at' => $ticketType->sale_ends_at?->format(DateFormat::DATETIME_LOCAL),
+            ])->all()),
         ];
     }
 }

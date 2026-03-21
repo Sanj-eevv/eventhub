@@ -7,6 +7,7 @@ import {
     ChevronsUpDown,
     LayoutGrid,
     LogOut,
+    Receipt,
     ShieldCheck,
     Users,
 } from "lucide-vue-next";
@@ -40,6 +41,7 @@ import type { NavItem } from "@/types";
 import { logout } from "@/wayfinder/routes/auth";
 import { index } from "@/wayfinder/routes/dashboard";
 import { index as eventsIndex } from "@/wayfinder/routes/dashboard/events";
+import { index as ordersIndex } from "@/wayfinder/routes/dashboard/orders";
 import { index as orgsIndex } from "@/wayfinder/routes/dashboard/organizations";
 import { index as rolesIndex } from "@/wayfinder/routes/dashboard/roles";
 import { index as usersIndex } from "@/wayfinder/routes/dashboard/users";
@@ -77,6 +79,13 @@ const mainNavItems: NavItem[] = [
         icon: CalendarDays,
         matchPrefix: true,
         show: usePermission("event")("viewAny"),
+    },
+    {
+        title: "Orders",
+        href: ordersIndex(),
+        icon: Receipt,
+        matchPrefix: true,
+        show: usePermission("order")("viewAny"),
     },
     {
         title: "Roles",

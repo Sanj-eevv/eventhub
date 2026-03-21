@@ -4,11 +4,23 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Events\EventCancelled;
+use App\Events\OrderCompleted;
 use App\Events\OrganizationApproved;
 use App\Events\OrganizationRejected;
+use App\Listeners\GenerateTicketQrCodes;
+use App\Listeners\NotifyEventTicketHolders;
+use App\Listeners\SendOrderConfirmationNotification;
 use App\Listeners\SendOrganizationApprovedMail;
 use App\Listeners\SendOrganizationRejectedMail;
+use App\Listeners\VoidEventTickets;
+use App\Models\Order;
+use App\Models\Ticket;
+use App\Models\TicketType;
 use App\Models\User;
+use App\Policies\OrderPolicy;
+use App\Policies\TicketPolicy;
+use App\Policies\TicketTypePolicy;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Auth\Notifications\ResetPassword;
@@ -22,6 +34,7 @@ use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\URL;
@@ -35,6 +48,7 @@ final class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        $this->configurePolicies();
         $this->configureEvents();
         $this->configureCommands();
         $this->configureModels();
@@ -48,10 +62,23 @@ final class AppServiceProvider extends ServiceProvider
         JsonResource::withoutWrapping();
     }
 
+    private function configurePolicies(): void
+    {
+        Gate::policy(TicketType::class, TicketTypePolicy::class);
+        Gate::policy(Order::class, OrderPolicy::class);
+        Gate::policy(Ticket::class, TicketPolicy::class);
+    }
+
     private function configureEvents(): void
     {
         Event::listen(OrganizationApproved::class, SendOrganizationApprovedMail::class);
         Event::listen(OrganizationRejected::class, SendOrganizationRejectedMail::class);
+
+        Event::listen(OrderCompleted::class, GenerateTicketQrCodes::class);
+        Event::listen(OrderCompleted::class, SendOrderConfirmationNotification::class);
+
+        Event::listen(EventCancelled::class, VoidEventTickets::class);
+        Event::listen(EventCancelled::class, NotifyEventTicketHolders::class);
     }
 
     private function configureDatabase(): void

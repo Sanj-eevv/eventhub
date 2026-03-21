@@ -124,6 +124,12 @@ This project follows Laravel architecture practices. Always ask "What Would Tayl
 - Prefer `collect()` over raw PHP array functions throughout the codebase.
 - Always activate the `wwtd` skill when choosing between multiple approaches or making architectural decisions.
 
+## PHP Imports
+
+- Always use `use` statements to import PHP classes, interfaces, enums, and global namespace classes (e.g. `use DateTimeZone;`).
+- Never reference classes with a leading backslash (e.g. `\DateTimeZone`) — always import them at the top of the file.
+- This applies to PHP built-ins, global classes, and all userland classes without exception.
+
 ## Conditionals
 
 - Compound `&&` conditions are acceptable in `if` statements, return expressions, and closures. Do not split them into nested `if` blocks.
@@ -195,6 +201,8 @@ This project has domain-specific skills available. You MUST activate the relevan
 - `laravel-validation` — Form request validation and comprehensive validation testing. Use when working with validation rules, form requests, validation testing, or when user mentions validation, form requests, validation rules, conditional validation, validation testing.
 - `laravel-value-objects` — Immutable value objects for domain values. Use when working with domain values, immutable objects, or when user mentions value objects, immutable values, domain values, money objects, coordinate objects.
 - `php-guidelines-from-spatie` — Describes PHP and Laravel guidelines provided by Spatie. These rules result in more maintainable, and readable code.
+- `shadcn-vue` — shadcn-vue for Vue/Nuxt with Reka UI components and Tailwind. Use for accessible UI, Auto Form, data tables, charts, dark mode, MCP server setup, or encountering component imports, Reka UI errors.
+- `vue-best-practices` — MUST be used for Vue.js tasks. Strongly recommends Composition API with `<script setup>` and TypeScript as the standard approach. Covers Vue 3, SSR, Volar, vue-tsc. Load for any Vue, .vue files, Vue Router, Pinia, or Vite with Vue work. ALWAYS use Composition API unless the project explicitly requires Options API.
 - `wwtd` — Apply "What Would Taylor Otwell Do?" (WWTD) as a decision-making lens for Laravel architecture, conventions, and code quality questions. Activate when the user asks about best practices, naming conventions, code structure, or when choosing between multiple approaches.
 
 ## Conventions

@@ -15,6 +15,7 @@ use App\Http\Resources\EventResource;
 use App\Http\Resources\Organization\PickerResource as OrganizationPickerResource;
 use App\Models\Event;
 use App\Models\Organization;
+use DateTimeZone;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
@@ -69,6 +70,7 @@ final class EventController extends Controller
 
         return $this->inertiaResponse->render('Dashboard/Events/Create', [
             'organizations' => OrganizationPickerResource::collection(Organization::query()->approved()->get()),
+            'timezones' => DateTimeZone::listIdentifiers(),
         ]);
     }
 
@@ -86,8 +88,9 @@ final class EventController extends Controller
         $this->authorize('update', $event);
 
         return $this->inertiaResponse->render('Dashboard/Events/Edit', [
-            'event' => new EventResource($event->load(['organization', 'user'])),
+            'event' => new EventResource($event->load(['organization', 'user', 'ticketTypes'])),
             'organizations' => OrganizationPickerResource::collection(Organization::query()->approved()->get()),
+            'timezones' => DateTimeZone::listIdentifiers(),
         ]);
     }
 

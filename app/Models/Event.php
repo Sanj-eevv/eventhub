@@ -12,9 +12,11 @@ use Carbon\CarbonImmutable;
 use Database\Factories\EventFactory;
 use Eloquent;
 use Illuminate\Database\Eloquent\Attributes\UseEloquentBuilder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -29,13 +31,15 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property CarbonImmutable|null $ends_at
  * @property string $timezone
  * @property array<array-key, mixed>|null $location
- * @property array<array-key, mixed>|null $tickets
  * @property EventStatus $status
  * @property CarbonImmutable|null $deleted_at
  * @property CarbonImmutable|null $created_at
  * @property CarbonImmutable|null $updated_at
  * @property-read Organization $organization
  * @property-read User $user
+ * @property-read Collection<int, TicketType> $ticketTypes
+ * @property-read Collection<int, Order> $orders
+ * @property-read Collection<int, Ticket> $tickets
  *
  * @method static EventFactory factory($count = null, $state = [])
  * @method static Builder<static>|Event newModelQuery()
@@ -47,12 +51,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static Builder<static>|Event whereDescription($value)
  * @method static Builder<static>|Event whereEndsAt($value)
  * @method static Builder<static>|Event whereId($value)
- * @method static Builder<static>|Event whereLocation($value)
  * @method static Builder<static>|Event whereOrganizationId($value)
  * @method static Builder<static>|Event whereSlug($value)
  * @method static Builder<static>|Event whereStartsAt($value)
  * @method static Builder<static>|Event whereStatus($value)
- * @method static Builder<static>|Event whereTickets($value)
  * @method static Builder<static>|Event whereTimezone($value)
  * @method static Builder<static>|Event whereTitle($value)
  * @method static Builder<static>|Event whereUpdatedAt($value)
@@ -82,8 +84,22 @@ final class Event extends Model
         'status',
         'timezone',
         'location',
-        'tickets',
     ];
+
+    public function ticketTypes(): HasMany
+    {
+        return $this->hasMany(TicketType::class)->orderBy('sort_order');
+    }
+
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    public function tickets(): HasMany
+    {
+        return $this->hasMany(Ticket::class);
+    }
 
     public function user(): BelongsTo
     {
@@ -102,7 +118,6 @@ final class Event extends Model
             'starts_at' => 'datetime',
             'ends_at' => 'datetime',
             'location' => 'array',
-            'tickets' => 'array',
         ];
     }
 }

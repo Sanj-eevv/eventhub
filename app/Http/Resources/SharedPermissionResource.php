@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Resources;
 
 use App\Models\Event;
+use App\Models\Order;
 use App\Models\Organization;
 use App\Models\Role;
 use App\Models\User;
@@ -30,6 +31,9 @@ final class SharedPermissionResource
                 'create' => Gate::forUser($this->user)->allows('create', Role::class),
             ],
             'event' => $this->abilities(Event::class),
+            'order' => [
+                'viewAny' => Gate::forUser($this->user)->allows('viewAny', Order::class),
+            ],
         ];
     }
 

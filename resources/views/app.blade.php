@@ -5,6 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <script src="https://js.stripe.com/v3/" defer></script>
     @vite('resources/js/app.ts')
     @inertiaHead
 </head>

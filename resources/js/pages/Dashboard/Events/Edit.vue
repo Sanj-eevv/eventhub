@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { router, useForm } from "@inertiajs/vue3";
+import { router } from "@inertiajs/vue3";
 import { ref } from "vue";
 import EventForm from "@/components/Dashboard/Events/EventForm.vue";
 import EventStatusBadge from "@/components/Dashboard/Events/EventStatusBadge.vue";
@@ -21,6 +21,7 @@ import {
 const props = defineProps<{
     event: Event;
     organizations: OrganizationPicker[];
+    timezones: string[];
 }>();
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -29,78 +30,48 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: props.event.title, href: eventsEdit(props.event.uuid).url },
 ];
 
-const formatForInput = (iso: string | null | undefined) =>
-    iso?.substring(0, 16) ?? "";
-
-const form = useForm({
-    organization_id: props.event.organization_id,
+const initialValues = {
+    organization_uuid: props.event.organization_uuid,
     title: props.event.title,
     description: props.event.description,
-    starts_at: formatForInput(props.event.starts_at),
-    ends_at: formatForInput(props.event.ends_at),
-    timezone:
-        props.event.timezone ??
-        Intl.DateTimeFormat().resolvedOptions().timeZone,
+    starts_at: props.event.starts_at,
+    ends_at: props.event.ends_at ?? "",
+    timezone: props.event.timezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone,
     location: {
         venue_name: props.event.location?.venue_name ?? "",
         address_line_1: props.event.location?.address_line_1 ?? "",
         address_line_2: props.event.location?.address_line_2 ?? "",
-        city: props.event.location?.city ?? "",
-        state: props.event.location?.state ?? "",
         zip: props.event.location?.zip ?? "",
-        country: props.event.location?.country ?? "",
         map_url: props.event.location?.map_url ?? "",
     },
-    tickets: (props.event.tickets ?? []).map((t) => ({
-        ...t,
+    ticket_types: (props.event.ticket_types ?? []).map((ticketType) => ({
         _key: crypto.randomUUID(),
-    })) as {
-        _key: string;
-        label: string;
-        price: number | string;
-        quantity: number | null;
-        sale_starts_at: string | null;
-        sale_ends_at: string | null;
-    }[],
-});
+        uuid: ticketType.uuid,
+        name: ticketType.name,
+        price: ticketType.price.toFixed(2),
+        capacity: String(ticketType.capacity),
+        max_per_user: String(ticketType.max_per_user),
+        sale_starts_at: ticketType.sale_starts_at ?? undefined,
+        sale_ends_at: ticketType.sale_ends_at ?? undefined,
+    })),
+};
 
 const isPublishing = ref(false);
 
-const submit = () => {
-    form.transform((data) => ({
-        ...data,
-        tickets: data.tickets.map(({ _key: _, ...rest }) => rest),
-    })).put(update(props.event.uuid).url, {
-        preserveScroll: true,
-    });
-};
-
 const handlePublish = () => {
     isPublishing.value = true;
-    router.post(
-        publish(props.event.uuid).url,
-        {},
-        {
-            preserveScroll: true,
-            onFinish: () => {
-                isPublishing.value = false;
-            },
-        },
-    );
+    router.post(publish(props.event.uuid).url, {}, {
+        preserveScroll: true,
+        onFinish: () => { isPublishing.value = false; },
+    });
 };
 
 const handleUnpublish = () => {
     isPublishing.value = true;
-    router.post(
-        unpublish(props.event.uuid).url,
-        {},
-        {
-            preserveScroll: true,
-            onFinish: () => {
-                isPublishing.value = false;
-            },
-        },
-    );
+    router.post(unpublish(props.event.uuid).url, {}, {
+        preserveScroll: true,
+        onFinish: () => { isPublishing.value = false; },
+    });
 };
 </script>
 
@@ -125,7 +96,7 @@ const handleUnpublish = () => {
 
                     <div class="flex shrink-0 gap-2">
                         <Button
-                            v-if="event.status === 'draft'"
+                            v-if="event.status.value === 'draft'"
                             type="button"
                             size="sm"
                             :disabled="isPublishing"
@@ -135,7 +106,7 @@ const handleUnpublish = () => {
                             Publish
                         </Button>
                         <Button
-                            v-else-if="event.status === 'published'"
+                            v-else-if="event.status.value === 'published'"
                             type="button"
                             variant="outline"
                             size="sm"
@@ -151,10 +122,12 @@ const handleUnpublish = () => {
 
             <div class="flex min-h-0 flex-1 flex-col">
                 <EventForm
-                    :form="form"
+                    :initial-values="initialValues"
                     :organizations="organizations"
+                    :timezones="timezones"
+                    submit-method="put"
+                    :submit-url="update(event.uuid).url"
                     :is-editing="true"
-                    @submit="submit"
                     @cancel="router.visit(eventsIndex().url)"
                 />
             </div>

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Http\Requests\Dashboard;
 
 use App\DataTransferObjects\EventData;
+use App\DataTransferObjects\TicketTypeData;
+use App\Models\Organization;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -13,7 +15,7 @@ final class EventRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'organization_id' => ['required', 'integer', 'exists:organizations,id'],
+            'organization_uuid' => ['required', 'string', 'exists:organizations,uuid'],
             'title' => ['required', 'string', 'max:191'],
             'description' => ['required', 'string', 'max:10000'],
             'starts_at' => ['required', 'date'],
@@ -23,17 +25,23 @@ final class EventRequest extends FormRequest
             'location.venue_name' => ['nullable', 'string', 'max:191'],
             'location.address_line_1' => ['nullable', 'string', 'max:191'],
             'location.address_line_2' => ['nullable', 'string', 'max:191'],
-            'location.city' => ['nullable', 'string', 'max:191'],
-            'location.state' => ['nullable', 'string', 'max:191'],
             'location.zip' => ['nullable', 'string', 'max:20'],
-            'location.country' => ['nullable', 'string', 'max:191'],
             'location.map_url' => ['nullable', 'url'],
-            'tickets' => ['nullable', 'array'],
-            'tickets.*.label' => ['required_with:tickets', 'string', 'max:191'],
-            'tickets.*.price' => ['nullable', 'numeric', 'min:0'],
-            'tickets.*.quantity' => ['nullable', 'integer', 'min:1'],
-            'tickets.*.sale_starts_at' => ['nullable', 'date'],
-            'tickets.*.sale_ends_at' => ['nullable', 'date', 'after:tickets.*.sale_starts_at'],
+            'ticket_types' => ['required', 'array', 'min:1'],
+            'ticket_types.*.uuid' => ['nullable', 'string'],
+            'ticket_types.*.name' => ['required', 'string', 'max:191'],
+            'ticket_types.*.price' => ['required', 'numeric', 'min:0.01'],
+            'ticket_types.*.capacity' => ['required', 'integer', 'min:1'],
+            'ticket_types.*.max_per_user' => ['nullable', 'integer', 'min:1', 'max:100'],
+            'ticket_types.*.sale_starts_at' => ['nullable', 'date'],
+            'ticket_types.*.sale_ends_at' => ['nullable', 'date', 'after_or_equal:ticket_types.*.sale_starts_at'],
+        ];
+    }
+
+    public function attributes(): array
+    {
+        return [
+            'organization_uuid' => 'organization',
         ];
     }
 
@@ -41,30 +49,43 @@ final class EventRequest extends FormRequest
     {
         return [
             'location.map_url.url' => 'The map URL must be a valid URL.',
-            'tickets.*.label.required_with' => 'Each ticket must have a label.',
-            'tickets.*.label.max' => 'Ticket labels may not exceed 191 characters.',
-            'tickets.*.price.numeric' => 'Ticket price must be a number.',
-            'tickets.*.price.min' => 'Ticket price must be at least 0.',
-            'tickets.*.quantity.integer' => 'Ticket quantity must be a whole number.',
-            'tickets.*.quantity.min' => 'Ticket quantity must be at least 1.',
-            'tickets.*.sale_starts_at.date' => 'Ticket sale start date must be a valid date.',
-            'tickets.*.sale_ends_at.date' => 'Ticket sale end date must be a valid date.',
-            'tickets.*.sale_ends_at.after' => 'Ticket sale end date must be after the sale start date.',
+            'ticket_types.required' => 'At least one ticket type is required.',
+            'ticket_types.min' => 'At least one ticket type is required.',
+            'ticket_types.*.name.required' => 'Each ticket type must have a name.',
+            'ticket_types.*.price.required' => 'Each ticket type must have a price.',
+            'ticket_types.*.price.min' => 'Ticket price must be greater than zero.',
+            'ticket_types.*.capacity.required' => 'Each ticket type must have a capacity.',
+            'ticket_types.*.capacity.min' => 'Capacity must be at least 1.',
         ];
     }
 
     public function toDto(): EventData
     {
+        $organizationId = Organization::where('uuid', $this->validated('organization_uuid'))->value('id');
+
+        $ticketTypes = collect($this->validated('ticket_types'))
+            ->map(fn (array $type, int $index) => new TicketTypeData(
+                name: $type['name'],
+                price: (int) round((float) $type['price'] * 100),
+                capacity: (int) $type['capacity'],
+                max_per_user: isset($type['max_per_user']) ? (int) $type['max_per_user'] : 5,
+                sort_order: $index,
+                uuid: $type['uuid'] ?? null,
+                sale_starts_at: isset($type['sale_starts_at']) ? CarbonImmutable::parse($type['sale_starts_at']) : null,
+                sale_ends_at: isset($type['sale_ends_at']) ? CarbonImmutable::parse($type['sale_ends_at']) : null,
+            ))
+            ->all();
+
         return new EventData(
             user_id: $this->user()->id,
-            organization_id: $this->validated('organization_id'),
+            organization_id: $organizationId,
             title: $this->validated('title'),
             description: $this->validated('description'),
             starts_at: CarbonImmutable::parse($this->validated('starts_at')),
             ends_at: $this->validated('ends_at') ? CarbonImmutable::parse($this->validated('ends_at')) : null,
             timezone: $this->validated('timezone'),
             location: $this->validated('location'),
-            tickets: $this->validated('tickets'),
+            ticket_types: $ticketTypes,
         );
     }
 }

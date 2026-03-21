@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Actions;
 
 use App\Enums\EventStatus;
+use App\Events\EventCancelled;
 use App\Exceptions\InvalidStatusTransitionException;
 use App\Models\Event;
 
@@ -17,6 +18,10 @@ final class UpdateEventStatusAction
         }
 
         $event->update(['status' => $status]);
+
+        if (EventStatus::Cancelled === $status) {
+            EventCancelled::dispatch($event);
+        }
 
         return $event;
     }

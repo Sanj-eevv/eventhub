@@ -14,7 +14,6 @@ return new class() extends Migration
             $table->dateTime('ends_at')->nullable()->change();
             $table->string('timezone')->default('UTC')->after('ends_at');
             $table->json('location')->nullable()->after('timezone');
-            $table->json('tickets')->nullable()->after('location');
         });
     }
 };

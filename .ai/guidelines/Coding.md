@@ -40,6 +40,12 @@ This project follows Laravel architecture practices. Always ask "What Would Tayl
 - Prefer `collect()` over raw PHP array functions throughout the codebase.
 - Always activate the `wwtd` skill when choosing between multiple approaches or making architectural decisions.
 
+## PHP Imports
+
+- Always use `use` statements to import PHP classes, interfaces, enums, and global namespace classes (e.g. `use DateTimeZone;`).
+- Never reference classes with a leading backslash (e.g. `\DateTimeZone`) — always import them at the top of the file.
+- This applies to PHP built-ins, global classes, and all userland classes without exception.
+
 ## Conditionals
 
 - Compound `&&` conditions are acceptable in `if` statements, return expressions, and closures. Do not split them into nested `if` blocks.

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { router, useForm } from "@inertiajs/vue3";
+import { router } from "@inertiajs/vue3";
 import EventForm from "@/components/Dashboard/Events/EventForm.vue";
 import DashboardLayout from "@/layouts/DashboardLayout.vue";
 import type { BreadcrumbItem } from "@/types";
@@ -13,6 +13,7 @@ import {
 
 defineProps<{
     organizations: OrganizationPicker[];
+    timezones: string[];
 }>();
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -20,42 +21,6 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: "Events", href: eventsIndex().url },
     { title: "Create Event", href: eventsCreate().url },
 ];
-
-const form = useForm({
-    organization_id: "",
-    title: "",
-    description: "",
-    starts_at: "",
-    ends_at: "",
-    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-    location: {
-        venue_name: "",
-        address_line_1: "",
-        address_line_2: "",
-        city: "",
-        state: "",
-        zip: "",
-        country: "",
-        map_url: "",
-    },
-    tickets: [] as {
-        _key: string;
-        label: string;
-        price: number | string;
-        quantity: number | null;
-        sale_starts_at: string | null;
-        sale_ends_at: string | null;
-    }[],
-});
-
-const submit = () => {
-    form.transform((data) => ({
-        ...data,
-        tickets: data.tickets.map(({ _key: _, ...rest }) => rest),
-    })).post(store().url, {
-        preserveScroll: true,
-    });
-};
 </script>
 
 <template>
@@ -70,9 +35,10 @@ const submit = () => {
 
             <div class="flex min-h-0 flex-1 flex-col">
                 <EventForm
-                    :form="form"
                     :organizations="organizations"
-                    @submit="submit"
+                    :timezones="timezones"
+                    submit-method="post"
+                    :submit-url="store().url"
                     @cancel="router.visit(eventsIndex().url)"
                 />
             </div>

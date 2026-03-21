@@ -8,26 +8,66 @@ export type EventLocation = {
     venue_name?: string | null;
     address_line_1?: string | null;
     address_line_2?: string | null;
-    city?: string | null;
-    state?: string | null;
     zip?: string | null;
-    country?: string | null;
     map_url?: string | null;
 };
 
-export type EventTicket = {
-    _key: string;
-    label: string;
-    price: number | string;
-    quantity: number | null;
+export type OrderStatus = 'pending' | 'reserved' | 'paid' | 'expired' | 'cancelled';
+export type TicketStatus = 'pending' | 'active' | 'cancelled' | 'used';
+
+export type OrderTicket = {
+    uuid: string;
+    booking_reference: string;
+    status: TicketStatus;
+    qr_code_path: string | null;
+    attendee_name: string;
+    ticket_type: string;
+};
+
+export type Order = {
+    uuid: string;
+    status: { value: OrderStatus; label: string };
+    currency: string;
+    total: number;
+    total_formatted: string;
+    reserved_at: string | null;
+    expires_at: string | null;
+    paid_at: string | null;
+    event: { title: string; slug: string };
+    tickets: OrderTicket[];
+};
+
+export type PublicTicketType = {
+    uuid: string;
+    name: string;
+    description: string | null;
+    price_cents: number;
+    price_formatted: string;
+    capacity: number;
+    max_per_user: number;
+    is_active: boolean;
     sale_starts_at: string | null;
     sale_ends_at: string | null;
 };
 
-export type Event = Omit<App.Models.Event, "status" | "location" | "tickets"> & {
+export type PublicEvent = {
+    uuid: string;
+    slug: string;
+    title: string;
+    description: string;
+    starts_at: string;
+    ends_at: string | null;
+    timezone: string;
+    location: EventLocation | null;
+};
+
+export type TicketType = App.Models.TicketType;
+
+export type Event = Omit<App.Models.Event, "status" | "location" | "organization_id" | "user_id"> & {
     status: EventStatusData;
     location: EventLocation | null;
-    tickets: Omit<EventTicket, "_key">[] | null;
+    organization_uuid: string;
+    ticket_types?: TicketType[];
 };
 
 export type EventFilterProps = {

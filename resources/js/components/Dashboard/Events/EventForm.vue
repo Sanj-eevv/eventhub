@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import { useForm } from "@inertiajs/vue3";
 import { Check, ChevronsUpDown } from "lucide-vue-next";
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import EventFormSection from "@/components/Dashboard/Events/EventFormSection.vue";
+import type { TicketFormItem } from "@/components/Dashboard/Events/ticket-form-types";
 import TicketRepeater from "@/components/Dashboard/Events/TicketRepeater.vue";
 import InputError from "@/components/InputError.vue";
 import { Button } from "@/components/ui/button";
@@ -30,89 +32,94 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { useEventSections } from "@/composables/events/useEventSections";
-import type { EventTicket } from "@/types/event";
 import type { OrganizationPicker } from "@/types/organization";
 
-type FormErrors = Partial<Record<string, string>>;
-
-type FormState = {
-    organization_id: string;
-    title: string;
-    description: string;
-    starts_at: string;
-    ends_at: string;
-    timezone: string;
-    location: {
-        venue_name: string;
-        address_line_1: string;
-        address_line_2: string;
-        city: string;
-        state: string;
-        zip: string;
-        country: string;
-        map_url: string;
+type EventFormInitial = {
+    organization_uuid?: string;
+    title?: string;
+    description?: string;
+    starts_at?: string;
+    ends_at?: string;
+    timezone?: string;
+    location?: {
+        venue_name?: string;
+        address_line_1?: string;
+        address_line_2?: string;
+        zip?: string;
+        map_url?: string;
     };
-    tickets: EventTicket[];
-    errors: FormErrors;
-    processing: boolean;
+    ticket_types?: TicketFormItem[];
 };
 
 const props = defineProps<{
-    form: FormState;
+    initialValues?: EventFormInitial;
+    submitUrl: string;
+    submitMethod: "post" | "put";
     organizations: OrganizationPicker[];
+    timezones: string[];
     isEditing?: boolean;
 }>();
 
 const emit = defineEmits<{
-    submit: [];
     cancel: [];
 }>();
+
+const form = useForm({
+    organization_uuid: props.initialValues?.organization_uuid ?? "",
+    title: props.initialValues?.title ?? "",
+    description: props.initialValues?.description ?? "",
+    starts_at: props.initialValues?.starts_at ?? "",
+    ends_at: props.initialValues?.ends_at ?? "",
+    timezone: props.initialValues?.timezone ?? "",
+    location: {
+        venue_name: props.initialValues?.location?.venue_name ?? "",
+        address_line_1: props.initialValues?.location?.address_line_1 ?? "",
+        address_line_2: props.initialValues?.location?.address_line_2 ?? "",
+        zip: props.initialValues?.location?.zip ?? "",
+        map_url: props.initialValues?.location?.map_url ?? "",
+    },
+    ticket_types: (props.initialValues?.ticket_types ?? []) as TicketFormItem[],
+});
+
+const handleSubmit = () => {
+    form.transform((data) => ({
+        ...data,
+        ticket_types: data.ticket_types.map(({ _key, ...rest }) => rest),
+    }))[props.submitMethod](props.submitUrl, { preserveScroll: true });
+};
 
 const {
     activeSection,
     sections,
     scrollContainerRef,
-    detailsRef,
-    locationRef,
-    ticketsRef,
+    sectionRefs,
     scrollToSection,
 } = useEventSections();
 
-const timezones = Intl.supportedValuesOf("timeZone");
 const timezoneOpen = ref(false);
 const timezoneSearch = ref("");
 
 const filteredTimezones = computed(() =>
-    timezoneSearch.value
-        ? timezones.filter((tz) =>
-              tz.toLowerCase().includes(timezoneSearch.value.toLowerCase()),
-          )
-        : timezones,
+    props.timezones.filter((timezone) =>
+        timezone.toLowerCase().includes(timezoneSearch.value.toLowerCase()),
+    ),
 );
 
-const formatForInput = (isoString: string | null | undefined) => {
-    if (!isoString) {
-        return "";
-    }
-    return isoString.substring(0, 16);
-};
-
-const ticketErrors = computed(() => {
-    const result: Record<string, string> = {};
-    for (const [key, val] of Object.entries(props.form.errors)) {
-        if (key.startsWith("tickets.") && val) {
-            result[key] = val;
-        }
-    }
-    return result;
-});
+watch(
+    () => form.errors,
+    (errors) => {
+        if (!Object.keys(errors).length) return;
+        scrollContainerRef.value
+            ?.querySelector("[data-error]")
+            ?.scrollIntoView({ behavior: "smooth", block: "center" });
+    },
+    { flush: "post" },
+);
 </script>
 
 <template>
-    <form class="flex min-h-0 flex-1" @submit.prevent="emit('submit')">
-        <aside
-            class="hidden w-52 shrink-0 flex-col border-r px-4 py-6 lg:flex"
-        >
+    <form class="flex min-h-0 flex-1" @submit.prevent="handleSubmit()">
+        <aside class="hidden w-52 shrink-0 flex-col border-r px-4 py-6 lg:flex">
             <p
                 class="text-muted-foreground mb-3 px-3 text-xs font-semibold uppercase tracking-widest"
             >
@@ -145,97 +152,106 @@ const ticketErrors = computed(() => {
         </aside>
 
         <div class="flex min-h-0 flex-1 flex-col">
-            <div ref="scrollContainerRef" class="flex-1 overflow-y-auto px-6 py-6 lg:px-8">
-                <div class="max-w-3xl space-y-6">
-                    <div ref="detailsRef">
+            <div
+                ref="scrollContainerRef"
+                class="flex-1 overflow-y-auto px-6 py-6 lg:px-8"
+            >
+                <div class="space-y-6">
+                    <div :ref="sectionRefs.details">
                         <EventFormSection
                             title="Details"
                             description="Basic information about your event."
                         >
                             <div class="space-y-4">
                                 <div class="grid gap-2">
-                                    <Label for="event-org">Organization</Label>
-                                    <Select v-model="form.organization_id" required>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select organization" />
+                                    <Label for="event-org" class="required"
+                                        >Organization</Label
+                                    >
+                                    <Select v-model="form.organization_uuid">
+                                        <SelectTrigger id="event-org">
+                                            <SelectValue
+                                                placeholder="Select organization"
+                                            />
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem
                                                 v-for="org in organizations"
-                                                :key="org.id"
-                                                :value="String(org.id)"
+                                                :key="org.uuid"
+                                                :value="org.uuid"
                                             >
                                                 {{ org.title }}
                                             </SelectItem>
                                         </SelectContent>
                                     </Select>
-                                    <InputError :message="form.errors.organization_id" />
+                                    <InputError
+                                        :message="form.errors.organization_uuid"
+                                    />
                                 </div>
 
                                 <div class="grid gap-2">
-                                    <Label for="event-title">Title</Label>
+                                    <Label for="event-title" class="required"
+                                        >Title</Label
+                                    >
                                     <Input
                                         id="event-title"
                                         v-model="form.title"
                                         type="text"
-                                        required
                                     />
                                     <InputError :message="form.errors.title" />
                                 </div>
 
                                 <div class="grid gap-2">
-                                    <Label for="event-description">Description</Label>
+                                    <Label
+                                        for="event-description"
+                                        class="required"
+                                        >Description</Label
+                                    >
                                     <Textarea
                                         id="event-description"
                                         v-model="form.description"
-                                        required
                                         rows="4"
                                     />
-                                    <InputError :message="form.errors.description" />
+                                    <InputError
+                                        :message="form.errors.description"
+                                    />
                                 </div>
 
-                                <div class="grid gap-4 sm:grid-cols-2">
+                                <div
+                                    class="grid gap-4 sm:grid-cols-2 sm:items-start"
+                                >
                                     <div class="grid gap-2">
-                                        <Label for="event-starts-at">Starts At</Label>
+                                        <Label
+                                            for="event-starts-at"
+                                            class="required"
+                                            >Starts At</Label
+                                        >
                                         <Input
                                             id="event-starts-at"
-                                            :value="formatForInput(form.starts_at)"
+                                            v-model="form.starts_at"
                                             type="datetime-local"
-                                            required
-                                            @input="
-                                                (e: Event) =>
-                                                    (form.starts_at = (
-                                                        e.target as HTMLInputElement
-                                                    ).value)
-                                            "
                                         />
-                                        <InputError :message="form.errors.starts_at" />
+                                        <InputError
+                                            :message="form.errors.starts_at"
+                                        />
                                     </div>
 
                                     <div class="grid gap-2">
                                         <Label for="event-ends-at">
                                             Ends At
-                                            <span class="text-muted-foreground text-xs">
-                                                (optional)
-                                            </span>
                                         </Label>
                                         <Input
                                             id="event-ends-at"
-                                            :value="formatForInput(form.ends_at)"
+                                            v-model="form.ends_at"
                                             type="datetime-local"
-                                            @input="
-                                                (e: Event) =>
-                                                    (form.ends_at = (
-                                                        e.target as HTMLInputElement
-                                                    ).value)
-                                            "
                                         />
-                                        <InputError :message="form.errors.ends_at" />
+                                        <InputError
+                                            :message="form.errors.ends_at"
+                                        />
                                     </div>
                                 </div>
 
                                 <div class="grid gap-2">
-                                    <Label>Timezone</Label>
+                                    <Label class="required">Timezone</Label>
                                     <Popover v-model:open="timezoneOpen">
                                         <PopoverTrigger as-child>
                                             <Button
@@ -245,7 +261,10 @@ const ticketErrors = computed(() => {
                                                 class="justify-between font-normal"
                                             >
                                                 <span class="truncate">
-                                                    {{ form.timezone || "Select timezone" }}
+                                                    {{
+                                                        form.timezone ||
+                                                        "Select timezone"
+                                                    }}
                                                 </span>
                                                 <ChevronsUpDown
                                                     class="ml-2 size-4 shrink-0 opacity-50"
@@ -259,7 +278,9 @@ const ticketErrors = computed(() => {
                                                     placeholder="Search timezone..."
                                                 />
                                                 <CommandList>
-                                                    <CommandEmpty>No timezone found.</CommandEmpty>
+                                                    <CommandEmpty>
+                                                        No timezone found.
+                                                    </CommandEmpty>
                                                     <CommandGroup>
                                                         <CommandItem
                                                             v-for="tz in filteredTimezones"
@@ -267,16 +288,19 @@ const ticketErrors = computed(() => {
                                                             :value="tz"
                                                             @select="
                                                                 () => {
-                                                                    form.timezone = tz;
+                                                                    form.timezone =
+                                                                        tz;
                                                                     timezoneOpen = false;
-                                                                    timezoneSearch = '';
+                                                                    timezoneSearch =
+                                                                        '';
                                                                 }
                                                             "
                                                         >
                                                             <Check
                                                                 :class="[
                                                                     'mr-2 size-4',
-                                                                    form.timezone === tz
+                                                                    form.timezone ===
+                                                                    tz
                                                                         ? 'opacity-100'
                                                                         : 'opacity-0',
                                                                 ]"
@@ -288,20 +312,24 @@ const ticketErrors = computed(() => {
                                             </Command>
                                         </PopoverContent>
                                     </Popover>
-                                    <InputError :message="form.errors.timezone" />
+                                    <InputError
+                                        :message="form.errors.timezone"
+                                    />
                                 </div>
                             </div>
                         </EventFormSection>
                     </div>
 
-                    <div ref="locationRef">
+                    <div :ref="sectionRefs.location">
                         <EventFormSection
                             title="Location"
                             description="Where will your event take place?"
                         >
                             <div class="space-y-4">
                                 <div class="grid gap-2">
-                                    <Label for="location-venue">Venue Name</Label>
+                                    <Label for="location-venue"
+                                        >Venue Name</Label
+                                    >
                                     <Input
                                         id="location-venue"
                                         v-model="form.location.venue_name"
@@ -309,12 +337,16 @@ const ticketErrors = computed(() => {
                                         placeholder="e.g. City Hall Auditorium"
                                     />
                                     <InputError
-                                        :message="form.errors['location.venue_name']"
+                                        :message="
+                                            form.errors['location.venue_name']
+                                        "
                                     />
                                 </div>
 
                                 <div class="grid gap-2">
-                                    <Label for="location-addr1">Address Line 1</Label>
+                                    <Label for="location-addr1"
+                                        >Address Line 1</Label
+                                    >
                                     <Input
                                         id="location-addr1"
                                         v-model="form.location.address_line_1"
@@ -322,12 +354,18 @@ const ticketErrors = computed(() => {
                                         placeholder="Street address"
                                     />
                                     <InputError
-                                        :message="form.errors['location.address_line_1']"
+                                        :message="
+                                            form.errors[
+                                                'location.address_line_1'
+                                            ]
+                                        "
                                     />
                                 </div>
 
                                 <div class="grid gap-2">
-                                    <Label for="location-addr2">Address Line 2</Label>
+                                    <Label for="location-addr2"
+                                        >Address Line 2</Label
+                                    >
                                     <Input
                                         id="location-addr2"
                                         v-model="form.location.address_line_2"
@@ -335,52 +373,26 @@ const ticketErrors = computed(() => {
                                         placeholder="Suite, floor, etc."
                                     />
                                     <InputError
-                                        :message="form.errors['location.address_line_2']"
+                                        :message="
+                                            form.errors[
+                                                'location.address_line_2'
+                                            ]
+                                        "
                                     />
                                 </div>
 
-                                <div class="grid gap-4 sm:grid-cols-2">
-                                    <div class="grid gap-2">
-                                        <Label for="location-city">City</Label>
-                                        <Input
-                                            id="location-city"
-                                            v-model="form.location.city"
-                                            type="text"
-                                        />
-                                        <InputError :message="form.errors['location.city']" />
-                                    </div>
-
-                                    <div class="grid gap-2">
-                                        <Label for="location-state">State / Region</Label>
-                                        <Input
-                                            id="location-state"
-                                            v-model="form.location.state"
-                                            type="text"
-                                        />
-                                        <InputError :message="form.errors['location.state']" />
-                                    </div>
-
-                                    <div class="grid gap-2">
-                                        <Label for="location-zip">ZIP / Postal Code</Label>
-                                        <Input
-                                            id="location-zip"
-                                            v-model="form.location.zip"
-                                            type="text"
-                                        />
-                                        <InputError :message="form.errors['location.zip']" />
-                                    </div>
-
-                                    <div class="grid gap-2">
-                                        <Label for="location-country">Country</Label>
-                                        <Input
-                                            id="location-country"
-                                            v-model="form.location.country"
-                                            type="text"
-                                        />
-                                        <InputError
-                                            :message="form.errors['location.country']"
-                                        />
-                                    </div>
+                                <div class="grid gap-2">
+                                    <Label for="location-zip"
+                                        >ZIP / Postal Code</Label
+                                    >
+                                    <Input
+                                        id="location-zip"
+                                        v-model="form.location.zip"
+                                        type="text"
+                                    />
+                                    <InputError
+                                        :message="form.errors['location.zip']"
+                                    />
                                 </div>
 
                                 <div class="grid gap-2">
@@ -391,18 +403,26 @@ const ticketErrors = computed(() => {
                                         type="url"
                                         placeholder="https://maps.google.com/..."
                                     />
-                                    <InputError :message="form.errors['location.map_url']" />
+                                    <InputError
+                                        :message="
+                                            form.errors['location.map_url']
+                                        "
+                                    />
                                 </div>
                             </div>
                         </EventFormSection>
                     </div>
 
-                    <div ref="ticketsRef">
+                    <div :ref="sectionRefs.tickets">
                         <EventFormSection
                             title="Tickets"
                             description="Define ticket types and pricing for your event."
                         >
-                            <TicketRepeater v-model="form.tickets" :errors="ticketErrors" />
+                            <TicketRepeater
+                                v-model="form.ticket_types"
+                                :errors="form.errors"
+                            />
+                            <InputError :message="form.errors.ticket_types" />
                         </EventFormSection>
                     </div>
                 </div>
@@ -410,7 +430,11 @@ const ticketErrors = computed(() => {
 
             <div class="bg-background shrink-0 border-t px-6 py-4 lg:px-8">
                 <div class="flex max-w-3xl items-center justify-end gap-3">
-                    <Button type="button" variant="ghost" @click="emit('cancel')">
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        @click="emit('cancel')"
+                    >
                         Cancel
                     </Button>
                     <Button type="submit" :disabled="form.processing">

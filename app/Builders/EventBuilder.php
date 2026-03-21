@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Builders;
 
+use App\Enums\EventStatus;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\JoinClause;
 
@@ -45,5 +46,10 @@ final class EventBuilder extends AppBuilder
     public function filterByStatus(?string $status): self
     {
         return $this->when($status, fn (self $query) => $query->where('events.status', $status));
+    }
+
+    public function published(): self
+    {
+        return $this->where('events.status', EventStatus::Published);
     }
 }

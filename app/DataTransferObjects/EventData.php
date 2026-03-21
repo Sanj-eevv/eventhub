@@ -17,6 +17,7 @@ final readonly class EventData
         public ?CarbonImmutable $ends_at,
         public string $timezone,
         public ?array $location,
-        public ?array $tickets,
+        /** @param TicketTypeData[] $ticket_types */
+        public array $ticket_types,
     ) {}
 }

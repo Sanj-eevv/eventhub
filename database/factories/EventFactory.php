@@ -34,7 +34,6 @@ final class EventFactory extends Factory
             'status' => EventStatus::Draft,
             'timezone' => 'UTC',
             'location' => null,
-            'tickets' => null,
         ];
     }
 
