@@ -6,6 +6,7 @@ import EventFormSection from "@/components/Dashboard/Events/EventFormSection.vue
 import type { TicketFormItem } from "@/components/Dashboard/Events/ticket-form-types";
 import TicketRepeater from "@/components/Dashboard/Events/TicketRepeater.vue";
 import InputError from "@/components/InputError.vue";
+import MediaUploader from "@/components/MediaUploader.vue";
 import { Button } from "@/components/ui/button";
 import {
     Command,
@@ -33,7 +34,13 @@ import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { useEventSections } from "@/composables/events/useEventSections";
 import { useFormScrollToError } from "@/composables/useFormScrollToError";
+import type { MediaItem } from "@/types/event";
 import type { OrganizationPicker } from "@/types/organization";
+import {
+    cover as coverMediaRoute,
+    destroy as destroyMediaRoute,
+    store as storeMediaRoute,
+} from "@/wayfinder/routes/dashboard/events/media";
 
 type EventFormInitial = {
     organization_uuid?: string;
@@ -54,6 +61,8 @@ type EventFormInitial = {
 
 const props = defineProps<{
     initialValues?: EventFormInitial;
+    eventUuid?: string;
+    mediaItems?: MediaItem[];
     submitUrl: string;
     submitMethod: "post" | "put";
     organizations: OrganizationPicker[];
@@ -96,7 +105,7 @@ const {
     scrollContainerRef,
     sectionRefs,
     scrollToSection,
-} = useEventSections();
+} = useEventSections(props.isEditing);
 
 const timezoneOpen = ref(false);
 const timezoneSearch = ref("");
@@ -416,6 +425,21 @@ useFormScrollToError(form, scrollContainerRef);
                                 :errors="form.errors"
                             />
                             <InputError :message="form.errors.ticket_types" />
+                        </EventFormSection>
+                    </div>
+
+                    <div v-if="isEditing && eventUuid" :ref="sectionRefs.media">
+                        <EventFormSection
+                            title="Media"
+                            description="Upload images for your event. The first image will become the cover."
+                        >
+                            <MediaUploader
+                                :items="mediaItems ?? []"
+                                :upload-url="storeMediaRoute({ event: eventUuid }).url"
+                                :delete-url="(mediaUuid) => destroyMediaRoute({ event: eventUuid, media: mediaUuid }).url"
+                                :cover-url="(mediaUuid) => coverMediaRoute({ event: eventUuid, media: mediaUuid }).url"
+                                partial-reload-key="event"
+                            />
                         </EventFormSection>
                     </div>
                 </div>

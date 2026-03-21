@@ -1,8 +1,12 @@
 <script setup lang="ts">
-import { Head, Link } from "@inertiajs/vue3";
+import { Head, Link, usePage } from "@inertiajs/vue3";
+import { computed } from "vue";
 import HomeLayout from "@/layouts/HomeLayout.vue";
 import { index as eventsIndex } from "@/wayfinder/routes/events";
 import { register as registerCreate } from "@/wayfinder/routes/auth";
+
+const page = usePage();
+const user = computed(() => page.props.auth?.user ?? null);
 </script>
 
 <template>
@@ -46,6 +50,7 @@ import { register as registerCreate } from "@/wayfinder/routes/auth";
                                 </svg>
                             </Link>
                             <Link
+                                v-if="!user"
                                 :href="registerCreate()"
                                 class="inline-flex items-center gap-3 px-7 py-3.5 border border-sf-border text-sf-muted text-sm tracking-wide rounded hover:border-sf-muted hover:text-sf-text transition-all duration-200"
                             >

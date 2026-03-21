@@ -7,6 +7,7 @@ namespace App\Actions;
 use App\Enums\EventStatus;
 use App\Events\EventCancelled;
 use App\Exceptions\InvalidStatusTransitionException;
+use App\Exceptions\MissingEventCoverImageException;
 use App\Models\Event;
 
 final class UpdateEventStatusAction
@@ -15,6 +16,10 @@ final class UpdateEventStatusAction
     {
         if ( ! $event->status->canTransitionTo($status)) {
             throw new InvalidStatusTransitionException($event->status, $status);
+        }
+
+        if (EventStatus::Published === $status && ! $event->coverImage()->exists()) {
+            throw new MissingEventCoverImageException();
         }
 
         $event->update(['status' => $status]);

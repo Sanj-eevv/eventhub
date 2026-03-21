@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head, Link } from "@inertiajs/vue3";
+import { Head, InfiniteScroll, Link } from "@inertiajs/vue3";
 import HomeLayout from "@/layouts/HomeLayout.vue";
 import type { PaginatedResponse } from "@/types";
 import type { PublicEvent } from "@/types/event";
@@ -60,70 +60,76 @@ const formatShortDate = (dateStr: string): string => {
             </div>
 
             <!-- Event grid -->
-            <div v-else class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                <Link
-                    v-for="(event, index) in events.data"
-                    :key="event.uuid"
-                    :href="show({ event: event.slug })"
-                    class="group relative flex flex-col rounded-xl overflow-hidden border border-sf-border hover:border-sf-muted/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
-                >
-                    <!-- Poster background — always dark, editorial poster aesthetic -->
-                    <div :class="['aspect-[2/3] relative bg-gradient-to-br', cardGradients[index % cardGradients.length]]">
-                        <!-- Date chip -->
-                        <div class="absolute top-4 right-4">
-                            <span class="font-code text-[10px] tracking-widest text-[#c9a55a] bg-black/40 backdrop-blur-sm px-2.5 py-1 rounded">
-                                {{ formatShortDate(event.starts_at) }}
+            <InfiniteScroll v-else data="events">
+                <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                    <Link
+                        v-for="(event, index) in events.data"
+                        :key="event.uuid"
+                        :href="show({ event: event.slug })"
+                        class="group relative flex flex-col rounded-xl overflow-hidden border border-sf-border hover:border-sf-muted/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+                    >
+                        <!-- Poster background -->
+                        <div :class="['aspect-[2/3] relative overflow-hidden', !event.cover_image ? 'bg-gradient-to-br ' + cardGradients[index % cardGradients.length] : 'bg-sf-surface']">
+                            <!-- Cover image -->
+                            <img
+                                v-if="event.cover_image"
+                                :src="event.cover_image.url"
+                                :alt="event.title"
+                                class="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                            />
+                            <!-- Date chip -->
+                            <div class="absolute top-4 right-4 z-10">
+                                <span class="font-code text-[10px] tracking-widest text-[#c9a55a] bg-black/40 backdrop-blur-sm px-2.5 py-1 rounded">
+                                    {{ formatShortDate(event.starts_at) }}
+                                </span>
+                            </div>
+                            <!-- Decorative lines (only when no image) -->
+                            <div v-if="!event.cover_image" class="absolute top-1/3 left-0 right-0 px-6 opacity-20 group-hover:opacity-30 transition-opacity">
+                                <div class="h-px w-full bg-[#c9a55a]" />
+                                <div class="h-px w-2/3 bg-[#c9a55a] mt-3" />
+                            </div>
+                            <!-- Bottom overlay -->
+                            <div class="absolute bottom-0 left-0 right-0 z-10 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-5 pt-14">
+                                <h2 class="font-display font-semibold text-xl text-white leading-tight">
+                                    {{ event.title }}
+                                </h2>
+                                <p v-if="event.location?.venue_name" class="font-body text-xs text-white/60 mt-1.5 tracking-wide">
+                                    {{ event.location.venue_name }}<span v-if="event.location.address_line_1">, {{ event.location.address_line_1 }}</span>
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Card footer -->
+                        <div class="bg-sf-surface border-t border-sf-border-subtle px-5 py-3.5 flex items-center justify-between transition-colors duration-200">
+                            <p class="font-body text-xs text-sf-muted">
+                                {{ formatDate(event.starts_at) }}
+                                <span v-if="event.ends_at"> — {{ formatDate(event.ends_at) }}</span>
+                            </p>
+                            <span class="font-body text-xs text-sf-ember tracking-wide group-hover:translate-x-0.5 transition-transform inline-flex items-center gap-1">
+                                View
+                                <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                                </svg>
                             </span>
                         </div>
-                        <!-- Decorative lines -->
-                        <div class="absolute top-1/3 left-0 right-0 px-6 opacity-20 group-hover:opacity-30 transition-opacity">
-                            <div class="h-px w-full bg-[#c9a55a]" />
-                            <div class="h-px w-2/3 bg-[#c9a55a] mt-3" />
-                        </div>
-                        <!-- Bottom overlay -->
-                        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-5 pt-14">
-                            <h2 class="font-display font-semibold text-xl text-white leading-tight">
-                                {{ event.title }}
-                            </h2>
-                            <p v-if="event.location?.venue_name" class="font-body text-xs text-white/60 mt-1.5 tracking-wide">
-                                {{ event.location.venue_name }}<span v-if="event.location.address_line_1">, {{ event.location.address_line_1 }}</span>
-                            </p>
+                    </Link>
+                </div>
+
+                <template #fallback>
+                    <div class="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                        <div
+                            v-for="i in 3"
+                            :key="i"
+                            class="rounded-xl overflow-hidden border border-sf-border"
+                        >
+                            <div class="aspect-[2/3] animate-pulse bg-sf-surface" />
+                            <div class="bg-sf-surface border-t border-sf-border-subtle px-5 py-3.5">
+                                <div class="h-3 w-24 rounded animate-pulse bg-sf-border" />
+                            </div>
                         </div>
                     </div>
-
-                    <!-- Card footer -->
-                    <div class="bg-sf-surface border-t border-sf-border-subtle px-5 py-3.5 flex items-center justify-between transition-colors duration-200">
-                        <p class="font-body text-xs text-sf-muted">
-                            {{ formatDate(event.starts_at) }}
-                            <span v-if="event.ends_at"> — {{ formatDate(event.ends_at) }}</span>
-                        </p>
-                        <span class="font-body text-xs text-sf-ember tracking-wide group-hover:translate-x-0.5 transition-transform inline-flex items-center gap-1">
-                            View
-                            <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                            </svg>
-                        </span>
-                    </div>
-                </Link>
-            </div>
-
-            <!-- Pagination -->
-            <div v-if="events.meta.last_page > 1" class="mt-12 flex justify-center gap-2">
-                <Link
-                    v-for="link in events.meta.links"
-                    :key="link.label"
-                    :href="link.url ?? ''"
-                    :class="[
-                        'inline-flex items-center justify-center h-9 min-w-9 px-3 rounded border text-sm font-body transition-all duration-200',
-                        link.active
-                            ? 'border-sf-gold text-sf-gold bg-sf-gold/10'
-                            : link.url
-                                ? 'border-sf-border text-sf-muted hover:border-sf-muted hover:text-sf-text'
-                                : 'border-sf-border-subtle text-sf-tertiary cursor-not-allowed pointer-events-none',
-                    ]"
-                    v-html="link.label"
-                />
-            </div>
+                </template>
+            </InfiniteScroll>
         </div>
     </HomeLayout>
 </template>

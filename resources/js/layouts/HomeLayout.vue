@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link, router, usePage } from "@inertiajs/vue3";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { useTheme } from "@/composables/useTheme";
 import { index as eventsIndex } from "@/wayfinder/routes/events";
 import { index as ordersIndex } from "@/wayfinder/routes/orders";
@@ -8,8 +8,10 @@ import { login as loginCreate, logout, register as registerCreate } from "@/wayf
 import { index as dashboardIndex } from "@/wayfinder/routes/dashboard";
 
 const page = usePage();
-const user = page.props.auth?.user as { name: string; email: string } | null;
 const appName = page.props.name as string;
+const user = computed(() => page.props.auth?.user as { name: string; email: string } | null);
+const can = computed(() => page.props.can as { event?: { viewAny?: boolean }; organization?: { viewAny?: boolean } } | null);
+const canAccessDashboard = computed(() => !!(can.value?.event?.viewAny || can.value?.organization?.viewAny));
 
 const mobileOpen = ref(false);
 
@@ -55,6 +57,7 @@ const handleLogout = (): void => {
                                 My Orders
                             </Link>
                             <Link
+                                v-if="canAccessDashboard"
                                 :href="dashboardIndex()"
                                 class="text-sm tracking-wide text-sf-muted hover:text-sf-text transition-colors duration-200"
                             >
@@ -148,7 +151,7 @@ const handleLogout = (): void => {
                 <Link :href="eventsIndex()" class="block py-3 text-sm text-sf-muted hover:text-sf-text border-b border-sf-border-subtle transition-colors">Browse Events</Link>
                 <template v-if="user">
                     <Link :href="ordersIndex()" class="block py-3 text-sm text-sf-muted hover:text-sf-text border-b border-sf-border-subtle transition-colors">My Orders</Link>
-                    <Link :href="dashboardIndex()" class="block py-3 text-sm text-sf-muted hover:text-sf-text border-b border-sf-border-subtle transition-colors">Dashboard</Link>
+                    <Link v-if="canAccessDashboard" :href="dashboardIndex()" class="block py-3 text-sm text-sf-muted hover:text-sf-text border-b border-sf-border-subtle transition-colors">Dashboard</Link>
                     <Link :href="logout()" method="post" as="button" class="block w-full text-left py-3 text-sm text-sf-muted hover:text-sf-text transition-colors" @click="handleLogout">Sign out</Link>
                 </template>
                 <template v-else>
@@ -168,17 +171,23 @@ const handleLogout = (): void => {
             <div class="mx-auto max-w-7xl px-5 sm:px-8 py-10 flex flex-col sm:flex-row items-center justify-between gap-5">
                 <div class="flex items-center gap-2.5">
                     <span class="inline-block w-1 h-1 rounded-full bg-sf-gold" />
-                    <span class="font-display text-sm font-medium tracking-[0.25em] uppercase text-sf-tertiary">
+                    <span class="font-display text-sm font-medium tracking-[0.25em] uppercase text-sf-muted">
                         {{ appName }}
                     </span>
                 </div>
-                <p class="text-xs text-sf-tertiary font-light">
+                <p class="text-xs text-sf-muted font-light">
                     © {{ new Date().getFullYear() }} {{ appName }}. All rights reserved.
                 </p>
                 <div class="flex gap-6">
-                    <Link :href="eventsIndex()" class="text-xs text-sf-tertiary hover:text-sf-muted transition-colors">Events</Link>
-                    <Link :href="loginCreate()" class="text-xs text-sf-tertiary hover:text-sf-muted transition-colors">Sign In</Link>
-                    <Link :href="registerCreate()" class="text-xs text-sf-tertiary hover:text-sf-muted transition-colors">Register</Link>
+                    <Link :href="eventsIndex()" class="text-xs text-sf-muted hover:text-sf-text transition-colors">Events</Link>
+                    <template v-if="user">
+                        <Link :href="ordersIndex()" class="text-xs text-sf-muted hover:text-sf-text transition-colors">My Orders</Link>
+                        <Link v-if="canAccessDashboard" :href="dashboardIndex()" class="text-xs text-sf-muted hover:text-sf-text transition-colors">Dashboard</Link>
+                    </template>
+                    <template v-else>
+                        <Link :href="loginCreate()" class="text-xs text-sf-muted hover:text-sf-text transition-colors">Sign In</Link>
+                        <Link :href="registerCreate()" class="text-xs text-sf-muted hover:text-sf-text transition-colors">Register</Link>
+                    </template>
                 </div>
             </div>
         </footer>

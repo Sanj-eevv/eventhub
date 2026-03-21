@@ -14,6 +14,7 @@ use App\Listeners\SendOrderConfirmationNotification;
 use App\Listeners\SendOrganizationApprovedMail;
 use App\Listeners\SendOrganizationRejectedMail;
 use App\Listeners\VoidEventTickets;
+use App\Models\Event as EventModel;
 use App\Models\Order;
 use App\Models\Ticket;
 use App\Models\TicketType;
@@ -27,6 +28,7 @@ use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -98,6 +100,10 @@ final class AppServiceProvider extends ServiceProvider
     {
         Model::shouldBeStrict();
         Model::preventLazyLoading( ! app()->isProduction());
+
+        Relation::morphMap([
+            'event' => EventModel::class,
+        ]);
     }
 
     private function configureDates(): void

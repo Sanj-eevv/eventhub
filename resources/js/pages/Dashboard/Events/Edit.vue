@@ -122,6 +122,8 @@ const handleStatusChange = (action: StatusAction) => {
             <div class="flex min-h-0 flex-1 flex-col">
                 <EventForm
                     :initial-values="initialValues"
+                    :event-uuid="event.uuid"
+                    :media-items="event.media"
                     :organizations="organizations"
                     :timezones="timezones"
                     submit-method="put"

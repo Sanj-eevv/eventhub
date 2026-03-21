@@ -4,6 +4,18 @@ import type { App } from "@/wayfinder/types";
 export type EventStatus = App.Enums.EventStatus;
 export type EventStatusData = { value: EventStatus; label: string };
 
+export type MediaItem = {
+    uuid: string;
+    url: string;
+    original_url: string;
+    filename: string;
+    size: number;
+    is_cover: boolean;
+    sort_order: number;
+    processing: boolean;
+    processing_failed: boolean;
+};
+
 export type EventLocation = {
     venue_name?: string | null;
     address_line_1?: string | null;
@@ -59,6 +71,8 @@ export type PublicEvent = {
     ends_at: string | null;
     timezone: string;
     location: EventLocation | null;
+    cover_image: MediaItem | null;
+    media: MediaItem[];
 };
 
 export type TicketType = App.Models.TicketType;
@@ -68,6 +82,8 @@ export type Event = Omit<App.Models.Event, "status" | "location" | "organization
     location: EventLocation | null;
     organization_uuid: string;
     ticket_types?: TicketType[];
+    media?: MediaItem[];
+    cover_image?: MediaItem | null;
 };
 
 export type EventFilterProps = {

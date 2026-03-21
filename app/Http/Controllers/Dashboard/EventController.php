@@ -88,7 +88,7 @@ final class EventController extends Controller
         $this->authorize('update', $event);
 
         return $this->inertiaResponse->render('Dashboard/Events/Edit', [
-            'event' => new EventResource($event->load(['organization', 'user', 'ticketTypes'])),
+            'event' => new EventResource($event->load(['organization', 'user', 'ticketTypes', 'media'])),
             'organizations' => OrganizationPickerResource::collection(Organization::query()->approved()->get()),
             'timezones' => DateTimeZone::listIdentifiers(),
         ]);

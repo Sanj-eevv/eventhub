@@ -17,6 +17,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -40,6 +42,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read Collection<int, TicketType> $ticketTypes
  * @property-read Collection<int, Order> $orders
  * @property-read Collection<int, Ticket> $tickets
+ * @property-read Collection<int, Media> $media
+ * @property-read Media|null $coverImage
  *
  * @method static EventFactory factory($count = null, $state = [])
  * @method static Builder<static>|Event newModelQuery()
@@ -109,6 +113,16 @@ final class Event extends Model
     public function organization(): BelongsTo
     {
         return $this->belongsTo(Organization::class);
+    }
+
+    public function media(): MorphMany
+    {
+        return $this->morphMany(Media::class, 'mediable')->orderBy('sort_order');
+    }
+
+    public function coverImage(): MorphOne
+    {
+        return $this->morphOne(Media::class, 'mediable')->where('is_cover', true);
     }
 
     protected function casts(): array

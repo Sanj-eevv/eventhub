@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Http\Resources;
 
+use App\Models\Event;
 use App\Support\DateFormat;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/** @mixin Event */
 final class EventResource extends JsonResource
 {
     public function toArray(Request $request): array
@@ -42,6 +44,13 @@ final class EventResource extends JsonResource
                 'sale_starts_at' => $ticketType->sale_starts_at?->format(DateFormat::DATETIME_LOCAL),
                 'sale_ends_at' => $ticketType->sale_ends_at?->format(DateFormat::DATETIME_LOCAL),
             ])->all()),
+            'media' => $this->whenLoaded('media', fn () => MediaResource::collection($this->media)->resolve()),
+            'cover_image' => $this->whenLoaded(
+                'media',
+                fn () => $this->media->firstWhere('is_cover', true)
+                ? new MediaResource($this->media->firstWhere('is_cover', true))
+                : null,
+            ),
         ];
     }
 }

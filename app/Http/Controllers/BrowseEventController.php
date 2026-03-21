@@ -8,6 +8,7 @@ use App\Http\Resources\Event\ShowResource;
 use App\Http\Resources\TicketTypeResource;
 use App\Models\Event;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Inertia\Response;
 use Inertia\ResponseFactory;
 
@@ -21,10 +22,11 @@ final class BrowseEventController extends Controller
     {
         $events = Event::query()
             ->published()
-            ->paginate(perPage: $request->integer('per_page', 12), page: $request->integer('page', 1));
+            ->with('media')
+            ->paginate(12);
 
         return $this->inertiaResponse->render('Events/Index', [
-            'events' => ShowResource::collection($events),
+            'events' => Inertia::scroll(ShowResource::collection($events)),
         ]);
     }
 
@@ -34,6 +36,7 @@ final class BrowseEventController extends Controller
 
         $event->load([
             'ticketTypes' => fn ($query) => $query->active()->orderBy('sort_order'),
+            'media',
         ]);
 
         return $this->inertiaResponse->render('Events/Show', [

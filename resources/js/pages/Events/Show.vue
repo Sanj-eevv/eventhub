@@ -6,15 +6,16 @@ import type { PublicEvent, PublicTicketType } from "@/types/event";
 import { reserve } from "@/wayfinder/routes/tickets";
 
 const props = defineProps<{
-    event: PublicEvent & { ticket_types: PublicTicketType[] };
+    event: PublicEvent;
+    ticketTypes: PublicTicketType[];
 }>();
 
 const quantities = reactive<Record<string, number>>(
-    Object.fromEntries(props.event.ticket_types.map((ticketType) => [ticketType.uuid, 0])),
+    Object.fromEntries(props.ticketTypes.map((ticketType) => [ticketType.uuid, 0])),
 );
 
 const form = useForm(() => ({
-    items: props.event.ticket_types
+    items: props.ticketTypes
         .filter((ticketType) => quantities[ticketType.uuid] > 0)
         .map((ticketType) => ({
             ticket_type_id: ticketType.uuid,
@@ -23,11 +24,11 @@ const form = useForm(() => ({
 }));
 
 const hasSelection = computed(() =>
-    props.event.ticket_types.some((ticketType) => quantities[ticketType.uuid] > 0),
+    props.ticketTypes.some((ticketType) => quantities[ticketType.uuid] > 0),
 );
 
 const orderTotal = computed(() =>
-    props.event.ticket_types.reduce((sum, ticketType) => {
+    props.ticketTypes.reduce((sum, ticketType) => {
         return sum + ticketType.price_cents * (quantities[ticketType.uuid] ?? 0);
     }, 0),
 );
@@ -57,35 +58,69 @@ const formatTime = (dateStr: string): string => {
         <Head :title="event.title" />
 
         <!-- Hero -->
-        <div class="relative bg-gradient-to-b from-sf-surface to-sf-bg border-b border-sf-border-subtle transition-colors duration-200">
-            <div class="absolute inset-0 bg-[radial-gradient(ellipse_70%_50%_at_50%_0%,color-mix(in_srgb,var(--sf-gold)_6%,transparent),transparent)]" />
-            <div class="relative mx-auto max-w-7xl px-5 sm:px-8 py-16 lg:py-24">
-                <div class="flex items-start gap-3 mb-6">
-                    <span class="h-px w-6 bg-sf-gold mt-3 shrink-0" />
-                    <div>
-                        <p class="font-body text-xs tracking-[0.25em] uppercase text-sf-gold mb-4">Live Event</p>
-                        <h1 class="font-display font-semibold text-[clamp(2.5rem,6vw,5.5rem)] text-sf-text leading-[0.95]">
-                            {{ event.title }}
-                        </h1>
+        <div class="relative border-b border-sf-border-subtle">
+            <!-- Cover image hero (when available) -->
+            <div v-if="event.cover_image" class="relative h-[45vw] max-h-[560px] min-h-[260px] overflow-hidden bg-sf-surface">
+                <img
+                    :src="event.cover_image.url"
+                    :alt="event.title"
+                    class="h-full w-full object-cover"
+                />
+                <div class="absolute inset-0 bg-gradient-to-t from-sf-bg via-sf-bg/40 to-transparent" />
+                <div class="absolute bottom-0 left-0 right-0 mx-auto max-w-7xl px-5 sm:px-8 pb-10 lg:pb-14">
+                    <p class="font-body text-xs tracking-[0.25em] uppercase text-sf-gold mb-3">Live Event</p>
+                    <h1 class="font-display font-semibold text-[clamp(2rem,5vw,4.5rem)] text-sf-text leading-[0.95]">
+                        {{ event.title }}
+                    </h1>
+                    <div class="mt-4 flex flex-wrap items-center gap-6 text-sm">
+                        <span class="flex items-center gap-2 text-sf-muted">
+                            <svg class="h-4 w-4 text-sf-gold shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                            </svg>
+                            {{ formatDate(event.starts_at) }} · {{ formatTime(event.starts_at) }}
+                        </span>
+                        <span v-if="event.ends_at" class="text-sf-tertiary">— {{ formatTime(event.ends_at) }}</span>
+                        <span v-if="event.location?.venue_name" class="flex items-center gap-2 text-sf-muted">
+                            <svg class="h-4 w-4 text-sf-gold shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                            </svg>
+                            {{ event.location.venue_name }}
+                            <span v-if="event.location.address_line_1" class="text-sf-tertiary">, {{ event.location.address_line_1 }}</span>
+                        </span>
                     </div>
                 </div>
-                <!-- Meta -->
-                <div class="ml-9 flex flex-wrap items-center gap-6 text-sm">
-                    <span class="flex items-center gap-2 text-sf-muted">
-                        <svg class="h-4 w-4 text-sf-gold shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
-                        </svg>
-                        {{ formatDate(event.starts_at) }} · {{ formatTime(event.starts_at) }}
-                    </span>
-                    <span v-if="event.ends_at" class="text-sf-tertiary">— {{ formatTime(event.ends_at) }}</span>
-                    <span v-if="event.location?.venue_name" class="flex items-center gap-2 text-sf-muted">
-                        <svg class="h-4 w-4 text-sf-gold shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-                        </svg>
-                        {{ event.location.venue_name }}
-                        <span v-if="event.location.address_line_1" class="text-sf-tertiary">, {{ event.location.address_line_1 }}</span>
-                    </span>
+            </div>
+            <!-- Fallback hero (no image) -->
+            <div v-else class="bg-gradient-to-b from-sf-surface to-sf-bg transition-colors duration-200">
+                <div class="absolute inset-0 bg-[radial-gradient(ellipse_70%_50%_at_50%_0%,color-mix(in_srgb,var(--sf-gold)_6%,transparent),transparent)]" />
+                <div class="relative mx-auto max-w-7xl px-5 sm:px-8 py-16 lg:py-24">
+                    <div class="flex items-start gap-3 mb-6">
+                        <span class="h-px w-6 bg-sf-gold mt-3 shrink-0" />
+                        <div>
+                            <p class="font-body text-xs tracking-[0.25em] uppercase text-sf-gold mb-4">Live Event</p>
+                            <h1 class="font-display font-semibold text-[clamp(2.5rem,6vw,5.5rem)] text-sf-text leading-[0.95]">
+                                {{ event.title }}
+                            </h1>
+                        </div>
+                    </div>
+                    <div class="ml-9 flex flex-wrap items-center gap-6 text-sm">
+                        <span class="flex items-center gap-2 text-sf-muted">
+                            <svg class="h-4 w-4 text-sf-gold shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                            </svg>
+                            {{ formatDate(event.starts_at) }} · {{ formatTime(event.starts_at) }}
+                        </span>
+                        <span v-if="event.ends_at" class="text-sf-tertiary">— {{ formatTime(event.ends_at) }}</span>
+                        <span v-if="event.location?.venue_name" class="flex items-center gap-2 text-sf-muted">
+                            <svg class="h-4 w-4 text-sf-gold shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                            </svg>
+                            {{ event.location.venue_name }}
+                            <span v-if="event.location.address_line_1" class="text-sf-tertiary">, {{ event.location.address_line_1 }}</span>
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -104,6 +139,27 @@ const formatTime = (dateStr: string): string => {
                         <p class="font-body font-light text-sf-muted leading-relaxed whitespace-pre-line text-base">
                             {{ event.description }}
                         </p>
+                    </div>
+
+                    <!-- Gallery strip -->
+                    <div v-if="event.media && event.media.length > 0" class="border-t border-sf-border-subtle pt-10">
+                        <div class="flex items-center gap-3 mb-5">
+                            <span class="h-px w-6 bg-sf-gold" />
+                            <h2 class="font-display text-2xl font-medium text-sf-text">Gallery</h2>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                            <div
+                                v-for="image in event.media"
+                                :key="image.uuid"
+                                class="aspect-square overflow-hidden rounded-lg border border-sf-border-subtle bg-sf-surface"
+                            >
+                                <img
+                                    :src="image.url"
+                                    :alt="image.filename"
+                                    class="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
+                                />
+                            </div>
+                        </div>
                     </div>
 
                     <div v-if="event.location && (event.location.venue_name || event.location.address_line_1)" class="border-t border-sf-border-subtle pt-10">
@@ -129,7 +185,7 @@ const formatTime = (dateStr: string): string => {
                 <div class="lg:col-span-1">
                     <div class="sticky top-24 space-y-4">
                         <div
-                            v-for="ticketType in event.ticket_types"
+                            v-for="ticketType in ticketTypes"
                             :key="ticketType.uuid"
                             :class="[
                                 'bg-sf-surface border rounded-xl p-5 transition-all duration-200',
@@ -157,11 +213,11 @@ const formatTime = (dateStr: string): string => {
                             </div>
                         </div>
 
-                        <div v-if="event.ticket_types.length === 0" class="bg-sf-surface border border-sf-border-subtle rounded-xl p-6 text-center">
+                        <div v-if="ticketTypes.length === 0" class="bg-sf-surface border border-sf-border-subtle rounded-xl p-6 text-center">
                             <p class="font-body text-sm text-sf-tertiary">No tickets available yet.</p>
                         </div>
 
-                        <div v-if="event.ticket_types.length > 0" class="pt-1 space-y-3">
+                        <div v-if="ticketTypes.length > 0" class="pt-1 space-y-3">
                             <div v-if="formatTotal" class="flex justify-between items-center px-1">
                                 <span class="font-body text-sm text-sf-muted">Total</span>
                                 <span class="font-display text-xl font-medium text-sf-text">{{ formatTotal }}</span>
