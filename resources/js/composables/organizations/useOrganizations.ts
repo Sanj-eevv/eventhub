@@ -1,14 +1,15 @@
-import { router } from "@inertiajs/vue3";
+import { Link, router } from "@inertiajs/vue3";
 import type {
     ColumnDef,
     PaginationState,
     SortingState,
 } from "@tanstack/vue-table";
 import { refDebounced } from "@vueuse/core";
-import { h, ref, watch } from "vue";
+import { h, ref, shallowRef, watch } from "vue";
 import OrganizationActions from "@/components/Dashboard/Organizations/OrganizationActions.vue";
 import OrganizationStatusBadge from "@/components/Dashboard/Organizations/OrganizationStatusBadge.vue";
 import { useDialogState } from "@/composables/useDialogState";
+import { useTableLoading } from "@/composables/useTableLoading";
 import type { PaginatedResponseMeta } from "@/types";
 import type { Organization, OrganizationFilterProps } from "@/types/organization";
 import { index, show as orgsShow } from "@/wayfinder/routes/dashboard/organizations";
@@ -23,17 +24,16 @@ export function useOrganizationTable(
     const rejectDialog = useDialogState();
     const deleteDialog = useDialogState();
 
-    const search = ref<OrganizationFilterProps["search"]>(filters.search ?? "");
+    const search = shallowRef<OrganizationFilterProps["search"]>(filters.search ?? "");
     const debouncedSearch = refDebounced(search, 300);
-    const statusFilter = ref<OrganizationStatus | "">(filters.status ?? "");
+    const statusFilter = shallowRef<OrganizationStatus | "">(filters.status ?? "");
 
-    const isLoading = ref(false);
+    const { isLoading, onStart, onFinish } = useTableLoading();
     const pagination = ref<PaginationState>({
         pageIndex: pageMeta.current_page - 1,
         pageSize: pageMeta.per_page,
     });
     const sorting = ref<SortingState>(pageMeta.sort);
-    let loadingTimeout: ReturnType<typeof setTimeout> | null = null;
 
     const handlePagination = () => {
         router.get(
@@ -50,19 +50,8 @@ export function useOrganizationTable(
                 preserveState: true,
                 replace: true,
                 preserveScroll: true,
-                onStart: () => {
-                    loadingTimeout = setTimeout(() => {
-                        isLoading.value = true;
-                    }, 250);
-                },
-                onSuccess: () => {},
-                onFinish: () => {
-                    if (loadingTimeout) {
-                        clearTimeout(loadingTimeout);
-                        loadingTimeout = null;
-                    }
-                    isLoading.value = false;
-                },
+                onStart,
+                onFinish,
             },
         );
     };
@@ -81,12 +70,12 @@ export function useOrganizationTable(
             enableHiding: false,
             cell: ({ row }) =>
                 h(
-                    "a",
+                    Link,
                     {
-                        href: orgsShow({ organization: row.original.uuid }).url,
+                        href: orgsShow({ organization: row.original.uuid }),
                         class: "font-medium text-blue-600 hover:underline",
                     },
-                    row.original.title,
+                    () => row.original.title,
                 ),
         },
         {

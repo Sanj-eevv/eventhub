@@ -34,7 +34,7 @@ import {
     SidebarGroupLabel,
 } from "@/components/ui/sidebar";
 import { useCurrentUrl } from "@/composables/useCurrentUrl";
-import { useInitials } from "@/composables/useInitials";
+import { getInitials } from "@/composables/useInitials";
 import { usePermission } from "@/composables/usePermission";
 import { toUrl } from "@/lib/utils";
 import type { NavItem } from "@/types";
@@ -118,7 +118,6 @@ function isNavItemActive(item: NavItem): boolean {
 
 const user = pageProps.auth.user;
 const { isMobile, state } = useSidebar();
-const { getInitials } = useInitials();
 
 const handleLogout = () => {
     router.flushAll();
@@ -232,7 +231,6 @@ const handleLogout = () => {
                                             </div>
                                         </div>
                                     </DropdownMenuLabel>
-                                    <DropdownMenuSeparator />
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem :as-child="true">
                                         <Link

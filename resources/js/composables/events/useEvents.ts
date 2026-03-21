@@ -1,15 +1,16 @@
-import { router } from "@inertiajs/vue3";
+import { Link, router } from "@inertiajs/vue3";
 import type {
     ColumnDef,
     PaginationState,
     SortingState,
 } from "@tanstack/vue-table";
 import { refDebounced } from "@vueuse/core";
-import { h, ref, watch } from "vue";
+import { h, ref, shallowRef, watch } from "vue";
 import { toast } from "vue-sonner";
 import EventActions from "@/components/Dashboard/Events/EventActions.vue";
 import EventStatusBadge from "@/components/Dashboard/Events/EventStatusBadge.vue";
 import { useDialogState } from "@/composables/useDialogState";
+import { useTableLoading } from "@/composables/useTableLoading";
 import type { PaginatedResponseMeta } from "@/types";
 import type { Event, EventFilterProps, EventStatus } from "@/types/event";
 import {
@@ -27,17 +28,16 @@ export function useEventTable(
     const activeEvent = ref<Event | null>(null);
     const deleteDialog = useDialogState();
 
-    const search = ref<string>(filters.search ?? "");
+    const search = shallowRef<string>(filters.search ?? "");
     const debouncedSearch = refDebounced(search, 300);
-    const statusFilter = ref<EventStatus | "">(filters.status ?? "");
+    const statusFilter = shallowRef<EventStatus | "">(filters.status ?? "");
 
-    const isLoading = ref(false);
+    const { isLoading, onStart, onFinish } = useTableLoading();
     const pagination = ref<PaginationState>({
         pageIndex: pageMeta.current_page - 1,
         pageSize: pageMeta.per_page,
     });
     const sorting = ref<SortingState>(pageMeta.sort ?? []);
-    let loadingTimeout: ReturnType<typeof setTimeout> | null = null;
 
     const handlePagination = () => {
         router.get(
@@ -54,18 +54,8 @@ export function useEventTable(
                 preserveState: true,
                 replace: true,
                 preserveScroll: true,
-                onStart: () => {
-                    loadingTimeout = setTimeout(() => {
-                        isLoading.value = true;
-                    }, 250);
-                },
-                onFinish: () => {
-                    if (loadingTimeout) {
-                        clearTimeout(loadingTimeout);
-                        loadingTimeout = null;
-                    }
-                    isLoading.value = false;
-                },
+                onStart,
+                onFinish,
             },
         );
     };
@@ -86,12 +76,12 @@ export function useEventTable(
             enableHiding: false,
             cell: ({ row }) =>
                 h(
-                    "a",
+                    Link,
                     {
-                        href: eventsShow({ event: row.original.uuid }).url,
+                        href: eventsShow({ event: row.original.uuid }),
                         class: "font-medium text-blue-600 hover:underline",
                     },
-                    row.original.title,
+                    () => row.original.title,
                 ),
         },
         {

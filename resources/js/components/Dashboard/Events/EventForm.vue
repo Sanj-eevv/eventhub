@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useForm } from "@inertiajs/vue3";
 import { Check, ChevronsUpDown } from "lucide-vue-next";
-import { computed, ref, watch } from "vue";
+import { computed, ref } from "vue";
 import EventFormSection from "@/components/Dashboard/Events/EventFormSection.vue";
 import type { TicketFormItem } from "@/components/Dashboard/Events/ticket-form-types";
 import TicketRepeater from "@/components/Dashboard/Events/TicketRepeater.vue";
@@ -32,6 +32,7 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { useEventSections } from "@/composables/events/useEventSections";
+import { useFormScrollToError } from "@/composables/useFormScrollToError";
 import type { OrganizationPicker } from "@/types/organization";
 
 type EventFormInitial = {
@@ -84,6 +85,7 @@ const form = useForm({
 const handleSubmit = () => {
     form.transform((data) => ({
         ...data,
+        // _key is a Vue-only tracking key — strip before sending to server
         ticket_types: data.ticket_types.map(({ _key, ...rest }) => rest),
     }))[props.submitMethod](props.submitUrl, { preserveScroll: true });
 };
@@ -105,16 +107,7 @@ const filteredTimezones = computed(() =>
     ),
 );
 
-watch(
-    () => form.errors,
-    (errors) => {
-        if (!Object.keys(errors).length) return;
-        scrollContainerRef.value
-            ?.querySelector("[data-error]")
-            ?.scrollIntoView({ behavior: "smooth", block: "center" });
-    },
-    { flush: "post" },
-);
+useFormScrollToError(form, scrollContainerRef);
 </script>
 
 <template>

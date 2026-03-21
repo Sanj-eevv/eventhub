@@ -1,5 +1,5 @@
 import { useEventListener } from "@vueuse/core";
-import { ref } from "vue";
+import { type Ref, ref, shallowRef } from "vue";
 
 type SectionId = "details" | "location" | "tickets";
 
@@ -10,12 +10,12 @@ const sections: { id: SectionId; label: string }[] = [
 ];
 
 export function useEventSections() {
-    const activeSection = ref<SectionId>("details");
+    const activeSection = shallowRef<SectionId>("details");
     const scrollContainerRef = ref<HTMLElement | null>(null);
 
     const sectionRefs = Object.fromEntries(
         sections.map((s) => [s.id, ref<HTMLElement | null>(null)]),
-    ) as Record<SectionId, any>;
+    ) as Record<SectionId, Ref<HTMLElement | null>>;
 
     const updateActiveSection = () => {
         const container = scrollContainerRef.value;

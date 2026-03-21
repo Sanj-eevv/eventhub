@@ -23,7 +23,8 @@ import {
 } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
-import type { Organization, OrganizationStatus } from "@/types/organization";
+import type { Organization } from "@/types/organization";
+import { organizationStatusLabels } from "@/constants/statusLabels";
 import { store, update } from "@/wayfinder/routes/dashboard/organizations";
 
 const props = defineProps<{
@@ -48,12 +49,6 @@ const formConfig = computed(() => {
     };
 });
 
-const selectableStatus: Record<OrganizationStatus, string> = {
-    pending: "Pending",
-    approved: "Approved",
-    rejected: "Rejected",
-    suspended: "Suspended",
-};
 
 const form = useForm({
     title: props.organization?.title || "",
@@ -156,7 +151,7 @@ const createOrganization = () => {
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem
-                                v-for="(label, value) in selectableStatus"
+                                v-for="(label, value) in organizationStatusLabels"
                                 :key="value"
                                 :value="value"
                                 >{{ label }}</SelectItem

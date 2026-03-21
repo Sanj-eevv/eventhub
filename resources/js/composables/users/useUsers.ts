@@ -1,14 +1,15 @@
-import { router } from "@inertiajs/vue3";
+import { Link, router } from "@inertiajs/vue3";
 import type {
     ColumnDef,
     PaginationState,
     SortingState,
 } from "@tanstack/vue-table";
 import { refDebounced } from "@vueuse/core";
-import { h, ref, watch } from "vue";
+import { h, ref, shallowRef, watch } from "vue";
 import UserActions from "@/components/Dashboard/Users/UserActions.vue";
 import { Badge } from "@/components/ui/badge";
 import { useDialogState } from "@/composables/useDialogState";
+import { useTableLoading } from "@/composables/useTableLoading";
 import type { PaginatedResponseMeta } from "@/types";
 import type { User, UserFilterProps } from "@/types/user";
 import { index, show as usersShow } from "@/wayfinder/routes/dashboard/users";
@@ -21,16 +22,15 @@ export function useUserTable(
     const createOrEditDialog = useDialogState();
     const deleteDialog = useDialogState();
 
-    const search = ref<string>(filters.search ?? "");
+    const search = shallowRef<string>(filters.search ?? "");
     const debouncedSearch = refDebounced(search, 300);
 
-    const isLoading = ref(false);
+    const { isLoading, onStart, onFinish } = useTableLoading();
     const pagination = ref<PaginationState>({
         pageIndex: pageMeta.current_page - 1,
         pageSize: pageMeta.per_page,
     });
     const sorting = ref<SortingState>(pageMeta?.sort ?? []);
-    let loadingTimeout: ReturnType<typeof setTimeout> | null = null;
 
     const handlePagination = () => {
         router.get(
@@ -46,18 +46,8 @@ export function useUserTable(
                 preserveState: true,
                 replace: true,
                 preserveScroll: true,
-                onStart: () => {
-                    loadingTimeout = setTimeout(() => {
-                        isLoading.value = true;
-                    }, 250);
-                },
-                onFinish: () => {
-                    if (loadingTimeout) {
-                        clearTimeout(loadingTimeout);
-                        loadingTimeout = null;
-                    }
-                    isLoading.value = false;
-                },
+                onStart,
+                onFinish,
             },
         );
     };
@@ -78,12 +68,12 @@ export function useUserTable(
             enableHiding: false,
             cell: ({ row }) =>
                 h(
-                    "a",
+                    Link,
                     {
-                        href: usersShow({ user: row.original.uuid }).url,
+                        href: usersShow({ user: row.original.uuid }),
                         class: "font-medium text-blue-600 hover:underline",
                     },
-                    row.original.name,
+                    () => row.original.name,
                 ),
         },
         {

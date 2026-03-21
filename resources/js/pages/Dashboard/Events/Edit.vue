@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { router } from "@inertiajs/vue3";
-import { ref } from "vue";
+import { shallowRef } from "vue";
 import EventForm from "@/components/Dashboard/Events/EventForm.vue";
 import EventStatusBadge from "@/components/Dashboard/Events/EventStatusBadge.vue";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,8 @@ import {
     unpublish,
     update,
 } from "@/wayfinder/routes/dashboard/events";
+
+type StatusAction = "publish" | "unpublish";
 
 const props = defineProps<{
     event: Event;
@@ -56,19 +58,16 @@ const initialValues = {
     })),
 };
 
-const isPublishing = ref(false);
+const isPublishing = shallowRef(false);
 
-const handlePublish = () => {
-    isPublishing.value = true;
-    router.post(publish(props.event.uuid).url, {}, {
-        preserveScroll: true,
-        onFinish: () => { isPublishing.value = false; },
-    });
+const routes: Record<StatusAction, ReturnType<typeof publish | typeof unpublish>> = {
+    publish: publish(props.event.uuid),
+    unpublish: unpublish(props.event.uuid),
 };
 
-const handleUnpublish = () => {
+const handleStatusChange = (action: StatusAction) => {
     isPublishing.value = true;
-    router.post(unpublish(props.event.uuid).url, {}, {
+    router.post(routes[action].url, {}, {
         preserveScroll: true,
         onFinish: () => { isPublishing.value = false; },
     });
@@ -100,7 +99,7 @@ const handleUnpublish = () => {
                             type="button"
                             size="sm"
                             :disabled="isPublishing"
-                            @click="handlePublish"
+                            @click="handleStatusChange('publish')"
                         >
                             <Spinner v-if="isPublishing" />
                             Publish
@@ -111,7 +110,7 @@ const handleUnpublish = () => {
                             variant="outline"
                             size="sm"
                             :disabled="isPublishing"
-                            @click="handleUnpublish"
+                            @click="handleStatusChange('unpublish')"
                         >
                             <Spinner v-if="isPublishing" />
                             Unpublish

@@ -84,8 +84,8 @@ const can = usePermission("role");
         </div>
 
         <DeleteRoleDialog
-            v-if="deleteDialog.isOpen()"
-            :open="deleteDialog.isOpen()"
+            v-if="deleteDialog.isOpen.value"
+            :open="deleteDialog.isOpen.value"
             :role="activeRole as Role"
             @update:open="deleteDialog.close()"
         />

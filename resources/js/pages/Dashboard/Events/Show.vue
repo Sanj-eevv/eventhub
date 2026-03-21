@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head } from "@inertiajs/vue3";
+import { Head, Link } from "@inertiajs/vue3";
 import { ArrowLeftIcon } from "lucide-vue-next";
 import EventStatusBadge from "@/components/Dashboard/Events/EventStatusBadge.vue";
 import { Button } from "@/components/ui/button";
@@ -91,16 +91,12 @@ const breadcrumbs: BreadcrumbItem[] = [
                     <CardContent class="space-y-4">
                         <div>
                             <p class="text-sm text-muted-foreground">Name</p>
-                            <a
-                                :href="
-                                    orgsShow({
-                                        organization: event.organization.uuid,
-                                    }).url
-                                "
+                            <Link
+                                :href="orgsShow({ organization: event.organization.uuid })"
                                 class="font-medium text-blue-600 hover:underline"
                             >
                                 {{ event.organization.title }}
-                            </a>
+                            </Link>
                         </div>
                     </CardContent>
                 </Card>
@@ -112,16 +108,12 @@ const breadcrumbs: BreadcrumbItem[] = [
                     <CardContent class="space-y-4">
                         <div>
                             <p class="text-sm text-muted-foreground">Name</p>
-                            <a
-                                :href="
-                                    usersShow({
-                                        user: event.user.uuid,
-                                    }).url
-                                "
+                            <Link
+                                :href="usersShow({ user: event.user.uuid })"
                                 class="font-medium text-blue-600 hover:underline"
                             >
                                 {{ event.user.name }}
-                            </a>
+                            </Link>
                         </div>
                     </CardContent>
                 </Card>

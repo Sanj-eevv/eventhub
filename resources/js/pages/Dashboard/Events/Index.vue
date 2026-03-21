@@ -15,7 +15,8 @@ import {
 import { useEventTable } from "@/composables/events/useEvents";
 import DashboardLayout from "@/layouts/DashboardLayout.vue";
 import type { BreadcrumbItem } from "@/types";
-import type { Event, EventPageProps, EventStatus } from "@/types/event";
+import type { Event, EventPageProps } from "@/types/event";
+import { eventStatusLabels } from "@/constants/statusLabels";
 import { index as dashboardIndex } from "@/wayfinder/routes/dashboard";
 import {
     create as eventsCreate,
@@ -40,11 +41,6 @@ const {
     deleteDialog,
 } = useEventTable(props.events.meta, props.events.filters);
 
-const eventStatus: Record<EventStatus, string> = {
-    draft: "Draft",
-    published: "Published",
-    cancelled: "Cancelled",
-};
 </script>
 
 <template>
@@ -95,7 +91,7 @@ const eventStatus: Record<EventStatus, string> = {
                                     <SelectItem
                                         v-for="(
                                             label, value
-                                        ) in eventStatus"
+                                        ) in eventStatusLabels"
                                         :value="value"
                                         :key="value"
                                     >
@@ -118,8 +114,8 @@ const eventStatus: Record<EventStatus, string> = {
         </div>
 
         <DeleteEventDialog
-            v-if="deleteDialog.isOpen()"
-            :open="deleteDialog.isOpen()"
+            v-if="deleteDialog.isOpen.value"
+            :open="deleteDialog.isOpen.value"
             :event="activeEvent as Event"
             @update:open="deleteDialog.close()"
         />

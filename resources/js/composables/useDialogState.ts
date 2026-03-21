@@ -1,11 +1,7 @@
-import { ref } from "vue";
+import { readonly, shallowRef } from "vue";
 
 export function useDialogState() {
-    const modalOpen = ref(false);
-
-    const isOpen = () => {
-        return modalOpen.value;
-    };
+    const modalOpen = shallowRef(false);
 
     const open = (): void => {
         modalOpen.value = true;
@@ -15,5 +11,5 @@ export function useDialogState() {
         modalOpen.value = false;
     };
 
-    return { isOpen, close, open };
+    return { isOpen: readonly(modalOpen), open, close };
 }

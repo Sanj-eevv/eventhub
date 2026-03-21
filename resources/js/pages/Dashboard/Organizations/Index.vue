@@ -18,8 +18,9 @@ import { useOrganizationTable } from "@/composables/organizations/useOrganizatio
 import { usePermission } from "@/composables/usePermission";
 import DashboardLayout from "@/layouts/DashboardLayout.vue";
 import type { BreadcrumbItem } from "@/types";
-import type { Organization, OrganizationStatus } from "@/types/organization";
+import type { Organization } from "@/types/organization";
 import type { OrganizationPageProps } from "@/types/organization";
+import { organizationStatusLabels } from "@/constants/statusLabels";
 import { index as dashboardIndex } from "@/wayfinder/routes/dashboard";
 import { index as orgsIndex } from "@/wayfinder/routes/dashboard/organizations";
 
@@ -44,12 +45,6 @@ const {
     rejectDialog,
     deleteDialog,
 } = useOrganizationTable(props.organizations.meta, props.organizations.filters);
-const organizationStatus: Record<OrganizationStatus, string> = {
-    pending: "Pending",
-    suspended: "Suspended",
-    rejected: "Rejected",
-    approved: "Approved",
-};
 </script>
 
 <template>
@@ -106,7 +101,7 @@ const organizationStatus: Record<OrganizationStatus, string> = {
                                     <SelectItem
                                         v-for="(
                                             label, value
-                                        ) in organizationStatus"
+                                        ) in organizationStatusLabels"
                                         :value="value"
                                         :key="value"
                                     >
@@ -129,31 +124,31 @@ const organizationStatus: Record<OrganizationStatus, string> = {
         </div>
 
         <OrganizationFormDialog
-            v-if="createOrEditDialog.isOpen()"
-            :open="createOrEditDialog.isOpen()"
+            v-if="createOrEditDialog.isOpen.value"
+            :open="createOrEditDialog.isOpen.value"
             :organization="activeOrganization"
             @update:open="createOrEditDialog.close()"
         />
 
         <OrganizationConfirmDialog
-            v-if="approveDialog.isOpen()"
-            :open="approveDialog.isOpen()"
+            v-if="approveDialog.isOpen.value"
+            :open="approveDialog.isOpen.value"
             action="approve"
             :organization="activeOrganization as Organization"
             @update:open="approveDialog.close()"
         />
 
         <OrganizationConfirmDialog
-            v-if="rejectDialog.isOpen()"
-            :open="rejectDialog.isOpen()"
+            v-if="rejectDialog.isOpen.value"
+            :open="rejectDialog.isOpen.value"
             action="reject"
             :organization="activeOrganization as Organization"
             @update:open="rejectDialog.close()"
         />
 
         <OrganizationDeleteDialog
-            v-if="deleteDialog.isOpen()"
-            :open="deleteDialog.isOpen()"
+            v-if="deleteDialog.isOpen.value"
+            :open="deleteDialog.isOpen.value"
             :organization="activeOrganization as Organization"
             @update:open="deleteDialog.close()"
         />

@@ -85,8 +85,8 @@ const {
         </div>
 
         <UserFormDialog
-            v-if="createOrEditDialog.isOpen()"
-            :open="createOrEditDialog.isOpen()"
+            v-if="createOrEditDialog.isOpen.value"
+            :open="createOrEditDialog.isOpen.value"
             :user="activeUser ?? undefined"
             :roles="roles"
             :organizations="organizations"
@@ -94,8 +94,8 @@ const {
         />
 
         <DeleteUserDialog
-            v-if="deleteDialog.isOpen()"
-            :open="deleteDialog.isOpen()"
+            v-if="deleteDialog.isOpen.value"
+            :open="deleteDialog.isOpen.value"
             :user="activeUser as User"
             @update:open="deleteDialog.close()"
         />
