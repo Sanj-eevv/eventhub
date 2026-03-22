@@ -32,7 +32,7 @@ const hasSelection = computed(() =>
 const orderTotal = computed(() =>
     props.ticketTypes.reduce((sum, ticketType) => {
         return (
-            sum + ticketType.price_cents * (quantities[ticketType.uuid] ?? 0)
+            sum + ticketType.price * (quantities[ticketType.uuid] ?? 0)
         );
     }, 0),
 );
@@ -388,7 +388,7 @@ const formatTime = (dateStr: string): string => {
                                 </div>
                                 <span
                                     class="font-display text-xl font-medium text-sf-text shrink-0"
-                                    >{{ ticketType.price_formatted }}</span
+                                    >${{ ticketType.price.toFixed(2) }}</span
                                 >
                             </div>
 

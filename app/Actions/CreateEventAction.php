@@ -30,6 +30,7 @@ final class CreateEventAction
                 $event->ticketTypes()->create([
                     'name' => $ticketType->name,
                     'price' => $ticketType->price,
+
                     'capacity' => $ticketType->capacity,
                     'max_per_user' => $ticketType->max_per_user,
                     'sort_order' => $ticketType->sort_order,

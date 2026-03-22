@@ -64,8 +64,7 @@ export type PublicTicketType = Pick<
     | "sale_starts_at"
     | "sale_ends_at"
 > & {
-    price_cents: number;
-    price_formatted: string;
+    price: number;
 };
 
 export type PublicEvent = Pick<

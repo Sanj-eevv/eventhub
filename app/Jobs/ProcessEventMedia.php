@@ -6,8 +6,8 @@ namespace App\Jobs;
 
 use App\Models\Media;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Foundation\Queue\Queueable;
-use Illuminate\Support\Facades\Storage;
 use Intervention\Image\ImageManager;
 
 final class ProcessEventMedia implements ShouldQueue
@@ -20,10 +20,10 @@ final class ProcessEventMedia implements ShouldQueue
 
     public function __construct(private readonly Media $media) {}
 
-    public function handle(): void
+    public function handle(FilesystemManager $filesystemManager): void
     {
 
-        $disk = Storage::disk($this->media->disk);
+        $disk = $filesystemManager->disk($this->media->disk);
 
         if ( ! $disk->exists($this->media->path)) {
             return;

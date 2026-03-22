@@ -9,8 +9,8 @@ use App\Jobs\ProcessEventMedia;
 use App\Models\Event;
 use App\Models\Media;
 use Illuminate\Contracts\Config\Repository as Config;
-use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Database\DatabaseManager;
+use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
 use Throwable;
@@ -20,7 +20,7 @@ final class StoreEventMediaAction
     private const int MAX_FILES = 10;
 
     public function __construct(
-        private readonly Filesystem $filesystem,
+        private readonly FilesystemManager $filesystem,
         private readonly DatabaseManager $databaseManager,
         private readonly Config $config,
     ) {}

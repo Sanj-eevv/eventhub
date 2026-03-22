@@ -6,17 +6,22 @@ namespace App\Actions;
 
 use App\Models\Event;
 use App\Models\Media;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\DatabaseManager;
+use Illuminate\Filesystem\FilesystemManager;
 
 final class DestroyEventMediaAction
 {
+    public function __construct(
+        private readonly FilesystemManager $filesystemManager,
+        private readonly DatabaseManager $databaseManager,
+    ) {}
+
     public function execute(Event $event, Media $media): void
     {
-        DB::transaction(function () use ($event, $media): void {
+        $this->databaseManager->transaction(function () use ($event, $media): void {
             $wasCover = $media->is_cover;
 
-            Storage::disk($media->disk)->delete($media->path);
+            $this->filesystemManager->disk($media->disk)->delete($media->path);
 
             $media->delete();
 
