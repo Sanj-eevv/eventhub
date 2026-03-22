@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { router } from "@inertiajs/vue3";
-import { shallowRef } from "vue";
+import { onMounted, shallowRef } from "vue";
 import EventForm from "@/components/Dashboard/Events/EventForm.vue";
 import EventStatusBadge from "@/components/Dashboard/Events/EventStatusBadge.vue";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import DashboardLayout from "@/layouts/DashboardLayout.vue";
 import type { BreadcrumbItem } from "@/types";
-import type { Event } from "@/types/event";
+import type { Event, EventFormInitial } from "@/types/event";
 import type { OrganizationPicker } from "@/types/organization";
 import { index as dashboardIndex } from "@/wayfinder/routes/dashboard";
 import {
@@ -32,13 +32,16 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: props.event.title, href: eventsEdit(props.event.uuid).url },
 ];
 
-const initialValues = {
+const initialValues: EventFormInitial = {
+    uuid: props.event.uuid,
     organization_uuid: props.event.organization_uuid,
     title: props.event.title,
     description: props.event.description,
     starts_at: props.event.starts_at,
     ends_at: props.event.ends_at ?? "",
-    timezone: props.event.timezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone,
+    timezone:
+        props.event.timezone ??
+        Intl.DateTimeFormat().resolvedOptions().timeZone,
     location: {
         venue_name: props.event.location?.venue_name ?? "",
         address_line_1: props.event.location?.address_line_1 ?? "",
@@ -47,30 +50,44 @@ const initialValues = {
         map_url: props.event.location?.map_url ?? "",
     },
     ticket_types: (props.event.ticket_types ?? []).map((ticketType) => ({
+        ...ticketType,
         _key: crypto.randomUUID(),
         uuid: ticketType.uuid,
-        name: ticketType.name,
-        price: ticketType.price.toFixed(2),
-        capacity: String(ticketType.capacity),
-        max_per_user: String(ticketType.max_per_user),
-        sale_starts_at: ticketType.sale_starts_at ?? undefined,
-        sale_ends_at: ticketType.sale_ends_at ?? undefined,
     })),
 };
 
 const isPublishing = shallowRef(false);
+const eventForm = shallowRef<InstanceType<typeof EventForm> | null>(null);
 
-const routes: Record<StatusAction, ReturnType<typeof publish | typeof unpublish>> = {
+onMounted(() => {
+    const focus = new URLSearchParams(window.location.search).get("focus");
+    if (focus) {
+        eventForm.value?.scrollToSection(
+            focus as "details" | "location" | "tickets" | "media",
+        );
+    }
+});
+
+const routes: Record<
+    StatusAction,
+    ReturnType<typeof publish | typeof unpublish>
+> = {
     publish: publish(props.event.uuid),
     unpublish: unpublish(props.event.uuid),
 };
 
 const handleStatusChange = (action: StatusAction) => {
     isPublishing.value = true;
-    router.post(routes[action].url, {}, {
-        preserveScroll: true,
-        onFinish: () => { isPublishing.value = false; },
-    });
+    router.post(
+        routes[action].url,
+        {},
+        {
+            preserveScroll: true,
+            onFinish: () => {
+                isPublishing.value = false;
+            },
+        },
+    );
 };
 </script>
 
@@ -121,8 +138,8 @@ const handleStatusChange = (action: StatusAction) => {
 
             <div class="flex min-h-0 flex-1 flex-col">
                 <EventForm
+                    ref="eventForm"
                     :initial-values="initialValues"
-                    :event-uuid="event.uuid"
                     :media-items="event.media"
                     :organizations="organizations"
                     :timezones="timezones"

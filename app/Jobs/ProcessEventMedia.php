@@ -8,9 +8,7 @@ use App\Models\Media;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Storage;
-use Intervention\Image\Drivers\Gd\Driver;
 use Intervention\Image\ImageManager;
-use Throwable;
 
 final class ProcessEventMedia implements ShouldQueue
 {
@@ -24,29 +22,30 @@ final class ProcessEventMedia implements ShouldQueue
 
     public function handle(): void
     {
+
         $disk = Storage::disk($this->media->disk);
 
-        if ( ! $disk->exists($this->media->original_path)) {
+        if ( ! $disk->exists($this->media->path)) {
             return;
         }
 
-        $manager = new ImageManager(new Driver());
-        $image = $manager->read($disk->path($this->media->original_path));
+        $originalPath = $this->media->path;
+        $baseName = pathinfo($originalPath, PATHINFO_FILENAME).'.webp';
+        $processedPath = pathinfo($originalPath, PATHINFO_DIRNAME).'/'.$baseName;
 
-        $image->scaleDown(width: 1920);
+        $webpContent = ImageManager::gd()->read($disk->path($originalPath))
+            ->scaleDown(width: 1920)
+            ->toWebp(quality: 85)
+            ->toString();
 
-        $processedPath = 'media/'.dirname($this->media->original_path).'/'.pathinfo($this->media->filename, PATHINFO_FILENAME).'_processed.webp';
-
-        $disk->put($processedPath, $image->toWebp(quality: 85)->toString());
+        $disk->put($processedPath, $webpContent);
 
         $this->media->update([
-            'processed_path' => $processedPath,
-            'processed_at' => now(),
+            'path' => $processedPath,
+            'filename' => $baseName,
+            'mime_type' => 'image/webp',
+            'size' => mb_strlen($webpContent),
         ]);
-    }
-
-    public function failed(Throwable $exception): void
-    {
-        $this->media->update(['processing_failed_at' => now()]);
+        $disk->delete($originalPath);
     }
 }

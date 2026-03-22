@@ -99,6 +99,31 @@ When a conditional check (guard) exists before calling an action, decide where i
 - **Guard goes in the action** — when it only determines whether the action should do its work, with no effect on the controller's response. The controller calls the action unconditionally.
 - **Guard stays in the controller** — when it produces a different redirect or response (e.g. early return to a different route). The guard is part of the response logic, not the action's concern.
 
+## Controllers — Required Structure
+
+Every controller must follow these rules without exception:
+
+1. **Extend `Controller`** — always `extends Controller` (provides `AuthorizesRequests`).
+2. **RESTful methods only** — resource controllers may only contain: `index`, `create`, `store`, `show`, `edit`, `update`, `destroy`. No custom method names (e.g. `cover`, `publish`, `approve`).
+3. **Invokable controllers for non-RESTful actions** — any action that does not map to a standard RESTful method must be its own `final class FooController extends Controller` with a single `__invoke()` method.
+4. **Authorize every method** — call `$this->authorize()` as the first line of every public method.
+5. **Flash `toastSuccess` on all redirects** — every redirect must chain `.with('toastSuccess', '...')`.
+
+```php
+// ✅ Non-RESTful action → invokable controller
+final class SetEventMediaCoverController extends Controller
+{
+    public function __invoke(Event $event, Media $media): RedirectResponse
+    {
+        $this->authorize('update', $event);
+
+        $this->setCoverAction->execute($event, $media);
+
+        return $this->redirector->back()->with('toastSuccess', 'Cover image updated successfully.');
+    }
+}
+```
+
 ## Controllers — No Global Helpers
 
 Controllers must never use global helper functions for HTTP concerns. Always use the injected dependency instead.
@@ -303,7 +328,7 @@ protected function isAccessible(User $user, ?string $path = null): bool
 
 ## Enums
 
-- That being said, keys in an Enum should follow existing application Enum conventions.
+- Typically, keys in an Enum should be TitleCase. For example: `FavoritePerson`, `BestLake`, `Monthly`.
 
 ## Comments
 

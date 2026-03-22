@@ -34,6 +34,9 @@ final class SharedPermissionResource
             'order' => [
                 'viewAny' => Gate::forUser($this->user)->allows('viewAny', Order::class),
             ],
+            'dashboard' => [
+                'access' => Gate::forUser($this->user)->allows('access-dashboard'),
+            ],
         ];
     }
 

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Link, router, usePage } from "@inertiajs/vue3";
 import { computed, ref } from "vue";
+import { usePermission } from "@/composables/usePermission";
 import { useTheme } from "@/composables/useTheme";
 import { home } from "@/wayfinder/routes";
 import {
@@ -17,17 +18,9 @@ const appName = page.props.name as string;
 const user = computed(
     () => page.props.auth.user as { name: string; email: string } | null,
 );
-const can = computed(
-    () =>
-        page.props.can as {
-            event?: { viewAny?: boolean };
-            organization?: { viewAny?: boolean };
-        } | null,
-);
 
-const canAccessDashboard = computed(
-    () => !!(can.value?.event?.viewAny || can.value?.organization?.viewAny),
-);
+const canDashboard = usePermission("dashboard");
+const canAccessDashboard = computed(() => canDashboard("access"));
 
 const mobileOpen = ref(false);
 

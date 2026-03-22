@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Enums\PreservedRoleList;
 use App\Events\EventCancelled;
 use App\Events\OrderCompleted;
 use App\Events\OrganizationApproved;
@@ -17,11 +18,9 @@ use App\Listeners\VoidEventTickets;
 use App\Models\Event as EventModel;
 use App\Models\Order;
 use App\Models\Ticket;
-use App\Models\TicketType;
 use App\Models\User;
 use App\Policies\OrderPolicy;
 use App\Policies\TicketPolicy;
-use App\Policies\TicketTypePolicy;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Auth\Notifications\ResetPassword;
@@ -66,9 +65,10 @@ final class AppServiceProvider extends ServiceProvider
 
     private function configurePolicies(): void
     {
-        Gate::policy(TicketType::class, TicketTypePolicy::class);
         Gate::policy(Order::class, OrderPolicy::class);
         Gate::policy(Ticket::class, TicketPolicy::class);
+
+        Gate::define('access-dashboard', fn (User $user): bool => $user->hasAnyRole(PreservedRoleList::adminRoles()));
     }
 
     private function configureEvents(): void
@@ -100,7 +100,6 @@ final class AppServiceProvider extends ServiceProvider
     {
         Model::shouldBeStrict();
         Model::preventLazyLoading( ! app()->isProduction());
-
         Relation::morphMap([
             'event' => EventModel::class,
         ]);

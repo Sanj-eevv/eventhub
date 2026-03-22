@@ -1,19 +1,30 @@
 import type { PaginatedResponse } from "@/types";
 import type { App } from "@/wayfinder/types";
 
-export type EventStatus = App.Enums.EventStatus;
-export type EventStatusData = { value: EventStatus; label: string };
+export type StatusLabel<T extends string> = { value: T; label: string };
 
-export type MediaItem = {
-    uuid: string;
+export type TicketType = Omit<
+    App.Models.TicketType,
+    | "id"
+    | "event_id"
+    | "uuid"
+    | "created_at"
+    | "updated_at"
+    | "event"
+    | "tickets"
+> & {
+    _key: string;
+    uuid: string | null;
+};
+
+export type EventStatus = App.Enums.EventStatus;
+export type EventStatusData = StatusLabel<EventStatus>;
+
+export type MediaItem = Pick<
+    App.Models.Media,
+    "uuid" | "filename" | "size" | "is_cover" | "sort_order"
+> & {
     url: string;
-    original_url: string;
-    filename: string;
-    size: number;
-    is_cover: boolean;
-    sort_order: number;
-    processing: boolean;
-    processing_failed: boolean;
 };
 
 export type EventLocation = {
@@ -24,66 +35,76 @@ export type EventLocation = {
     map_url?: string | null;
 };
 
-export type OrderStatus = 'pending' | 'reserved' | 'paid' | 'expired' | 'cancelled';
-export type TicketStatus = 'pending' | 'active' | 'cancelled' | 'used';
-
-export type OrderTicket = {
-    uuid: string;
-    booking_reference: string;
-    status: TicketStatus;
-    qr_code_path: string | null;
-    attendee_name: string;
+export type OrderTicket = Pick<
+    App.Models.Ticket,
+    "uuid" | "booking_reference" | "qr_code_path" | "attendee_name"
+> & {
+    status: App.Enums.TicketStatus;
     ticket_type: string;
 };
 
-export type Order = {
-    uuid: string;
-    status: { value: OrderStatus; label: string };
-    currency: string;
-    total: number;
+export type Order = Pick<
+    App.Models.Order,
+    "uuid" | "currency" | "total" | "reserved_at" | "expires_at" | "paid_at"
+> & {
+    status: StatusLabel<App.Enums.OrderStatus>;
     total_formatted: string;
-    reserved_at: string | null;
-    expires_at: string | null;
-    paid_at: string | null;
-    event: { title: string; slug: string };
+    event: Pick<App.Models.Event, "title" | "slug">;
     tickets: OrderTicket[];
 };
 
-export type PublicTicketType = {
-    uuid: string;
-    name: string;
-    description: string | null;
+export type PublicTicketType = Pick<
+    App.Models.TicketType,
+    | "uuid"
+    | "name"
+    | "description"
+    | "capacity"
+    | "max_per_user"
+    | "is_active"
+    | "sale_starts_at"
+    | "sale_ends_at"
+> & {
     price_cents: number;
     price_formatted: string;
-    capacity: number;
-    max_per_user: number;
-    is_active: boolean;
-    sale_starts_at: string | null;
-    sale_ends_at: string | null;
 };
 
-export type PublicEvent = {
-    uuid: string;
-    slug: string;
-    title: string;
-    description: string;
-    starts_at: string;
-    ends_at: string | null;
-    timezone: string;
+export type PublicEvent = Pick<
+    App.Models.Event,
+    | "uuid"
+    | "slug"
+    | "title"
+    | "description"
+    | "starts_at"
+    | "ends_at"
+    | "timezone"
+> & {
     location: EventLocation | null;
     cover_image: MediaItem | null;
     media: MediaItem[];
 };
 
-export type TicketType = App.Models.TicketType;
-
-export type Event = Omit<App.Models.Event, "status" | "location" | "organization_id" | "user_id"> & {
+export type Event = Omit<
+    App.Models.Event,
+    "id" | "status" | "location" | "organization_id" | "user_id"
+> & {
+    organization_uuid: string;
     status: EventStatusData;
     location: EventLocation | null;
-    organization_uuid: string;
     ticket_types?: TicketType[];
     media?: MediaItem[];
     cover_image?: MediaItem | null;
+};
+
+export type EventFormInitial = {
+    uuid: string;
+    organization_uuid?: string;
+    title?: string;
+    description?: string;
+    starts_at?: string;
+    ends_at?: string;
+    timezone?: string;
+    location?: { [K in keyof EventLocation]?: string };
+    ticket_types?: TicketType[];
 };
 
 export type EventFilterProps = {

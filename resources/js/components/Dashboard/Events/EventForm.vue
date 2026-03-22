@@ -3,7 +3,6 @@ import { useForm } from "@inertiajs/vue3";
 import { Check, ChevronsUpDown } from "lucide-vue-next";
 import { computed, ref } from "vue";
 import EventFormSection from "@/components/Dashboard/Events/EventFormSection.vue";
-import type { TicketFormItem } from "@/components/Dashboard/Events/ticket-form-types";
 import TicketRepeater from "@/components/Dashboard/Events/TicketRepeater.vue";
 import InputError from "@/components/InputError.vue";
 import MediaUploader from "@/components/MediaUploader.vue";
@@ -34,7 +33,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { useEventSections } from "@/composables/events/useEventSections";
 import { useFormScrollToError } from "@/composables/useFormScrollToError";
-import type { MediaItem } from "@/types/event";
+import type { EventFormInitial, MediaItem, TicketType } from "@/types/event";
 import type { OrganizationPicker } from "@/types/organization";
 import {
     cover as coverMediaRoute,
@@ -42,26 +41,8 @@ import {
     store as storeMediaRoute,
 } from "@/wayfinder/routes/dashboard/events/media";
 
-type EventFormInitial = {
-    organization_uuid?: string;
-    title?: string;
-    description?: string;
-    starts_at?: string;
-    ends_at?: string;
-    timezone?: string;
-    location?: {
-        venue_name?: string;
-        address_line_1?: string;
-        address_line_2?: string;
-        zip?: string;
-        map_url?: string;
-    };
-    ticket_types?: TicketFormItem[];
-};
-
 const props = defineProps<{
     initialValues?: EventFormInitial;
-    eventUuid?: string;
     mediaItems?: MediaItem[];
     submitUrl: string;
     submitMethod: "post" | "put";
@@ -88,7 +69,7 @@ const form = useForm({
         zip: props.initialValues?.location?.zip ?? "",
         map_url: props.initialValues?.location?.map_url ?? "",
     },
-    ticket_types: (props.initialValues?.ticket_types ?? []) as TicketFormItem[],
+    ticket_types: (props.initialValues?.ticket_types ?? []) as TicketType[],
 });
 
 const handleSubmit = () => {
@@ -105,7 +86,7 @@ const {
     scrollContainerRef,
     sectionRefs,
     scrollToSection,
-} = useEventSections(props.isEditing);
+} = useEventSections();
 
 const timezoneOpen = ref(false);
 const timezoneSearch = ref("");
@@ -117,6 +98,8 @@ const filteredTimezones = computed(() =>
 );
 
 useFormScrollToError(form, scrollContainerRef);
+
+defineExpose({ scrollToSection });
 </script>
 
 <template>
@@ -423,21 +406,44 @@ useFormScrollToError(form, scrollContainerRef);
                             <TicketRepeater
                                 v-model="form.ticket_types"
                                 :errors="form.errors"
+                                :timezone="form.timezone"
                             />
                             <InputError :message="form.errors.ticket_types" />
                         </EventFormSection>
                     </div>
 
-                    <div v-if="isEditing && eventUuid" :ref="sectionRefs.media">
+                    <div :ref="sectionRefs.media">
                         <EventFormSection
                             title="Media"
                             description="Upload images for your event. The first image will become the cover."
                         >
+                            <div
+                                v-if="!isEditing"
+                                class="text-muted-foreground flex flex-col items-center justify-center rounded-lg border border-dashed px-6 py-10 text-center text-sm"
+                            >
+                                <p class="font-medium">No media yet</p>
+                                <p class="mt-1">
+                                    Save your event first to start uploading
+                                    images.
+                                </p>
+                            </div>
                             <MediaUploader
+                                v-else
                                 :items="mediaItems ?? []"
-                                :upload-url="storeMediaRoute({ event: eventUuid }).url"
-                                :delete-url="(mediaUuid) => destroyMediaRoute({ event: eventUuid, media: mediaUuid }).url"
-                                :cover-url="(mediaUuid) => coverMediaRoute({ event: eventUuid, media: mediaUuid }).url"
+                                :upload-url="
+                                    storeMediaRoute({ event: initialValues?.uuid as string }).url
+                                "
+                                :delete-url="
+                                    (mediaUuid) =>
+                                        destroyMediaRoute({ event: initialValues?.uuid as string, media: mediaUuid }).url
+                                "
+                                :cover-url="
+                                    (mediaUuid) =>
+                                        coverMediaRoute({
+                                            event: initialValues?.uuid as string,
+                                            media: mediaUuid,
+                                        }).url
+                                "
                                 partial-reload-key="event"
                             />
                         </EventFormSection>
@@ -446,7 +452,7 @@ useFormScrollToError(form, scrollContainerRef);
             </div>
 
             <div class="bg-background shrink-0 border-t px-6 py-4 lg:px-8">
-                <div class="flex max-w-3xl items-center justify-end gap-3">
+                <div class="flex items-center justify-end gap-3">
                     <Button
                         type="button"
                         variant="ghost"

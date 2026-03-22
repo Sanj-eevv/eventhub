@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use App\Enums\PreservedRoleList;
 use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
@@ -25,6 +24,7 @@ use App\Http\Controllers\Dashboard\PublishEventController;
 use App\Http\Controllers\Dashboard\RejectOrganizationController;
 use App\Http\Controllers\Dashboard\RoleController;
 use App\Http\Controllers\Dashboard\ScanTicketController;
+use App\Http\Controllers\Dashboard\SetEventMediaCoverController;
 use App\Http\Controllers\Dashboard\UnpublishEventController;
 use App\Http\Controllers\Dashboard\UserController;
 use App\Http\Controllers\DashboardController;
@@ -77,7 +77,7 @@ Route::middleware('auth')->group(function (): void {
         Route::get('email/verify/{id}/{hash}', VerifyEmailController::class)->middleware(['signed', 'throttle:10,1'])->name('verification.verify');
         Route::post('email/verification-notification', ResendEmailVerificationController::class)->middleware('throttle:5,1')->name('verification.send');
     });
-    Route::middleware(['role:'.PreservedRoleList::adminRolesString(), 'verified:auth.verification.notice'])->prefix('dashboard')->as('dashboard.')->group(function (): void {
+    Route::middleware(['can:access-dashboard', 'verified:auth.verification.notice'])->prefix('dashboard')->as('dashboard.')->group(function (): void {
         Route::get('/', DashboardController::class)->name('index');
         Route::resource('users', UserController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
         Route::resource('roles', RoleController::class);
@@ -90,7 +90,7 @@ Route::middleware('auth')->group(function (): void {
         Route::post('events/{event}/cancel', CancelEventController::class)->name('events.cancel');
         Route::post('events/{event}/media', [EventMediaController::class, 'store'])->name('events.media.store');
         Route::delete('events/{event}/media/{media:uuid}', [EventMediaController::class, 'destroy'])->name('events.media.destroy');
-        Route::post('events/{event}/media/{media:uuid}/cover', [EventMediaController::class, 'cover'])->name('events.media.cover');
+        Route::post('events/{event}/media/{media:uuid}/cover', SetEventMediaCoverController::class)->name('events.media.cover');
 
         Route::resource('orders', DashboardOrderController::class)->only(['index', 'show']);
         Route::get('events/{event}/check-in', [CheckInController::class, 'index'])->name('events.check-in');

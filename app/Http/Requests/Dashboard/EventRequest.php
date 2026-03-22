@@ -42,6 +42,8 @@ final class EventRequest extends FormRequest
     {
         return [
             'organization_uuid' => 'organization',
+            'ticket_types.*.sale_starts_at' => 'sale start date',
+            'ticket_types.*.sale_ends_at' => 'sale end date',
         ];
     }
 
@@ -61,6 +63,7 @@ final class EventRequest extends FormRequest
 
     public function toDto(): EventData
     {
+        $timezone = $this->validated('timezone');
         $organizationId = Organization::where('uuid', $this->validated('organization_uuid'))->value('id');
 
         $ticketTypes = collect($this->validated('ticket_types'))
@@ -71,8 +74,8 @@ final class EventRequest extends FormRequest
                 max_per_user: isset($type['max_per_user']) ? (int) $type['max_per_user'] : 5,
                 sort_order: $index,
                 uuid: $type['uuid'] ?? null,
-                sale_starts_at: isset($type['sale_starts_at']) ? CarbonImmutable::parse($type['sale_starts_at']) : null,
-                sale_ends_at: isset($type['sale_ends_at']) ? CarbonImmutable::parse($type['sale_ends_at']) : null,
+                sale_starts_at: isset($type['sale_starts_at']) ? CarbonImmutable::parse($type['sale_starts_at'], $timezone)->utc() : null,
+                sale_ends_at: isset($type['sale_ends_at']) ? CarbonImmutable::parse($type['sale_ends_at'], $timezone)->utc() : null,
             ))
             ->all();
 
@@ -81,9 +84,9 @@ final class EventRequest extends FormRequest
             organization_id: $organizationId,
             title: $this->validated('title'),
             description: $this->validated('description'),
-            starts_at: CarbonImmutable::parse($this->validated('starts_at')),
-            ends_at: $this->validated('ends_at') ? CarbonImmutable::parse($this->validated('ends_at')) : null,
-            timezone: $this->validated('timezone'),
+            starts_at: CarbonImmutable::parse($this->validated('starts_at'), $timezone)->utc(),
+            ends_at: $this->validated('ends_at') ? CarbonImmutable::parse($this->validated('ends_at'), $timezone)->utc() : null,
+            timezone: $timezone,
             location: $this->validated('location'),
             ticket_types: $ticketTypes,
         );

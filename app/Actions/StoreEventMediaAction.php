@@ -8,53 +8,59 @@ use App\Exceptions\MediaLimitExceededException;
 use App\Jobs\ProcessEventMedia;
 use App\Models\Event;
 use App\Models\Media;
+use Illuminate\Contracts\Config\Repository as Config;
+use Illuminate\Contracts\Filesystem\Filesystem;
+use Illuminate\Database\DatabaseManager;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Throwable;
 
 final class StoreEventMediaAction
 {
     private const int MAX_FILES = 10;
 
-    private const string DISK = 'public';
+    public function __construct(
+        private readonly Filesystem $filesystem,
+        private readonly DatabaseManager $databaseManager,
+        private readonly Config $config,
+    ) {}
 
     public function execute(Event $event, UploadedFile $file): Media
     {
-        return DB::transaction(function () use ($event, $file): Media {
+        $uuid = Str::uuid()->toString();
+        $filename = $file->getClientOriginalName();
+        $extension = $file->extension();
+        $originalPath = "media/{$event->uuid}/{$uuid}.{$extension}";
+
+        $this->filesystem->put($originalPath, $file->getContent());
+
+        try {
+            $this->databaseManager->beginTransaction();
             $count = $event->media()->lockForUpdate()->count();
 
             if ($count >= self::MAX_FILES) {
                 throw new MediaLimitExceededException(self::MAX_FILES);
             }
 
-            $uuid = Str::uuid()->toString();
-            $extension = $file->extension();
-            $filename = $file->getClientOriginalName();
-            $originalPath = "media/{$event->uuid}/{$uuid}/original.{$extension}";
-
-            Storage::disk(self::DISK)->putFileAs(
-                "media/{$event->uuid}/{$uuid}",
-                $file,
-                "original.{$extension}",
-            );
-
-            $isFirstImage = 0 === $count;
-
             $media = $event->media()->create([
                 'uuid' => $uuid,
-                'disk' => self::DISK,
-                'original_path' => $originalPath,
+                'disk' => $this->config->get('filesystems.default'),
+                'path' => $originalPath,
                 'filename' => $filename,
                 'mime_type' => $file->getMimeType() ?? $file->getClientMimeType(),
                 'size' => $file->getSize(),
-                'is_cover' => $isFirstImage,
+                'is_cover' => 0 === $count,
                 'sort_order' => $count,
             ]);
-
             ProcessEventMedia::dispatch($media);
+            $this->databaseManager->commit();
 
             return $media;
-        });
+        } catch (Throwable $exception) {
+            $this->databaseManager->rollBack();
+            $this->filesystem->delete($originalPath);
+
+            throw $exception;
+        }
     }
 }

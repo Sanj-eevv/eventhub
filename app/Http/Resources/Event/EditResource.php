@@ -2,15 +2,17 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Event;
 
+use App\Http\Resources\MediaResource;
+use App\Http\Resources\TicketTypeResource;
 use App\Models\Event;
 use App\Support\DateFormat;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /** @mixin Event */
-final class EventResource extends JsonResource
+final class EditResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
@@ -35,15 +37,7 @@ final class EventResource extends JsonResource
                 'uuid' => $this->user->uuid,
                 'name' => $this->user->name,
             ]),
-            'ticket_types' => $this->whenLoaded('ticketTypes', fn () => $this->ticketTypes->map(fn ($ticketType) => [
-                'uuid' => $ticketType->uuid,
-                'name' => $ticketType->name,
-                'price' => $ticketType->price / 100,
-                'capacity' => $ticketType->capacity,
-                'max_per_user' => $ticketType->max_per_user,
-                'sale_starts_at' => $ticketType->sale_starts_at?->format(DateFormat::DATETIME_LOCAL),
-                'sale_ends_at' => $ticketType->sale_ends_at?->format(DateFormat::DATETIME_LOCAL),
-            ])->all()),
+            'ticket_types' => $this->whenLoaded('ticketTypes', fn () => TicketTypeResource::collection($this->ticketTypes)->resolve()),
             'media' => $this->whenLoaded('media', fn () => MediaResource::collection($this->media)->resolve()),
             'cover_image' => $this->whenLoaded(
                 'media',

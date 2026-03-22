@@ -9,9 +9,9 @@ use App\Actions\DeleteEventAction;
 use App\Actions\UpdateEventAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Dashboard\EventRequest;
+use App\Http\Resources\Event\EditResource;
 use App\Http\Resources\Event\IndexResource;
 use App\Http\Resources\Event\ShowResource;
-use App\Http\Resources\EventResource;
 use App\Http\Resources\Organization\PickerResource as OrganizationPickerResource;
 use App\Models\Event;
 use App\Models\Organization;
@@ -78,9 +78,9 @@ final class EventController extends Controller
     {
         $this->authorize('create', Event::class);
 
-        $this->createEventAction->execute($request->toDto());
+        $event = $this->createEventAction->execute($request->toDto());
 
-        return $this->redirector->route('dashboard.events.index')->with('toastSuccess', 'Event created successfully.');
+        return $this->redirector->route('dashboard.events.edit', ['event' => $event, 'focus' => 'media'])->with('toastSuccess', 'Event created successfully.');
     }
 
     public function edit(Event $event): Response
@@ -88,7 +88,7 @@ final class EventController extends Controller
         $this->authorize('update', $event);
 
         return $this->inertiaResponse->render('Dashboard/Events/Edit', [
-            'event' => new EventResource($event->load(['organization', 'user', 'ticketTypes', 'media'])),
+            'event' => new EditResource($event->load(['organization', 'user', 'ticketTypes', 'media'])),
             'organizations' => OrganizationPickerResource::collection(Organization::query()->approved()->get()),
             'timezones' => DateTimeZone::listIdentifiers(),
         ]);

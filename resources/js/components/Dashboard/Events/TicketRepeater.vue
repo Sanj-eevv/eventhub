@@ -1,15 +1,16 @@
 <script setup lang="ts">
 import { Trash2 } from "lucide-vue-next";
-import type { TicketFormItem } from "@/components/Dashboard/Events/ticket-form-types";
+import type { TicketType } from "@/types/event";
 import InputError from "@/components/InputError.vue";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-const localItems = defineModel<TicketFormItem[]>({ required: true });
+const localItems = defineModel<TicketType[]>({ required: true });
 
 const props = defineProps<{
     errors?: Record<string, string>;
+    timezone?: string;
 }>();
 
 const addItem = () => {
@@ -17,11 +18,15 @@ const addItem = () => {
         _key: crypto.randomUUID(),
         uuid: null,
         name: "",
-        price: "",
-        capacity: "",
-        max_per_user: "",
-        sale_starts_at: undefined,
-        sale_ends_at: undefined,
+        slug: "",
+        description: null,
+        price: 0,
+        capacity: 0,
+        max_per_user: 1,
+        sort_order: 0,
+        is_active: true,
+        sale_starts_at: null,
+        sale_ends_at: null,
     });
 };
 
@@ -66,7 +71,7 @@ const fieldError = (index: number, field: string) =>
                 </Button>
             </div>
 
-            <div class="grid gap-4 sm:grid-cols-2">
+            <div class="grid gap-4 sm:grid-cols-2 sm:items-start">
                 <div class="grid gap-2 sm:col-span-2">
                     <Label :for="`tt-name-${item._key}`" class="required"
                         >Name</Label
@@ -138,6 +143,9 @@ const fieldError = (index: number, field: string) =>
                         v-model="localItems[index].sale_starts_at"
                         type="datetime-local"
                     />
+                    <p v-if="timezone" class="text-muted-foreground text-xs">
+                        {{ timezone }}
+                    </p>
                     <InputError
                         :message="fieldError(index, 'sale_starts_at')"
                     />
@@ -155,6 +163,9 @@ const fieldError = (index: number, field: string) =>
                         v-model="localItems[index].sale_ends_at"
                         type="datetime-local"
                     />
+                    <p v-if="timezone" class="text-muted-foreground text-xs">
+                        {{ timezone }}
+                    </p>
                     <InputError :message="fieldError(index, 'sale_ends_at')" />
                 </div>
             </div>

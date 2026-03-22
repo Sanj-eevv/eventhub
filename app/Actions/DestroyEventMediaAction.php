@@ -16,10 +16,7 @@ final class DestroyEventMediaAction
         DB::transaction(function () use ($event, $media): void {
             $wasCover = $media->is_cover;
 
-            $paths = array_filter([$media->original_path, $media->processed_path]);
-            foreach ($paths as $path) {
-                Storage::disk($media->disk)->delete($path);
-            }
+            Storage::disk($media->disk)->delete($media->path);
 
             $media->delete();
 

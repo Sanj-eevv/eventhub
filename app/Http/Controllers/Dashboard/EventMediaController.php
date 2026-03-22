@@ -5,41 +5,37 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Dashboard;
 
 use App\Actions\DestroyEventMediaAction;
-use App\Actions\SetCoverMediaAction;
 use App\Actions\StoreEventMediaAction;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\Dashboard\StoreEventMediaRequest;
 use App\Models\Event;
 use App\Models\Media;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Redirector;
 
-final class EventMediaController
+final class EventMediaController extends Controller
 {
     public function __construct(
         private readonly StoreEventMediaAction $storeAction,
         private readonly DestroyEventMediaAction $destroyAction,
-        private readonly SetCoverMediaAction $setCoverAction,
         private readonly Redirector $redirector,
     ) {}
 
     public function store(StoreEventMediaRequest $request, Event $event): RedirectResponse
     {
+        $this->authorize('update', $event);
+
         $this->storeAction->execute($event, $request->file('file'));
 
-        return $this->redirector->back();
+        return $this->redirector->back()->with('toastSuccess', 'Media uploaded successfully.');
     }
 
     public function destroy(Event $event, Media $media): RedirectResponse
     {
+        $this->authorize('update', $event);
+
         $this->destroyAction->execute($event, $media);
 
-        return $this->redirector->back();
-    }
-
-    public function cover(Event $event, Media $media): RedirectResponse
-    {
-        $this->setCoverAction->execute($event, $media);
-
-        return $this->redirector->back();
+        return $this->redirector->back()->with('toastSuccess', 'Media deleted.');
     }
 }

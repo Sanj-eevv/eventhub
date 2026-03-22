@@ -11,12 +11,18 @@ enum PreservedRoleList: string
     case OrganizationAdmin = 'organization-admin';
     case User = 'user';
 
-    public static function adminRolesString(): string
+    /** @return list<string> */
+    public static function adminRoles(): array
     {
-        return implode(',', [
+        return [
             self::SuperAdmin->value,
             self::Admin->value,
             self::OrganizationAdmin->value,
-        ]);
+        ];
+    }
+
+    public static function adminRolesString(): string
+    {
+        return implode(',', self::adminRoles());
     }
 }

@@ -3,20 +3,18 @@ import { type Ref, computed, ref, shallowRef } from "vue";
 
 type SectionId = "details" | "location" | "tickets" | "media";
 
-const allSections: { id: SectionId; label: string; editOnly?: boolean }[] = [
+const allSections: { id: SectionId; label: string }[] = [
     { id: "details", label: "Details" },
     { id: "location", label: "Location" },
     { id: "tickets", label: "Tickets" },
-    { id: "media", label: "Media", editOnly: true },
+    { id: "media", label: "Media" },
 ];
 
-export function useEventSections(isEditing = false) {
+export function useEventSections() {
     const activeSection = shallowRef<SectionId>("details");
     const scrollContainerRef = ref<HTMLElement | null>(null);
 
-    const sections = computed(() =>
-        allSections.filter((section) => !section.editOnly || isEditing),
-    );
+    const sections = computed(() => allSections);
 
     const sectionRefs = Object.fromEntries(
         allSections.map((s) => [s.id, ref<HTMLElement | null>(null)]),

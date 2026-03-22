@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { Link, usePage } from "@inertiajs/vue3";
 import { computed } from "vue";
-import { login as loginCreate, register as registerCreate } from "@/wayfinder/routes/auth";
+import { usePermission } from "@/composables/usePermission";
+import {
+    login as loginCreate,
+    register as registerCreate,
+} from "@/wayfinder/routes/auth";
 import { index as dashboardIndex } from "@/wayfinder/routes/dashboard";
 import { index as ordersIndex } from "@/wayfinder/routes/orders";
 
@@ -10,17 +14,9 @@ const appName = page.props.name as string;
 const user = computed(
     () => page.props.auth.user as { name: string; email: string } | null,
 );
-const can = computed(
-    () =>
-        page.props.can as {
-            event?: { viewAny?: boolean };
-            organization?: { viewAny?: boolean };
-        } | null,
-);
 
-const canAccessDashboard = computed(
-    () => !!(can.value?.event?.viewAny || can.value?.organization?.viewAny),
-);
+const canDashboard = usePermission("dashboard");
+const canAccessDashboard = computed(() => canDashboard("access"));
 </script>
 
 <template>
