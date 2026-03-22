@@ -4,17 +4,21 @@ export type ThemePreference = "light" | "dark" | "system";
 
 export function useTheme() {
     const preference = ref<ThemePreference>(
-        (typeof localStorage !== "undefined" ? (localStorage.getItem("theme") as ThemePreference) : null) ?? "system",
+        (typeof localStorage !== "undefined"
+            ? (localStorage.getItem("theme") as ThemePreference)
+            : null) ?? "system",
     );
 
     const isDark = ref(false);
 
-    const systemQuery = typeof window !== "undefined"
-        ? window.matchMedia("(prefers-color-scheme: dark)")
-        : null;
+    const systemQuery =
+        typeof window !== "undefined"
+            ? window.matchMedia("(prefers-color-scheme: dark)")
+            : null;
 
     const resolveIsDark = (pref: ThemePreference): boolean =>
-        pref === "dark" || (pref === "system" && (systemQuery?.matches ?? false));
+        pref === "dark" ||
+        (pref === "system" && (systemQuery?.matches ?? false));
 
     const applyTheme = (pref: ThemePreference): void => {
         isDark.value = resolveIsDark(pref);

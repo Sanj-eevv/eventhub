@@ -171,14 +171,14 @@
     }
 
     .font-display {
-        font-family: 'Syne', system-ui, sans-serif;
+        font-family: 'Barlow Condensed', system-ui, sans-serif;
     }
 
     .font-body {
-        font-family: 'Manrope', system-ui, sans-serif;
+        font-family: 'DM Sans', system-ui, sans-serif;
     }
 
     .font-code {
-        font-family: 'Fira Code', ui-monospace, monospace;
+        font-family: 'Space Mono', ui-monospace, monospace;
     }
 }

@@ -16,11 +16,11 @@ import {
 } from "@/components/ui/select";
 import { useOrganizationTable } from "@/composables/organizations/useOrganizations";
 import { usePermission } from "@/composables/usePermission";
+import { organizationStatusLabels } from "@/constants/statusLabels";
 import DashboardLayout from "@/layouts/DashboardLayout.vue";
 import type { BreadcrumbItem } from "@/types";
 import type { Organization } from "@/types/organization";
 import type { OrganizationPageProps } from "@/types/organization";
-import { organizationStatusLabels } from "@/constants/statusLabels";
 import { index as dashboardIndex } from "@/wayfinder/routes/dashboard";
 import { index as orgsIndex } from "@/wayfinder/routes/dashboard/organizations";
 
