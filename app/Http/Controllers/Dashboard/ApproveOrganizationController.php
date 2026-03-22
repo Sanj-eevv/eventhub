@@ -29,6 +29,6 @@ final class ApproveOrganizationController extends Controller
             $request->boolean('send_notification', true),
         );
 
-        return $this->redirector->back()->with('toastSuccess', 'Organization approved successfully.');
+        return $this->redirector->back()->with('toast_success', 'Organization approved successfully.');
     }
 }

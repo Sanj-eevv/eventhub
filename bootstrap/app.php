@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Exceptions\InsufficientTicketCapacityException;
 use App\Exceptions\InvalidStatusTransitionException;
+use App\Exceptions\MediaLimitExceededException;
 use App\Exceptions\TicketLimitExceededException;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\RoleAccessMiddleware;
@@ -26,7 +27,8 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        $exceptions->render(fn (InvalidStatusTransitionException $exception) => back()->with('toastError', $exception->getMessage()));
-        $exceptions->render(fn (InsufficientTicketCapacityException $exception) => back()->with('toastError', $exception->getMessage()));
-        $exceptions->render(fn (TicketLimitExceededException $exception) => back()->with('toastError', $exception->getMessage()));
+        $exceptions->render(fn (InvalidStatusTransitionException $exception) => back()->with('toast_error', $exception->getMessage()));
+        $exceptions->render(fn (InsufficientTicketCapacityException $exception) => back()->with('toast_error', $exception->getMessage()));
+        $exceptions->render(fn (TicketLimitExceededException $exception) => back()->with('toast_error', $exception->getMessage()));
+        $exceptions->render(fn (MediaLimitExceededException $exception) => back()->with('toast_error', $exception->getMessage()));
     })->create();

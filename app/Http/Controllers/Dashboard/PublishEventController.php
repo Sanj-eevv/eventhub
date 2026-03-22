@@ -24,6 +24,6 @@ final class PublishEventController extends Controller
 
         $this->updateEventStatusAction->execute($event, EventStatus::Published);
 
-        return $this->redirector->back()->with('toastSuccess', 'Event published successfully.');
+        return $this->redirector->back()->with('toast_success', 'Event published successfully.');
     }
 }

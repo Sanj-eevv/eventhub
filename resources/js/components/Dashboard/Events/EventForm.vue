@@ -431,11 +431,16 @@ defineExpose({ scrollToSection });
                                 v-else
                                 :items="mediaItems ?? []"
                                 :upload-url="
-                                    storeMediaRoute({ event: initialValues?.uuid as string }).url
+                                    storeMediaRoute({
+                                        event: initialValues?.uuid as string,
+                                    }).url
                                 "
                                 :delete-url="
                                     (mediaUuid) =>
-                                        destroyMediaRoute({ event: initialValues?.uuid as string, media: mediaUuid }).url
+                                        destroyMediaRoute({
+                                            event: initialValues?.uuid as string,
+                                            media: mediaUuid,
+                                        }).url
                                 "
                                 :cover-url="
                                     (mediaUuid) =>

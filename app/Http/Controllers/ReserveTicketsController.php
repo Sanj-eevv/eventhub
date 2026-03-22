@@ -34,9 +34,9 @@ final class ReserveTicketsController extends Controller
 
             return $this->redirector->route('checkout.show', ['order' => $order->uuid]);
         } catch (InsufficientTicketCapacityException $exception) {
-            return $this->redirector->back()->with('toastError', $exception->getMessage());
+            return $this->redirector->back()->with('toast_error', $exception->getMessage());
         } catch (TicketLimitExceededException $exception) {
-            return $this->redirector->back()->with('toastError', $exception->getMessage());
+            return $this->redirector->back()->with('toast_error', $exception->getMessage());
         }
     }
 }

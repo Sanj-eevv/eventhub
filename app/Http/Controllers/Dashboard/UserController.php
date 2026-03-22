@@ -73,7 +73,7 @@ final class UserController extends Controller
 
         $this->createUserAction->execute($request->toDto());
 
-        return $this->redirector->route('dashboard.users.index')->with('toastSuccess', 'User created successfully.');
+        return $this->redirector->route('dashboard.users.index')->with('toast_success', 'User created successfully.');
     }
 
     public function update(UserRequest $request, User $user): RedirectResponse
@@ -82,7 +82,7 @@ final class UserController extends Controller
 
         $this->updateUserAction->execute($user, $request->toDto());
 
-        return $this->redirector->back()->with('toastSuccess', 'User updated successfully.');
+        return $this->redirector->back()->with('toast_success', 'User updated successfully.');
     }
 
     public function destroy(User $user): RedirectResponse
@@ -91,6 +91,6 @@ final class UserController extends Controller
 
         $this->deleteUserAction->execute($user);
 
-        return $this->redirector->back()->with('toastSuccess', 'User deleted.');
+        return $this->redirector->back()->with('toast_success', 'User deleted.');
     }
 }

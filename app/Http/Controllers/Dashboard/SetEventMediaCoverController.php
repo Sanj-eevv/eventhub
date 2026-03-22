@@ -24,6 +24,6 @@ final class SetEventMediaCoverController extends Controller
 
         $this->setCoverAction->execute($event, $media);
 
-        return $this->redirector->back()->with('toastSuccess', 'Cover image updated successfully.');
+        return $this->redirector->back()->with('toast_success', 'Cover image updated successfully.');
     }
 }

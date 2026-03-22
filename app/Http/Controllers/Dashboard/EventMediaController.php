@@ -27,7 +27,7 @@ final class EventMediaController extends Controller
 
         $this->storeAction->execute($event, $request->file('file'));
 
-        return $this->redirector->back()->with('toastSuccess', 'Media uploaded successfully.');
+        return $this->redirector->back()->with('toast_success', 'Media uploaded successfully.');
     }
 
     public function destroy(Event $event, Media $media): RedirectResponse
@@ -36,6 +36,6 @@ final class EventMediaController extends Controller
 
         $this->destroyAction->execute($event, $media);
 
-        return $this->redirector->back()->with('toastSuccess', 'Media deleted.');
+        return $this->redirector->back()->with('toast_success', 'Media deleted.');
     }
 }

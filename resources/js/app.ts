@@ -8,10 +8,10 @@ import { toast } from "vue-sonner";
 import { Toaster } from "@/components/ui/sonner";
 
 type Flash = {
-    toastError?: string | null;
-    toastInfo?: string | null;
-    toastSuccess?: string | null;
-    toastWarning?: string | null;
+    toast_error?: string | null;
+    toast_info?: string | null;
+    toast_success?: string | null;
+    toast_warning?: string | null;
 };
 
 const appName = import.meta.env.VITE_APP_NAME || "Laravel";
@@ -29,12 +29,12 @@ createInertiaApp({
                 watch(
                     () => page.props?.flash as Flash,
                     (flash: Flash) => {
-                        if (flash?.toastSuccess)
-                            toast.success(flash.toastSuccess);
-                        if (flash?.toastError) toast.error(flash.toastError);
-                        if (flash?.toastInfo) toast.info(flash.toastInfo);
-                        if (flash?.toastWarning)
-                            toast.warning(flash.toastWarning);
+                        if (flash?.toast_success)
+                            toast.success(flash.toast_success);
+                        if (flash?.toast_error) toast.error(flash.toast_error);
+                        if (flash?.toast_info) toast.info(flash.toast_info);
+                        if (flash?.toast_warning)
+                            toast.warning(flash.toast_warning);
                     },
                     { immediate: true },
                 );

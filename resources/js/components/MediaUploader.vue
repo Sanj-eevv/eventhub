@@ -73,7 +73,7 @@ function uploadSingle(file: File): void {
         {
             forceFormData: true,
             preserveScroll: true,
-            ...(props.partialReloadKey && { only: [props.partialReloadKey] }),
+            ...(props.partialReloadKey && { only: [props.partialReloadKey, 'flash'] }),
             onError(errors) {
                 uploadErrors.value.push(errors.file ?? "Upload failed.");
             },
@@ -87,7 +87,7 @@ function uploadSingle(file: File): void {
 function deleteMedia(mediaUuid: string): void {
     router.delete(props.deleteUrl(mediaUuid), {
         preserveScroll: true,
-        ...(props.partialReloadKey && { only: [props.partialReloadKey] }),
+        ...(props.partialReloadKey && { only: [props.partialReloadKey, 'flash'] }),
     });
 }
 
@@ -97,7 +97,7 @@ function setCover(mediaUuid: string): void {
         {},
         {
             preserveScroll: true,
-            ...(props.partialReloadKey && { only: [props.partialReloadKey] }),
+            ...(props.partialReloadKey && { only: [props.partialReloadKey, 'flash'] }),
         },
     );
 }
@@ -195,7 +195,7 @@ function setCover(mediaUuid: string): void {
 
         <div
             v-if="items.length > 0"
-            class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4"
+            class="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6"
         >
             <div
                 v-for="item in items"

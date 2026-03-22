@@ -71,7 +71,7 @@ final class OrganizationController extends Controller
 
         $this->createOrganizationAction->execute($request->toDto());
 
-        return $this->redirector->route('dashboard.organizations.index')->with('toastSuccess', 'Organization created successfully.');
+        return $this->redirector->route('dashboard.organizations.index')->with('toast_success', 'Organization created successfully.');
     }
 
     public function update(OrganizationRequest $request, Organization $organization): RedirectResponse
@@ -80,7 +80,7 @@ final class OrganizationController extends Controller
 
         $this->updateOrganizationAction->execute($organization, $request->toDto());
 
-        return $this->redirector->back()->with('toastSuccess', 'Organization updated successfully.');
+        return $this->redirector->back()->with('toast_success', 'Organization updated successfully.');
     }
 
     public function destroy(Organization $organization): RedirectResponse
@@ -89,6 +89,6 @@ final class OrganizationController extends Controller
 
         $this->deleteOrganizationAction->execute($organization);
 
-        return $this->redirector->back()->with('toastSuccess', 'Organization deleted successfully.');
+        return $this->redirector->back()->with('toast_success', 'Organization deleted successfully.');
     }
 }

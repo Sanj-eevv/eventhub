@@ -33,10 +33,10 @@ final class HandleInertiaRequests extends Middleware
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || 'true' === $request->cookie('sidebar_state'),
             'flash' => [
-                'toastSuccess' => fn () => $request->session()->get('toastSuccess'),
-                'toastWarning' => fn () => $request->session()->get('toast.warning'),
-                'toastInfo' => fn () => $request->session()->get('toast.info'),
-                'toastError' => fn () => $request->session()->get('toast.error'),
+                'toast_success' => fn () => $request->session()->get('toast_success'),
+                'toast_warning' => fn () => $request->session()->get('toast_warning'),
+                'toast_info' => fn () => $request->session()->get('toast_info'),
+                'toast_error' => fn () => $request->session()->get('toast_error'),
             ],
             'can' => $request->user() ? SharedPermissionResource::make($request->user())->toArray() : null,
 

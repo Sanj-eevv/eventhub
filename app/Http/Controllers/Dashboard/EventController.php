@@ -80,7 +80,7 @@ final class EventController extends Controller
 
         $event = $this->createEventAction->execute($request->toDto());
 
-        return $this->redirector->route('dashboard.events.edit', ['event' => $event, 'focus' => 'media'])->with('toastSuccess', 'Event created successfully.');
+        return $this->redirector->route('dashboard.events.edit', ['event' => $event, 'focus' => 'media'])->with('toast_success', 'Event created successfully.');
     }
 
     public function edit(Event $event): Response
@@ -100,7 +100,7 @@ final class EventController extends Controller
 
         $this->updateEventAction->execute($event, $request->toDto());
 
-        return $this->redirector->back()->with('toastSuccess', 'Event updated successfully.');
+        return $this->redirector->back()->with('toast_success', 'Event updated successfully.');
     }
 
     public function destroy(Event $event): RedirectResponse
@@ -109,6 +109,6 @@ final class EventController extends Controller
 
         $this->deleteEventAction->execute($event);
 
-        return $this->redirector->back()->with('toastSuccess', 'Event deleted.');
+        return $this->redirector->back()->with('toast_success', 'Event deleted.');
     }
 }

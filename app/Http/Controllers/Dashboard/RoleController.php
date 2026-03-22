@@ -68,7 +68,7 @@ final class RoleController extends Controller
 
         $this->createRoleAction->execute($request->toDto());
 
-        return $this->redirector->route('dashboard.roles.index')->with('toastSuccess', 'Role created successfully.');
+        return $this->redirector->route('dashboard.roles.index')->with('toast_success', 'Role created successfully.');
     }
 
     public function show(Role $role): Response
@@ -101,7 +101,7 @@ final class RoleController extends Controller
 
         $this->updateRoleAction->execute($role, $request->toDto());
 
-        return $this->redirector->back()->with('toastSuccess', 'Role updated successfully.');
+        return $this->redirector->back()->with('toast_success', 'Role updated successfully.');
     }
 
     public function destroy(Role $role): RedirectResponse
@@ -110,6 +110,6 @@ final class RoleController extends Controller
 
         $this->deleteRoleAction->execute($role);
 
-        return $this->redirector->back()->with('toastSuccess', 'Role deleted.');
+        return $this->redirector->back()->with('toast_success', 'Role deleted.');
     }
 }

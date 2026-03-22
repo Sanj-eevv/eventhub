@@ -24,6 +24,6 @@ final class CancelEventController extends Controller
 
         $this->updateEventStatusAction->execute($event, EventStatus::Cancelled);
 
-        return $this->redirector->back()->with('toastSuccess', 'Event cancelled.');
+        return $this->redirector->back()->with('toast_success', 'Event cancelled.');
     }
 }

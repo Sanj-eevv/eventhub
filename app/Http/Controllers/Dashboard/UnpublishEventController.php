@@ -24,6 +24,6 @@ final class UnpublishEventController extends Controller
 
         $this->updateEventStatusAction->execute($event, EventStatus::Draft);
 
-        return $this->redirector->back()->with('toastSuccess', 'Event unpublished.');
+        return $this->redirector->back()->with('toast_success', 'Event unpublished.');
     }
 }
