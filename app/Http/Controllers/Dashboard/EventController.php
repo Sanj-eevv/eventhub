@@ -7,11 +7,11 @@ namespace App\Http\Controllers\Dashboard;
 use App\Actions\CreateEventAction;
 use App\Actions\DeleteEventAction;
 use App\Actions\UpdateEventAction;
+use App\Enums\EventStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Dashboard\EventRequest;
-use App\Http\Resources\Event\EditResource;
 use App\Http\Resources\Event\IndexResource;
-use App\Http\Resources\Event\ShowResource;
+use App\Http\Resources\EventResource;
 use App\Http\Resources\Organization\PickerResource as OrganizationPickerResource;
 use App\Models\Event;
 use App\Models\Organization;
@@ -50,7 +50,10 @@ final class EventController extends Controller
         return $this->inertiaResponse->render('Dashboard/Events/Index', [
             'events' => IndexResource::collection($events)->additional([
                 'meta' => ['sort' => $sortBy],
-                'filters' => ['search' => $search, 'status' => $status],
+                'filters' => [
+                    'search' => $search,
+                    'status' => $status ? ['value' => $status, 'label' => EventStatus::from($status)->label()] : null,
+                ],
             ]),
         ]);
     }
@@ -79,7 +82,7 @@ final class EventController extends Controller
         $this->authorize('view', $event);
 
         return $this->inertiaResponse->render('Dashboard/Events/Show', [
-            'event' => ShowResource::make($event->load(['organization', 'user'])),
+            'event' => EventResource::make($event->load(['organization', 'user'])),
         ]);
     }
 
@@ -88,7 +91,7 @@ final class EventController extends Controller
         $this->authorize('update', $event);
 
         return $this->inertiaResponse->render('Dashboard/Events/Edit', [
-            'event' => new EditResource($event->load(['organization', 'user', 'ticketTypes', 'media'])),
+            'event' => EventResource::make($event->load(['organization', 'user', 'ticketTypes', 'media'])),
             'organizations' => OrganizationPickerResource::collection(Organization::query()->approved()->get()),
             'timezones' => DateTimeZone::listIdentifiers(),
         ]);

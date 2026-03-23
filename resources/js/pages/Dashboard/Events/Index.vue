@@ -13,17 +13,21 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { useEventTable } from "@/composables/events/useEvents";
-import { eventStatusLabels } from "@/constants/statusLabels";
+import { eventStatusLabels } from "@/lib/statusLabels";
 import DashboardLayout from "@/layouts/DashboardLayout.vue";
-import type { BreadcrumbItem } from "@/types";
-import type { Event, EventPageProps } from "@/types/event";
+import type { BreadcrumbItem, FilteredResponse } from "@/types";
+import type { Event, EventFilterProps } from "@/types/event";
 import { index as dashboardIndex } from "@/wayfinder/routes/dashboard";
 import {
     create as eventsCreate,
     index as eventsIndex,
 } from "@/wayfinder/routes/dashboard/events";
 
-const props = defineProps<EventPageProps>();
+type PageProps = {
+    events: FilteredResponse<Event, EventFilterProps>;
+};
+
+const props = defineProps<PageProps>();
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: "Dashboard", href: dashboardIndex().url },

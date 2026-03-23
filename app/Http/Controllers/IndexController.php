@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\Event\ShowResource;
+use App\Http\Resources\EventResource;
 use App\Models\Event;
 use Inertia\Response;
 use Inertia\ResponseFactory;
@@ -19,13 +19,13 @@ final class IndexController extends Controller
     {
         $events = Event::query()
             ->published()
-            ->with('media')
-            ->orderBy('starts_at')
+            ->with('coverImage')
+            ->orderBy('starts_at', 'desc')
             ->limit(9)
             ->get();
 
         return $this->inertiaResponse->render('Home', [
-            'events' => ShowResource::collection($events),
+            'events' => EventResource::collection($events),
         ]);
     }
 }

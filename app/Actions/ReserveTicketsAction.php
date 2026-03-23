@@ -8,6 +8,8 @@ use App\Enums\OrderStatus;
 use App\Enums\TicketStatus;
 use App\Exceptions\InsufficientTicketCapacityException;
 use App\Exceptions\TicketLimitExceededException;
+use App\Exceptions\TicketSaleClosedException;
+use App\Exceptions\TicketSaleNotOpenException;
 use App\Jobs\ExpireOrderJob;
 use App\Models\Event;
 use App\Models\Order;
@@ -36,6 +38,16 @@ final class ReserveTicketsAction
                 $ticketType = TicketType::query()
                     ->lockForUpdate()
                     ->findOrFail($item['ticket_type_id']);
+
+                $saleEndsAt = $ticketType->sale_ends_at ?? $event->ends_at;
+
+                if ($ticketType->sale_starts_at && $now->isBefore($ticketType->sale_starts_at)) {
+                    throw new TicketSaleNotOpenException($ticketType);
+                }
+
+                if ($now->isAfter($saleEndsAt)) {
+                    throw new TicketSaleClosedException($ticketType);
+                }
 
                 $soldCount = $ticketType->tickets()
                     ->whereIn('status', [TicketStatus::Pending, TicketStatus::Active])

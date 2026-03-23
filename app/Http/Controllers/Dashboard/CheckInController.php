@@ -6,7 +6,7 @@ namespace App\Http\Controllers\Dashboard;
 
 use App\Enums\CheckInPermissions;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\Event\ShowResource;
+use App\Http\Resources\EventResource;
 use App\Models\Event;
 use Illuminate\Http\Request;
 use Inertia\Response;
@@ -23,7 +23,7 @@ final class CheckInController extends Controller
         abort_if( ! $request->user()->hasPermission(CheckInPermissions::AllowManage), 403);
 
         return $this->inertiaResponse->render('Dashboard/CheckIn/Index', [
-            'event' => ShowResource::make($event),
+            'event' => EventResource::make($event),
         ]);
     }
 }

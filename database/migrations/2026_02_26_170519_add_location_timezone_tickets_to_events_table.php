@@ -11,7 +11,7 @@ return new class() extends Migration
     public function up(): void
     {
         Schema::table('events', function (Blueprint $table): void {
-            $table->dateTime('ends_at')->nullable()->change();
+            $table->dateTime('ends_at')->change();
             $table->string('timezone')->default('UTC')->after('ends_at');
             $table->string('venue_name')->after('timezone');
             $table->string('address')->after('venue_name');

@@ -16,7 +16,7 @@ final class IndexResource extends JsonResource
             'slug' => $this->slug,
             'name' => $this->name,
             'preserved' => (bool) $this->preserved,
-            'created_at' => formatUserTime($this->created_at, 'd M Y'),
+            'created_at' => $this->created_at->toISOString(),
             'can' => [
                 'update' => Gate::allows('update', $this),
                 'delete' => Gate::allows('delete', $this),

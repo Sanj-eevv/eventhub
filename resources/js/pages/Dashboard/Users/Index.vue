@@ -9,12 +9,20 @@ import { Input } from "@/components/ui/input";
 import { usePermission } from "@/composables/usePermission";
 import { useUserTable } from "@/composables/users/useUsers";
 import DashboardLayout from "@/layouts/DashboardLayout.vue";
-import type { BreadcrumbItem } from "@/types";
-import type { User, UserPageProps } from "@/types/user";
+import type { BreadcrumbItem, FilteredResponse } from "@/types";
+import type { OrganizationPicker } from "@/types/organization";
+import type { RolePicker } from "@/types/role";
+import type { User, UserFilterProps } from "@/types/user";
 import { index as dashboardIndex } from "@/wayfinder/routes/dashboard";
 import { index as usersIndex } from "@/wayfinder/routes/dashboard/users";
 
-const props = defineProps<UserPageProps>();
+type PageProps = {
+    users: FilteredResponse<User, UserFilterProps>;
+    roles: RolePicker[];
+    organizations: OrganizationPicker[];
+};
+
+const props = defineProps<PageProps>();
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: "Dashboard", href: dashboardIndex().url },

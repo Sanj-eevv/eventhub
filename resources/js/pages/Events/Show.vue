@@ -2,11 +2,12 @@
 import { Head, useForm } from "@inertiajs/vue3";
 import { computed, reactive } from "vue";
 import HomeLayout from "@/layouts/HomeLayout.vue";
-import type { PublicEvent, PublicTicketType } from "@/types/event";
+import type { Event, PublicTicketType } from "@/types/event";
+import { formatDate, formatTime } from "@/lib/utils";
 import { reserve } from "@/wayfinder/routes/tickets";
 
 const props = defineProps<{
-    event: PublicEvent;
+    event: Event;
     ticketTypes: PublicTicketType[];
 }>();
 
@@ -47,23 +48,7 @@ function submit(): void {
     form.post(reserve({ event: props.event.slug }).url);
 }
 
-const formatDate = (dateStr: string): string => {
-    const d = new Date(dateStr);
-    return d.toLocaleDateString("en-US", {
-        weekday: "long",
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-    });
-};
-
-const formatTime = (dateStr: string): string => {
-    const d = new Date(dateStr);
-    return d.toLocaleTimeString("en-US", {
-        hour: "numeric",
-        minute: "2-digit",
-    });
-};
+const timezone = props.event.timezone;
 </script>
 
 <template>
@@ -113,11 +98,11 @@ const formatTime = (dateStr: string): string => {
                                     d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"
                                 />
                             </svg>
-                            {{ formatDate(event.starts_at) }} ·
-                            {{ formatTime(event.starts_at) }}
+                            {{ formatDate(event.starts_at, timezone) }} ·
+                            {{ formatTime(event.starts_at, timezone) }}
                         </span>
                         <span v-if="event.ends_at" class="text-sf-tertiary"
-                            >— {{ formatTime(event.ends_at) }}</span
+                            >— {{ formatTime(event.ends_at, timezone) }}</span
                         >
                         <span
                             v-if="event.venue_name"
@@ -190,11 +175,11 @@ const formatTime = (dateStr: string): string => {
                                     d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"
                                 />
                             </svg>
-                            {{ formatDate(event.starts_at) }} ·
-                            {{ formatTime(event.starts_at) }}
+                            {{ formatDate(event.starts_at, timezone) }} ·
+                            {{ formatTime(event.starts_at, timezone) }}
                         </span>
                         <span v-if="event.ends_at" class="text-sf-tertiary"
-                            >— {{ formatTime(event.ends_at) }}</span
+                            >— {{ formatTime(event.ends_at, timezone) }}</span
                         >
                         <span
                             v-if="event.venue_name"
@@ -264,7 +249,7 @@ const formatTime = (dateStr: string): string => {
                         </div>
                         <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
                             <div
-                                v-for="image in event.media"
+                                v-for="image in event.media?.filter((m) => !m.is_cover)"
                                 :key="image.uuid"
                                 class="aspect-square overflow-hidden rounded-lg border border-sf-border-subtle bg-sf-surface"
                             >

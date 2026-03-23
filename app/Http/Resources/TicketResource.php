@@ -18,7 +18,7 @@ final class TicketResource extends JsonResource
             'attendee_name' => $this->attendee_name,
             'attendee_email' => $this->attendee_email,
             'qr_code_path' => $this->qr_code_path,
-            'checked_in_at' => $this->checked_in_at,
+            'checked_in_at' => $this->checked_in_at?->toISOString(),
             'event' => [
                 'title' => $this->event->title,
             ],

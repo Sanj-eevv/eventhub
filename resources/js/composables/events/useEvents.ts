@@ -23,7 +23,7 @@ export function useEventTable(
 
     const search = shallowRef<string>(filters.search ?? "");
     const debouncedSearch = refDebounced(search, 300);
-    const statusFilter = shallowRef<EventStatus | "">(filters.status ?? "");
+    const statusFilter = shallowRef<EventStatus | "">(filters.status?.value ?? "");
 
     const { isLoading, pagination, sorting } = useTableState(
         pageMeta,

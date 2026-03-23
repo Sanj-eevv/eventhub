@@ -2,6 +2,7 @@
 import { Head, Link } from "@inertiajs/vue3";
 import { ArrowLeftIcon } from "lucide-vue-next";
 import EventStatusBadge from "@/components/Dashboard/Events/EventStatusBadge.vue";
+import { formatDate, formatTime } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import DashboardLayout from "@/layouts/DashboardLayout.vue";
@@ -65,11 +66,11 @@ const breadcrumbs: BreadcrumbItem[] = [
                             <p class="text-sm text-muted-foreground">
                                 Starts At
                             </p>
-                            <p class="font-medium">{{ event.starts_at }}</p>
+                            <p class="font-medium">{{ formatDate(event.starts_at, event.timezone) }} · {{ formatTime(event.starts_at, event.timezone) }}</p>
                         </div>
                         <div>
                             <p class="text-sm text-muted-foreground">Ends At</p>
-                            <p class="font-medium">{{ event.ends_at }}</p>
+                            <p class="font-medium">{{ event.ends_at ? `${formatDate(event.ends_at, event.timezone)} · ${formatTime(event.ends_at, event.timezone)}` : '—' }}</p>
                         </div>
                     </CardContent>
                 </Card>
@@ -85,7 +86,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                         </div>
                         <div>
                             <p class="text-sm text-muted-foreground">Created</p>
-                            <p class="font-medium">{{ event.created_at }}</p>
+                            <p class="font-medium">{{ formatDate(event.created_at) }}</p>
                         </div>
                     </CardContent>
                 </Card>

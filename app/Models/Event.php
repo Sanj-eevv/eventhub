@@ -30,7 +30,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $slug
  * @property string $description
  * @property CarbonImmutable $starts_at
- * @property CarbonImmutable|null $ends_at
+ * @property CarbonImmutable $ends_at
  * @property string $timezone
  * @property string $venue_name
  * @property string $address

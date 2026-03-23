@@ -17,9 +17,9 @@ final class OrderResource extends JsonResource
             'currency' => $this->currency,
             'total' => $this->total,
             'total_formatted' => '$'.number_format($this->total / 100, 2),
-            'reserved_at' => $this->reserved_at,
-            'expires_at' => $this->expires_at,
-            'paid_at' => $this->paid_at,
+            'reserved_at' => $this->reserved_at?->toISOString(),
+            'expires_at' => $this->expires_at?->toISOString(),
+            'paid_at' => $this->paid_at?->toISOString(),
             'event' => [
                 'title' => $this->event->title,
                 'slug' => $this->event->slug,

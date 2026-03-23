@@ -24,7 +24,7 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import type { Organization } from "@/types/organization";
-import { organizationStatusLabels } from "@/constants/statusLabels";
+import { organizationStatusLabels } from "@/lib/statusLabels";
 import { store, update } from "@/wayfinder/routes/dashboard/organizations";
 
 const props = defineProps<{

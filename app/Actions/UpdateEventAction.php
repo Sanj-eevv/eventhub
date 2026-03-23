@@ -6,7 +6,9 @@ namespace App\Actions;
 
 use App\DataTransferObjects\EventData;
 use App\DataTransferObjects\TicketTypeData;
+use App\Enums\TicketStatus;
 use App\Models\Event;
+use App\Models\TicketType;
 use Illuminate\Support\Facades\DB;
 
 final class UpdateEventAction
@@ -37,14 +39,22 @@ final class UpdateEventAction
     /** @param TicketTypeData[] $ticketTypes */
     private function syncTicketTypes(Event $event, array $ticketTypes): void
     {
-        $submittedUuids = collect($ticketTypes)
-            ->filter(fn (TicketTypeData $ticketType) => null !== $ticketType->uuid)
-            ->map(fn (TicketTypeData $ticketType) => $ticketType->uuid);
+        $existingUuids = $event->ticketTypes()->pluck('uuid');
+        $submittedUuids = collect($ticketTypes)->pluck('uuid');
+        $uuidsToKeep = $submittedUuids->intersect($existingUuids);
 
-        $event->ticketTypes()->whereNotIn('uuid', $submittedUuids->all())->delete();
+        $event->ticketTypes()
+            ->whereNotIn('uuid', $uuidsToKeep)
+            ->each(function (TicketType $ticketType): void {
+                $ticketType->tickets()
+                    ->where('status', TicketStatus::Pending)
+                    ->update(['status' => TicketStatus::Cancelled]);
+
+                $ticketType->delete();
+            });
 
         foreach ($ticketTypes as $ticketType) {
-            if (null !== $ticketType->uuid) {
+            if ($existingUuids->contains($ticketType->uuid)) {
                 $event->ticketTypes()
                     ->where('uuid', $ticketType->uuid)
                     ->update([

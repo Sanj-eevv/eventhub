@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { Head, Link } from "@inertiajs/vue3";
 import HomeLayout from "@/layouts/HomeLayout.vue";
-import type { Order } from "@/types/event";
+import { formatDate, formatTime } from "@/lib/utils";
+import type { Order } from "@/types/order";
 import { index as ordersIndex } from "@/wayfinder/routes/orders";
 import { show as ticketShow } from "@/wayfinder/routes/tickets";
 
@@ -16,10 +17,6 @@ const ticketStatusConfig: Record<string, { classes: string }> = {
     cancelled: { classes: "text-sf-ember border-sf-ember/30 bg-sf-ember/10" },
 };
 
-const formatDate = (dateStr: string | null): string => {
-    if (!dateStr) return "";
-    return new Date(dateStr).toLocaleDateString("en-US", { day: "numeric", month: "long", year: "numeric", hour: "numeric", minute: "2-digit" });
-};
 </script>
 
 <template>

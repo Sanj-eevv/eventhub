@@ -2,7 +2,7 @@
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import { Head, router } from "@inertiajs/vue3";
 import HomeLayout from "@/layouts/HomeLayout.vue";
-import type { Order } from "@/types/event";
+import type { Order } from "@/types/order";
 import { show as eventShow } from "@/wayfinder/routes/events";
 import { pay } from "@/wayfinder/routes/checkout";
 

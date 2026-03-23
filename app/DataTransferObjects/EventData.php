@@ -14,7 +14,7 @@ final readonly class EventData
         public string $title,
         public string $description,
         public CarbonImmutable $starts_at,
-        public ?CarbonImmutable $ends_at,
+        public CarbonImmutable $ends_at,
         public string $timezone,
         public string $venue_name,
         public string $address,

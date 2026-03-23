@@ -9,7 +9,7 @@ export function useTableState(
     pageMeta: PaginatedResponseMeta,
     indexUrl: string,
     extraParams: () => Record<string, unknown>,
-    filterRefs: Ref[],
+    filterRefs: Ref<unknown>[],
 ) {
     const { isLoading, onStart, onFinish } = useTableLoading();
     const pagination = ref<PaginationState>({

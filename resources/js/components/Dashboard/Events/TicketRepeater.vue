@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { Trash2 } from "lucide-vue-next";
-import type { TicketType } from "@/types/event";
+import DateTimePicker from "@/components/DateTimePicker.vue";
 import InputError from "@/components/InputError.vue";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import type { TicketTypeResource } from "@/types/event";
 
-const localItems = defineModel<TicketType[]>({ required: true });
-
+const localItems = defineModel<TicketTypeResource[]>({ required: true });
 const props = defineProps<{
     errors?: Record<string, string>;
     timezone?: string;
@@ -15,14 +16,12 @@ const props = defineProps<{
 
 const addItem = () => {
     localItems.value.push({
-        _key: crypto.randomUUID(),
-        uuid: null,
+        uuid: crypto.randomUUID(),
         name: "",
+        description: "",
         slug: "",
-        description: null,
         price: 0,
         capacity: 0,
-        max_per_user: null,
         sort_order: 0,
         is_active: true,
         sale_starts_at: null,
@@ -54,7 +53,7 @@ const fieldError = (index: number, field: string) =>
 
         <div
             v-for="(item, index) in localItems"
-            :key="item._key"
+            :key="item.uuid"
             class="rounded-lg border p-4"
         >
             <div class="mb-4 flex items-center justify-between">
@@ -73,56 +72,65 @@ const fieldError = (index: number, field: string) =>
 
             <div class="grid gap-4 sm:grid-cols-2 sm:items-start">
                 <div class="grid gap-2 sm:col-span-2">
-                    <Label :for="`tt-name-${item._key}`" class="required"
+                    <Label :for="`tt-name-${item.uuid}`" class="required"
                         >Name</Label
                     >
                     <Input
-                        :id="`tt-name-${item._key}`"
+                        :id="`tt-name-${item.uuid}`"
                         v-model="localItems[index].name"
                         type="text"
-                        placeholder="e.g. General Admission"
                     />
                     <InputError :message="fieldError(index, 'name')" />
                 </div>
 
+                <div class="grid gap-2 sm:col-span-2">
+                    <Label :for="`tt-description-${item.uuid}`" class="required"
+                        >Description</Label
+                    >
+                    <Textarea
+                        :id="`tt-description-${item.uuid}`"
+                        v-model="localItems[index].description"
+                        rows="4"
+                    />
+                    <InputError :message="fieldError(index, 'description')" />
+                </div>
+
                 <div class="grid gap-2">
-                    <Label :for="`tt-price-${item._key}`" class="required"
+                    <Label :for="`tt-price-${item.uuid}`" class="required"
                         >Price ($)</Label
                     >
                     <Input
-                        :id="`tt-price-${item._key}`"
+                        :id="`tt-price-${item.uuid}`"
                         v-model="localItems[index].price"
                         type="number"
-                        min="0.01"
+                        min="1"
                         step="0.01"
-                        placeholder="0.00"
                     />
                     <InputError :message="fieldError(index, 'price')" />
                 </div>
 
                 <div class="grid gap-2">
-                    <Label :for="`tt-capacity-${item._key}`" class="required"
+                    <Label :for="`tt-capacity-${item.uuid}`" class="required"
                         >Capacity</Label
                     >
                     <Input
-                        :id="`tt-capacity-${item._key}`"
+                        :id="`tt-capacity-${item.uuid}`"
                         v-model="localItems[index].capacity"
                         type="number"
                         min="1"
-                        placeholder="e.g. 100"
                     />
                     <InputError :message="fieldError(index, 'capacity')" />
                 </div>
 
                 <div class="grid gap-2 sm:col-span-2">
-                    <Label :for="`tt-max-${item._key}`">
+                    <Label :for="`tt-max-${item.uuid}`">
                         Max per Person
                         <span class="text-muted-foreground text-xs"
                             >(optional)</span
                         >
                     </Label>
                     <Input
-                        :id="`tt-max-${item._key}`"
+                        :id="`tt-max-${item.uuid}`"
                         v-model="localItems[index].max_per_user"
                         type="number"
                         min="1"
@@ -132,16 +140,15 @@ const fieldError = (index: number, field: string) =>
                 </div>
 
                 <div class="grid gap-2">
-                    <Label :for="`tt-sale-starts-${item._key}`">
+                    <Label :for="`tt-sale-starts-${item.uuid}`">
                         Sale Starts
                         <span class="text-muted-foreground text-xs"
                             >(optional)</span
                         >
                     </Label>
-                    <Input
-                        :id="`tt-sale-starts-${item._key}`"
+                    <DateTimePicker
+                        :id="`tt-sale-starts-${item.uuid}`"
                         v-model="localItems[index].sale_starts_at"
-                        type="datetime-local"
                     />
                     <p v-if="timezone" class="text-muted-foreground text-xs">
                         {{ timezone }}
@@ -152,16 +159,15 @@ const fieldError = (index: number, field: string) =>
                 </div>
 
                 <div class="grid gap-2">
-                    <Label :for="`tt-sale-ends-${item._key}`">
+                    <Label :for="`tt-sale-ends-${item.uuid}`">
                         Sale Ends
                         <span class="text-muted-foreground text-xs"
                             >(optional)</span
                         >
                     </Label>
-                    <Input
-                        :id="`tt-sale-ends-${item._key}`"
+                    <DateTimePicker
+                        :id="`tt-sale-ends-${item.uuid}`"
                         v-model="localItems[index].sale_ends_at"
-                        type="datetime-local"
                     />
                     <p v-if="timezone" class="text-muted-foreground text-xs">
                         {{ timezone }}

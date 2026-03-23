@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { Head, Link } from "@inertiajs/vue3";
+import { formatDate } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import DashboardLayout from "@/layouts/DashboardLayout.vue";
 import type { BreadcrumbItem } from "@/types";
-import type { Order } from "@/types/event";
+import type { Order } from "@/types/order";
 import type { PaginatedResponse } from "@/types";
 import { index as dashboardIndex } from "@/wayfinder/routes/dashboard";
 import {
@@ -55,7 +56,7 @@ const statusVariantMap: Record<string, "default" | "secondary" | "destructive" |
                                 {{ order.uuid }}
                             </p>
                             <p v-if="order.paid_at" class="text-xs text-muted-foreground">
-                                Paid: {{ order.paid_at }}
+                                Paid: {{ formatDate(order.paid_at) }}
                             </p>
                         </div>
                         <div class="flex items-center gap-4">

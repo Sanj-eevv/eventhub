@@ -3,9 +3,9 @@ import { Head } from "@inertiajs/vue3";
 import HomeEventsGrid from "@/components/Home/HomeEventsGrid.vue";
 import HomeHero from "@/components/Home/HomeHero.vue";
 import HomeLayout from "@/layouts/HomeLayout.vue";
-import type { PublicEvent } from "@/types/event";
+import type { EventResource } from "@/types/event";
 
-const props = defineProps<{ events: PublicEvent[] }>();
+const props = defineProps<{ events: EventResource[] }>();
 </script>
 
 <template>

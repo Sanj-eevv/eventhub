@@ -33,6 +33,11 @@ export type PaginatedResponseMeta = {
     per_page: number;
     total: number;
 };
+export type StatusLabel<T extends string> = {
+    value: T;
+    label: string;
+};
+
 export type PaginatedResponse<T> = {
     data: T[];
     links: {
@@ -42,5 +47,8 @@ export type PaginatedResponse<T> = {
         prev: string | null;
     };
     meta: PaginatedResponseMeta;
-    filters?: Record<string, any>;
+};
+
+export type FilteredResponse<T, F extends object> = PaginatedResponse<T> & {
+    filters: F;
 };

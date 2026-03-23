@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ArrowLeftIcon } from "lucide-vue-next";
+import { formatDate } from "@/lib/utils";
 import OrganizationStatusBadge from "@/components/Dashboard/Organizations/OrganizationStatusBadge.vue";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -84,7 +85,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                         <div>
                             <p class="text-sm text-muted-foreground">Created</p>
                             <p class="font-medium">
-                                {{ organization.created_at }}
+                                {{ formatDate(organization.created_at) }}
                             </p>
                         </div>
                     </CardContent>

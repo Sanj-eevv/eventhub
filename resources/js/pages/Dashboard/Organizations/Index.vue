@@ -16,15 +16,18 @@ import {
 } from "@/components/ui/select";
 import { useOrganizationTable } from "@/composables/organizations/useOrganizations";
 import { usePermission } from "@/composables/usePermission";
-import { organizationStatusLabels } from "@/constants/statusLabels";
+import { organizationStatusLabels } from "@/lib/statusLabels";
 import DashboardLayout from "@/layouts/DashboardLayout.vue";
-import type { BreadcrumbItem } from "@/types";
-import type { Organization } from "@/types/organization";
-import type { OrganizationPageProps } from "@/types/organization";
+import type { BreadcrumbItem, FilteredResponse } from "@/types";
+import type { Organization, OrganizationFilterProps } from "@/types/organization";
 import { index as dashboardIndex } from "@/wayfinder/routes/dashboard";
 import { index as orgsIndex } from "@/wayfinder/routes/dashboard/organizations";
 
-const props = defineProps<OrganizationPageProps>();
+type PageProps = {
+    organizations: FilteredResponse<Organization, OrganizationFilterProps>;
+};
+
+const props = defineProps<PageProps>();
 const can = usePermission("organization");
 
 const breadcrumbs: BreadcrumbItem[] = [

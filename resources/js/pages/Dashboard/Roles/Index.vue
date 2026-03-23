@@ -8,15 +8,21 @@ import { Input } from "@/components/ui/input";
 import { useRoleTable } from "@/composables/roles/useRoles";
 import { usePermission } from "@/composables/usePermission";
 import DashboardLayout from "@/layouts/DashboardLayout.vue";
-import type { BreadcrumbItem } from "@/types";
-import type { Role, RolePageProps } from "@/types/role";
+import type { BreadcrumbItem, FilteredResponse, PaginatedResponseMeta } from "@/types";
+import type { Role, RoleFilterProps } from "@/types/role";
 import { index as dashboardIndex } from "@/wayfinder/routes/dashboard";
 import {
     create as rolesCreate,
     index as rolesIndex,
 } from "@/wayfinder/routes/dashboard/roles";
 
-const props = defineProps<RolePageProps>();
+type PageProps = {
+    roles: FilteredResponse<Role, RoleFilterProps> & {
+        meta: PaginatedResponseMeta & { sort: unknown[] };
+    };
+};
+
+const props = defineProps<PageProps>();
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: "Dashboard", href: dashboardIndex().url },

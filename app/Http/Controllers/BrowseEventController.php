@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\Event\ShowResource;
+use App\Http\Resources\EventResource;
 use App\Http\Resources\TicketTypeResource;
 use App\Models\Event;
 use Illuminate\Http\Request;
@@ -22,11 +22,11 @@ final class BrowseEventController extends Controller
     {
         $events = Event::query()
             ->published()
-            ->with('media')
+            ->with('coverImage')
             ->paginate(12);
 
         return $this->inertiaResponse->render('Events/Index', [
-            'events' => Inertia::scroll(ShowResource::collection($events)),
+            'events' => Inertia::scroll(EventResource::collection($events)),
         ]);
     }
 
@@ -40,7 +40,7 @@ final class BrowseEventController extends Controller
         ]);
 
         return $this->inertiaResponse->render('Events/Show', [
-            'event' => ShowResource::make($event),
+            'event' => EventResource::make($event),
             'ticketTypes' => TicketTypeResource::collection($event->ticketTypes->each->setRelation('event', $event)),
         ]);
     }

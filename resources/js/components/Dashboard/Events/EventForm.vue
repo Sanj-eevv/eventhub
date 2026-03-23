@@ -4,6 +4,7 @@ import { Check, ChevronsUpDown } from "lucide-vue-next";
 import { computed, ref } from "vue";
 import EventFormSection from "@/components/Dashboard/Events/EventFormSection.vue";
 import TicketRepeater from "@/components/Dashboard/Events/TicketRepeater.vue";
+import DateTimePicker from "@/components/DateTimePicker.vue";
 import InputError from "@/components/InputError.vue";
 import MediaUploader from "@/components/MediaUploader.vue";
 import { Button } from "@/components/ui/button";
@@ -33,7 +34,8 @@ import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { useEventSections } from "@/composables/events/useEventSections";
 import { useFormScrollToError } from "@/composables/useFormScrollToError";
-import type { EventFormInitial, MediaItem, TicketType } from "@/types/event";
+import { toDatetimeLocal } from "@/lib/utils";
+import type { EventResource } from "@/types/event";
 import type { OrganizationPicker } from "@/types/organization";
 import {
     cover as coverMediaRoute,
@@ -42,8 +44,7 @@ import {
 } from "@/wayfinder/routes/dashboard/events/media";
 
 const props = defineProps<{
-    initialValues?: EventFormInitial;
-    mediaItems?: MediaItem[];
+    initialValues?: EventResource;
     submitUrl: string;
     submitMethod: "post" | "put";
     organizations: OrganizationPicker[];
@@ -56,25 +57,38 @@ const emit = defineEmits<{
 }>();
 
 const form = useForm({
-    organization_uuid: props.initialValues?.organization_uuid ?? "",
+    organization_uuid: props.initialValues?.organization.uuid ?? "",
     title: props.initialValues?.title ?? "",
     description: props.initialValues?.description ?? "",
-    starts_at: props.initialValues?.starts_at ?? "",
-    ends_at: props.initialValues?.ends_at ?? "",
+    starts_at: toDatetimeLocal(
+        props.initialValues?.starts_at,
+        props.initialValues?.timezone,
+    ),
+    ends_at: toDatetimeLocal(
+        props.initialValues?.ends_at,
+        props.initialValues?.timezone,
+    ),
     timezone: props.initialValues?.timezone ?? "",
     venue_name: props.initialValues?.venue_name ?? "",
     address: props.initialValues?.address ?? "",
     zip: props.initialValues?.zip ?? "",
     map_url: props.initialValues?.map_url ?? "",
-    ticket_types: (props.initialValues?.ticket_types ?? []) as TicketType[],
+    ticket_types:
+        props.initialValues?.ticket_types.map((ticketType) => ({
+            ...ticketType,
+            sale_starts_at: toDatetimeLocal(
+                ticketType.sale_starts_at,
+                props.initialValues?.timezone,
+            ),
+            sale_ends_at: toDatetimeLocal(
+                ticketType.sale_ends_at,
+                props.initialValues?.timezone,
+            ),
+        })) ?? [],
 });
 
 const handleSubmit = () => {
-    form.transform((data) => ({
-        ...data,
-        // _key is a Vue-only tracking key — strip before sending to server
-        ticket_types: data.ticket_types.map(({ _key, ...rest }) => rest),
-    }))[props.submitMethod](props.submitUrl, { preserveScroll: true });
+    form[props.submitMethod](props.submitUrl, { preserveScroll: true });
 };
 
 const {
@@ -205,27 +219,41 @@ defineExpose({ scrollToSection });
                                         <Label
                                             for="event-starts-at"
                                             class="required"
-                                            >Starts At</Label
                                         >
-                                        <Input
+                                            Starts At
+                                        </Label>
+                                        <DateTimePicker
                                             id="event-starts-at"
                                             v-model="form.starts_at"
-                                            type="datetime-local"
                                         />
+                                        <p
+                                            v-if="form.timezone"
+                                            class="text-muted-foreground text-xs"
+                                        >
+                                            {{ form.timezone }}
+                                        </p>
                                         <InputError
                                             :message="form.errors.starts_at"
                                         />
                                     </div>
 
                                     <div class="grid gap-2">
-                                        <Label for="event-ends-at">
+                                        <Label
+                                            for="event-ends-at"
+                                            class="required"
+                                        >
                                             Ends At
                                         </Label>
-                                        <Input
+                                        <DateTimePicker
                                             id="event-ends-at"
                                             v-model="form.ends_at"
-                                            type="datetime-local"
                                         />
+                                        <p
+                                            v-if="form.timezone"
+                                            class="text-muted-foreground text-xs"
+                                        >
+                                            {{ form.timezone }}
+                                        </p>
                                         <InputError
                                             :message="form.errors.ends_at"
                                         />
@@ -233,10 +261,13 @@ defineExpose({ scrollToSection });
                                 </div>
 
                                 <div class="grid gap-2">
-                                    <Label class="required">Timezone</Label>
+                                    <Label for="event-timezone" class="required"
+                                        >Timezone</Label
+                                    >
                                     <Popover v-model:open="timezoneOpen">
                                         <PopoverTrigger as-child>
                                             <Button
+                                                id="event-timezone"
                                                 type="button"
                                                 variant="outline"
                                                 role="combobox"
@@ -316,7 +347,6 @@ defineExpose({ scrollToSection });
                                         id="venue-name"
                                         v-model="form.venue_name"
                                         type="text"
-                                        placeholder="e.g. City Hall Auditorium"
                                     />
                                     <InputError
                                         :message="form.errors.venue_name"
@@ -324,14 +354,13 @@ defineExpose({ scrollToSection });
                                 </div>
 
                                 <div class="grid gap-2">
-                                    <Label for="address" class="required"
+                                    <Label for="event-address" class="required"
                                         >Address</Label
                                     >
                                     <Input
-                                        id="address"
+                                        id="event-address"
                                         v-model="form.address"
                                         type="text"
-                                        placeholder="Street address"
                                     />
                                     <InputError
                                         :message="form.errors.address"
@@ -397,7 +426,7 @@ defineExpose({ scrollToSection });
                             </div>
                             <MediaUploader
                                 v-else
-                                :items="mediaItems ?? []"
+                                :items="initialValues?.media"
                                 :upload-url="
                                     storeMediaRoute({
                                         event: initialValues?.uuid as string,

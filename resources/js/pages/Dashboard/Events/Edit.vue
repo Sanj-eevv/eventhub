@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import DashboardLayout from "@/layouts/DashboardLayout.vue";
 import type { BreadcrumbItem } from "@/types";
-import type { Event, EventFormInitial } from "@/types/event";
+import type { EventResource } from "@/types/event";
 import type { OrganizationPicker } from "@/types/organization";
 import { index as dashboardIndex } from "@/wayfinder/routes/dashboard";
 import {
@@ -21,7 +21,7 @@ import {
 type StatusAction = "publish" | "unpublish";
 
 const props = defineProps<{
-    event: Event;
+    event: EventResource;
     organizations: OrganizationPicker[];
     timezones: string[];
 }>();
@@ -31,27 +31,6 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: "Events", href: eventsIndex().url },
     { title: props.event.title, href: eventsEdit(props.event.uuid).url },
 ];
-
-const initialValues: EventFormInitial = {
-    uuid: props.event.uuid,
-    organization_uuid: props.event.organization_uuid,
-    title: props.event.title,
-    description: props.event.description,
-    starts_at: props.event.starts_at,
-    ends_at: props.event.ends_at ?? "",
-    timezone:
-        props.event.timezone ??
-        Intl.DateTimeFormat().resolvedOptions().timeZone,
-    venue_name: props.event.venue_name ?? "",
-    address: props.event.address ?? "",
-    zip: props.event.zip ?? "",
-    map_url: props.event.map_url ?? "",
-    ticket_types: (props.event.ticket_types ?? []).map((ticketType) => ({
-        ...ticketType,
-        _key: crypto.randomUUID(),
-        uuid: ticketType.uuid,
-    })),
-};
 
 const isPublishing = shallowRef(false);
 const eventForm = shallowRef<InstanceType<typeof EventForm> | null>(null);
@@ -136,8 +115,7 @@ const handleStatusChange = (action: StatusAction) => {
             <div class="flex min-h-0 flex-1 flex-col">
                 <EventForm
                     ref="eventForm"
-                    :initial-values="initialValues"
-                    :media-items="event.media"
+                    :initial-values="props.event"
                     :organizations="organizations"
                     :timezones="timezones"
                     submit-method="put"

@@ -23,6 +23,7 @@ final class TicketTypeFactory extends Factory
         return [
             'event_id' => Event::factory(),
             'name' => $name,
+            'description' => $this->faker->sentence(),
             'slug' => Str::slug($name),
             'price' => $this->faker->numberBetween(500, 20000),
             'capacity' => $this->faker->numberBetween(10, 500),

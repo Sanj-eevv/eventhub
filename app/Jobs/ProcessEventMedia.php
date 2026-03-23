@@ -46,6 +46,9 @@ final class ProcessEventMedia implements ShouldQueue
             'mime_type' => 'image/webp',
             'size' => mb_strlen($webpContent),
         ]);
-        $disk->delete($originalPath);
+
+        if ($processedPath !== $originalPath) {
+            $disk->delete($originalPath);
+        }
     }
 }

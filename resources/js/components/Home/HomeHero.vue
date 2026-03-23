@@ -1,14 +1,13 @@
 <script setup lang="ts">
-import { Link, usePage } from "@inertiajs/vue3";
-import type { PublicEvent } from "@/types/event";
+import { Link } from "@inertiajs/vue3";
+import { formatDate } from "@/lib/utils";
+import type { EventResource } from "@/types/event";
 import {
     index as eventsIndex,
     show as eventShow,
 } from "@/wayfinder/routes/events";
 
-defineProps<{ events: PublicEvent[] }>();
-
-const appName = usePage().props.name as string;
+defineProps<{ events: EventResource[] }>();
 </script>
 
 <template>
@@ -136,17 +135,15 @@ const appName = usePage().props.name as string;
                                     <div
                                         class="flex items-center gap-2 text-[10px] font-code tracking-wider text-sf-muted uppercase"
                                     >
-                                        <span>{{ event.starts_at }}</span>
-                                        <template
-                                            v-if="event.location?.venue_name"
-                                        >
-                                            <span
-                                                class="h-0.75 w-0.75 rounded-full bg-sf-border shrink-0"
-                                            />
-                                            <span class="truncate">{{
-                                                event.location.venue_name
-                                            }}</span>
-                                        </template>
+                                        <span>{{
+                                            formatDate(event.starts_at)
+                                        }}</span>
+                                        <span
+                                            class="h-0.75 w-0.75 rounded-full bg-sf-border shrink-0"
+                                        />
+                                        <span class="truncate">{{
+                                            event.venue_name
+                                        }}</span>
                                     </div>
                                     <div
                                         class="h-px w-full bg-sf-border-subtle overflow-hidden"
@@ -174,27 +171,55 @@ const appName = usePage().props.name as string;
 
 <style scoped>
 @keyframes sfFadeUp {
-    from { opacity: 0; transform: translateY(14px); }
-    to   { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @keyframes sfCurtain {
-    from { transform: translateY(110%); }
-    to   { transform: translateY(0); }
+    from {
+        transform: translateY(110%);
+    }
+    to {
+        transform: translateY(0);
+    }
 }
 
 @keyframes sfLineGrow {
-    from { transform: scaleX(0); }
-    to   { transform: scaleX(1); }
+    from {
+        transform: scaleX(0);
+    }
+    to {
+        transform: scaleX(1);
+    }
 }
 
-.anim-line   { animation: sfLineGrow 0.7s cubic-bezier(0.16, 1, 0.3, 1) both 0s; }
-.anim-eyebrow { animation: sfFadeUp  0.5s ease both 0.2s; }
-.anim-word-1 { animation: sfCurtain 0.9s cubic-bezier(0.16, 1, 0.3, 1) both 0.05s; }
-.anim-word-2 { animation: sfCurtain 0.9s cubic-bezier(0.16, 1, 0.3, 1) both 0.18s; }
-.anim-word-3 { animation: sfCurtain 0.9s cubic-bezier(0.16, 1, 0.3, 1) both 0.31s; }
-.anim-desc   { animation: sfFadeUp  0.6s ease both 0.55s; }
-.anim-cta    { animation: sfFadeUp  0.6s ease both 0.7s; }
+.anim-line {
+    animation: sfLineGrow 0.7s cubic-bezier(0.16, 1, 0.3, 1) both 0s;
+}
+.anim-eyebrow {
+    animation: sfFadeUp 0.5s ease both 0.2s;
+}
+.anim-word-1 {
+    animation: sfCurtain 0.9s cubic-bezier(0.16, 1, 0.3, 1) both 0.05s;
+}
+.anim-word-2 {
+    animation: sfCurtain 0.9s cubic-bezier(0.16, 1, 0.3, 1) both 0.18s;
+}
+.anim-word-3 {
+    animation: sfCurtain 0.9s cubic-bezier(0.16, 1, 0.3, 1) both 0.31s;
+}
+.anim-desc {
+    animation: sfFadeUp 0.6s ease both 0.55s;
+}
+.anim-cta {
+    animation: sfFadeUp 0.6s ease both 0.7s;
+}
 </style>
 
 <style scoped>

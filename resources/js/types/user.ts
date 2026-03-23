@@ -1,7 +1,5 @@
-import type { PaginatedResponse } from "@/types";
-import type { OrganizationPicker } from "@/types/organization";
-import type { RolePicker } from "@/types/role";
 import type { App } from "@/wayfinder/types";
+import type { Role } from "@/types/role";
 
 export type User = App.Models.User;
 
@@ -9,10 +7,9 @@ export type UserFilterProps = {
     search: string;
 };
 
-export type UserPageProps = {
-    users: PaginatedResponse<User> & {
-        filters: UserFilterProps;
+export type UserShowProps = {
+    user: User & {
+        email_verified: boolean;
+        role: Role;
     };
-    roles: RolePicker[];
-    organizations: OrganizationPicker[];
 };

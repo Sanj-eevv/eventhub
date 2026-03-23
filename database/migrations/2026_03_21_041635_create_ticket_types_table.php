@@ -16,7 +16,7 @@ return new class() extends Migration
             $table->foreignId('event_id')->constrained()->cascadeOnDelete();
             $table->string('name');
             $table->string('slug');
-            $table->text('description')->nullable();
+            $table->text('description');
             $table->unsignedBigInteger('price');
             $table->unsignedInteger('capacity');
             $table->unsignedSmallInteger('max_per_user')->nullable();

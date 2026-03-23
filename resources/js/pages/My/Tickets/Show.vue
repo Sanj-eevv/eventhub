@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Head, Link } from "@inertiajs/vue3";
 import HomeLayout from "@/layouts/HomeLayout.vue";
-import type { OrderTicket } from "@/types/event";
+import type { OrderTicket } from "@/types/order";
 import { index as ordersIndex } from "@/wayfinder/routes/orders";
 
 type TicketDetail = OrderTicket & {

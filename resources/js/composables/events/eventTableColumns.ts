@@ -1,4 +1,5 @@
 import { Link } from "@inertiajs/vue3";
+import { formatDate } from "@/lib/utils";
 import type { ColumnDef } from "@tanstack/vue-table";
 import { h } from "vue";
 import EventActions from "@/components/Dashboard/Events/EventActions.vue";
@@ -49,12 +50,14 @@ export function createEventColumns(actions: EventColumnActions): ColumnDef<Event
             header: "Starts At",
             enableSorting: true,
             enableHiding: true,
+            cell: ({ row }) => formatDate(row.original.starts_at, row.original.timezone),
         },
         {
             accessorKey: "ends_at",
             header: "Ends At",
             enableSorting: true,
             enableHiding: true,
+            cell: ({ row }) => formatDate(row.original.ends_at, row.original.timezone),
         },
         {
             id: "actions",

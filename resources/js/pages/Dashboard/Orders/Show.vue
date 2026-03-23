@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { Head } from "@inertiajs/vue3";
+import { formatDate } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import DashboardLayout from "@/layouts/DashboardLayout.vue";
 import type { BreadcrumbItem } from "@/types";
-import type { Order } from "@/types/event";
+import type { Order } from "@/types/order";
 import { index as dashboardIndex } from "@/wayfinder/routes/dashboard";
 import {
     index as dashboardOrdersIndex,
@@ -66,11 +67,11 @@ const goBack = () => window.history.back();
                         </div>
                         <div v-if="order.paid_at" class="flex justify-between text-sm">
                             <span class="text-muted-foreground">Paid at</span>
-                            <span>{{ order.paid_at }}</span>
+                            <span>{{ formatDate(order.paid_at) }}</span>
                         </div>
                         <div v-if="order.reserved_at" class="flex justify-between text-sm">
                             <span class="text-muted-foreground">Reserved at</span>
-                            <span>{{ order.reserved_at }}</span>
+                            <span>{{ formatDate(order.reserved_at) }}</span>
                         </div>
                     </CardContent>
                 </Card>

@@ -6,20 +6,28 @@ namespace App\Http\Requests\Dashboard;
 
 use App\DataTransferObjects\EventData;
 use App\DataTransferObjects\TicketTypeData;
+use App\Enums\TicketStatus;
+use App\Models\Event;
 use App\Models\Organization;
+use App\Models\TicketType;
+use App\Rules\EndsOnDifferentCalendarDay;
+use App\Support\DateFormat;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Validator;
 
 final class EventRequest extends FormRequest
 {
     public function rules(): array
     {
+        $dateFormat = 'date_format:'.DateFormat::DATETIME_LOCAL;
+
         return [
             'organization_uuid' => ['required', 'string', 'exists:organizations,uuid'],
             'title' => ['required', 'string', 'max:191'],
             'description' => ['required', 'string', 'max:10000'],
-            'starts_at' => ['required', 'date'],
-            'ends_at' => ['nullable', 'date', 'after:starts_at'],
+            'starts_at' => ['required', $dateFormat],
+            'ends_at' => ['required', $dateFormat, 'after:starts_at', new EndsOnDifferentCalendarDay()],
             'timezone' => ['required', 'string', 'timezone:all'],
             'venue_name' => ['required', 'string', 'max:191'],
             'address' => ['required', 'string', 'max:191'],
@@ -28,18 +36,53 @@ final class EventRequest extends FormRequest
             'ticket_types' => ['required', 'array', 'min:1'],
             'ticket_types.*.uuid' => ['nullable', 'string'],
             'ticket_types.*.name' => ['required', 'string', 'max:191'],
-            'ticket_types.*.price' => ['required', 'numeric', 'min:1', '/^\d*(\.\d{1,2})?$/'],
+            'ticket_types.*.description' => ['required', 'string', 'max:500'],
+            'ticket_types.*.price' => ['required', 'numeric', 'min:1', 'regex:/^\d*(\.\d{1,2})?$/'],
             'ticket_types.*.capacity' => ['required', 'integer', 'min:1'],
             'ticket_types.*.max_per_user' => ['nullable', 'integer', 'min:1', 'max:100'],
-            'ticket_types.*.sale_starts_at' => ['nullable', 'date'],
-            'ticket_types.*.sale_ends_at' => ['nullable', 'date', 'after_or_equal:ticket_types.*.sale_starts_at'],
+            'ticket_types.*.sale_starts_at' => ['nullable', $dateFormat, 'before:starts_at'],
+            'ticket_types.*.sale_ends_at' => ['nullable', $dateFormat, 'before:starts_at', 'after_or_equal:ticket_types.*.sale_starts_at'],
         ];
+    }
+
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator): void {
+            foreach ($this->input('ticket_types', []) as $index => $ticketType) {
+                if (filled($ticketType['sale_ends_at'] ?? null) && blank($ticketType['sale_starts_at'] ?? null)) {
+                    $validator->errors()->add(
+                        "ticket_types.{$index}.sale_ends_at",
+                        'A sale end date requires a sale start date.'
+                    );
+                }
+            }
+
+            $event = $this->route('event');
+
+            if ( ! $event instanceof Event) {
+                return;
+            }
+
+            $submittedUuids = collect($this->input('ticket_types', []))->pluck('uuid');
+
+            $event->ticketTypes()
+                ->whereNotIn('uuid', $submittedUuids)
+                ->each(function (TicketType $ticketType) use ($validator): void {
+                    if ($ticketType->tickets()->where('status', TicketStatus::Active)->exists()) {
+                        $validator->errors()->add(
+                            'ticket_types',
+                            "The \"{$ticketType->name}\" ticket type has paid tickets and cannot be removed."
+                        );
+                    }
+                });
+        });
     }
 
     public function attributes(): array
     {
         return [
             'organization_uuid' => 'organization',
+            'ticket_types.*.description' => 'description',
             'ticket_types.*.sale_starts_at' => 'sale start date',
             'ticket_types.*.sale_ends_at' => 'sale end date',
         ];
@@ -65,12 +108,14 @@ final class EventRequest extends FormRequest
         $organizationId = Organization::where('uuid', $this->validated('organization_uuid'))->value('id');
         $ticketTypes = collect($this->validated('ticket_types'))
             ->map(fn (array $type, int $index) => new TicketTypeData(
-                uuid: $type['uuid'] ?? null,
                 name: $type['name'],
+                description: $type['description'],
                 price: (int) round($type['price'] * 100),
                 capacity: (int) $type['capacity'],
-                max_per_user: isset($type['max_per_user']) ? (int) $type['max_per_user'] : null,
                 sort_order: $index,
+                is_active: true,
+                uuid: $type['uuid'],
+                max_per_user: isset($type['max_per_user']) ? (int) $type['max_per_user'] : null,
                 sale_starts_at: isset($type['sale_starts_at']) ? CarbonImmutable::parse($type['sale_starts_at'], $timezone)->utc() : null,
                 sale_ends_at: isset($type['sale_ends_at']) ? CarbonImmutable::parse($type['sale_ends_at'], $timezone)->utc() : null,
             ))
@@ -82,7 +127,7 @@ final class EventRequest extends FormRequest
             title: $this->validated('title'),
             description: $this->validated('description'),
             starts_at: CarbonImmutable::parse($this->validated('starts_at'), $timezone)->utc(),
-            ends_at: $this->validated('ends_at') ? CarbonImmutable::parse($this->validated('ends_at'), $timezone)->utc() : null,
+            ends_at: CarbonImmutable::parse($this->validated('ends_at'), $timezone)->utc(),
             timezone: $timezone,
             venue_name: $this->validated('venue_name'),
             address: $this->validated('address'),

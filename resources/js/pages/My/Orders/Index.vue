@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { Head, Link } from "@inertiajs/vue3";
 import HomeLayout from "@/layouts/HomeLayout.vue";
+import { formatDate } from "@/lib/utils";
 import type { PaginatedResponse } from "@/types";
-import type { Order } from "@/types/event";
+import type { Order } from "@/types/order";
 import { show as ordersShow } from "@/wayfinder/routes/orders";
 
 defineProps<{
@@ -25,10 +26,6 @@ const statusBadgeClass: Record<string, string> = {
     pending: "text-sf-muted border-sf-border",
 };
 
-const formatDate = (dateStr: string | null): string => {
-    if (!dateStr) return "";
-    return new Date(dateStr).toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" });
-};
 </script>
 
 <template>

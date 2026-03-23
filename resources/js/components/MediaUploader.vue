@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { router } from "@inertiajs/vue3";
 import { onUnmounted, ref } from "vue";
-import type { MediaItem } from "@/types/event";
+import type { MediaResource } from "@/types/event";
 
 const props = defineProps<{
-    items: MediaItem[];
+    items?: MediaResource[];
     uploadUrl: string;
     deleteUrl: (mediaUuid: string) => string;
     coverUrl: (mediaUuid: string) => string;
@@ -24,7 +24,7 @@ onUnmounted(() => {
     objectUrls.value.forEach((url) => URL.revokeObjectURL(url));
 });
 
-const remainingSlots = () => maxFiles - props.items.length;
+const remainingSlots = () => maxFiles - (props.items?.length ?? 0);
 
 function handleDragOver(event: DragEvent): void {
     event.preventDefault();
@@ -73,7 +73,9 @@ function uploadSingle(file: File): void {
         {
             forceFormData: true,
             preserveScroll: true,
-            ...(props.partialReloadKey && { only: [props.partialReloadKey, 'flash'] }),
+            ...(props.partialReloadKey && {
+                only: [props.partialReloadKey, "flash"],
+            }),
             onError(errors) {
                 uploadErrors.value.push(errors.file ?? "Upload failed.");
             },
@@ -87,7 +89,9 @@ function uploadSingle(file: File): void {
 function deleteMedia(mediaUuid: string): void {
     router.delete(props.deleteUrl(mediaUuid), {
         preserveScroll: true,
-        ...(props.partialReloadKey && { only: [props.partialReloadKey, 'flash'] }),
+        ...(props.partialReloadKey && {
+            only: [props.partialReloadKey, "flash"],
+        }),
     });
 }
 
@@ -97,7 +101,9 @@ function setCover(mediaUuid: string): void {
         {},
         {
             preserveScroll: true,
-            ...(props.partialReloadKey && { only: [props.partialReloadKey, 'flash'] }),
+            ...(props.partialReloadKey && {
+                only: [props.partialReloadKey, "flash"],
+            }),
         },
     );
 }
@@ -157,7 +163,7 @@ function setCover(mediaUuid: string): void {
                 JPEG, PNG, or WebP — max 10 MB per file
             </p>
             <p class="mt-2 text-xs text-muted-foreground">
-                {{ items.length }} / {{ maxFiles }} images
+                {{ items?.length ?? 0 }} / {{ maxFiles }} images
             </p>
         </div>
 
@@ -194,7 +200,7 @@ function setCover(mediaUuid: string): void {
         </div>
 
         <div
-            v-if="items.length > 0"
+            v-if="items && items.length > 0"
             class="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6"
         >
             <div

@@ -18,7 +18,7 @@ final class ShowResource extends JsonResource
             'contact_address' => $this->contact_address,
             'contact_email' => $this->contact_email,
             'status' => ['value' => $this->status->value, 'label' => $this->status->label()],
-            'created_at' => formatUserTime($this->created_at, 'd M Y'),
+            'created_at' => $this->created_at->toISOString(),
         ];
     }
 }

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ArrowLeftIcon } from "lucide-vue-next";
+import { formatDate } from "@/lib/utils";
 import OrganizationStatusBadge from "@/components/Dashboard/Organizations/OrganizationStatusBadge.vue";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -7,8 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { usePermission } from "@/composables/usePermission";
 import DashboardLayout from "@/layouts/DashboardLayout.vue";
 import type { BreadcrumbItem } from "@/types";
-import type { Role } from "@/types/role";
-import type { User } from "@/types/user";
+import type { UserShowProps } from "@/types/user";
 import { index as dashboardIndex } from "@/wayfinder/routes/dashboard";
 import { show as orgsShow } from "@/wayfinder/routes/dashboard/organizations";
 import {
@@ -16,9 +16,7 @@ import {
     show as usersShow,
 } from "@/wayfinder/routes/dashboard/users";
 
-const props = defineProps<{
-    user: User & { email_verified: boolean; role: Role };
-}>();
+const props = defineProps<UserShowProps>();
 
 const can = usePermission("organization");
 
@@ -72,7 +70,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                         <div>
                             <p class="text-sm text-muted-foreground">Created</p>
                             <p class="font-medium">
-                                {{ user.created_at }}
+                                {{ formatDate(user.created_at) }}
                             </p>
                         </div>
                     </CardContent>
