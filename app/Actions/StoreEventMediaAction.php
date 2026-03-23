@@ -52,7 +52,7 @@ final class StoreEventMediaAction
                 'is_cover' => 0 === $count,
                 'sort_order' => $count,
             ]);
-            ProcessEventMedia::dispatch($media);
+            // ProcessEventMedia::dispatch($media);
             $this->databaseManager->commit();
 
             return $media;
