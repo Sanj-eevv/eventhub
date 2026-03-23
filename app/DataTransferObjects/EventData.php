@@ -16,7 +16,10 @@ final readonly class EventData
         public CarbonImmutable $starts_at,
         public ?CarbonImmutable $ends_at,
         public string $timezone,
-        public ?array $location,
+        public string $venue_name,
+        public string $address,
+        public string $zip,
+        public ?string $map_url,
         /** @param TicketTypeData[] $ticket_types */
         public array $ticket_types,
     ) {}

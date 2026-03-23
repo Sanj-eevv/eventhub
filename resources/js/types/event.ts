@@ -8,6 +8,7 @@ export type TicketType = Omit<
     | "id"
     | "event_id"
     | "uuid"
+    | "max_per_user"
     | "created_at"
     | "updated_at"
     | "event"
@@ -15,6 +16,7 @@ export type TicketType = Omit<
 > & {
     _key: string;
     uuid: string | null;
+    max_per_user: number | null;
 };
 
 export type EventStatus = App.Enums.EventStatus;
@@ -25,14 +27,6 @@ export type MediaItem = Pick<
     "uuid" | "filename" | "size" | "is_cover" | "sort_order"
 > & {
     url: string;
-};
-
-export type EventLocation = {
-    venue_name?: string | null;
-    address_line_1?: string | null;
-    address_line_2?: string | null;
-    zip?: string | null;
-    map_url?: string | null;
 };
 
 export type OrderTicket = Pick<
@@ -76,19 +70,21 @@ export type PublicEvent = Pick<
     | "starts_at"
     | "ends_at"
     | "timezone"
+    | "venue_name"
+    | "address"
+    | "zip"
+    | "map_url"
 > & {
-    location: EventLocation | null;
     cover_image: MediaItem | null;
     media: MediaItem[];
 };
 
 export type Event = Omit<
     App.Models.Event,
-    "id" | "status" | "location" | "organization_id" | "user_id"
+    "id" | "status" | "organization_id" | "user_id"
 > & {
     organization_uuid: string;
     status: EventStatusData;
-    location: EventLocation | null;
     ticket_types?: TicketType[];
     media?: MediaItem[];
     cover_image?: MediaItem | null;
@@ -102,7 +98,10 @@ export type EventFormInitial = {
     starts_at?: string;
     ends_at?: string;
     timezone?: string;
-    location?: { [K in keyof EventLocation]?: string };
+    venue_name?: string;
+    address?: string;
+    zip?: string;
+    map_url?: string;
     ticket_types?: TicketType[];
 };
 

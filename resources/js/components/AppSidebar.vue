@@ -47,6 +47,7 @@ import { index as orgsIndex } from "@/wayfinder/routes/dashboard/organizations";
 import { index as rolesIndex } from "@/wayfinder/routes/dashboard/roles";
 import { index as usersIndex } from "@/wayfinder/routes/dashboard/users";
 import AppLogo from "./AppLogo.vue";
+import UserRoleBadge from "./UserRoleBadge.vue";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 
 const pageProps = usePage<{
@@ -183,10 +184,13 @@ const handleLogout = () => {
                                                 {{ getInitials(user.name) }}
                                             </AvatarFallback>
                                         </Avatar>
-                                        <span
-                                            class="truncate text-sm leading-tight font-medium"
-                                            >{{ user.name }}</span
-                                        >
+                                        <div class="flex flex-1 items-center gap-2 text-left">
+                                            <span
+                                                class="truncate text-sm font-medium"
+                                                >{{ user.name }}</span
+                                            >
+                                            <UserRoleBadge />
+                                        </div>
                                         <ChevronsUpDown
                                             class="ml-auto size-4"
                                         />

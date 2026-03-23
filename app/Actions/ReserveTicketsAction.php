@@ -50,7 +50,7 @@ final class ReserveTicketsAction
                     ->whereIn('status', [TicketStatus::Pending, TicketStatus::Active])
                     ->count();
 
-                if ($userCount + $item['quantity'] > $ticketType->max_per_user) {
+                if (null !== $ticketType->max_per_user && $userCount + $item['quantity'] > $ticketType->max_per_user) {
                     throw new TicketLimitExceededException($ticketType);
                 }
 

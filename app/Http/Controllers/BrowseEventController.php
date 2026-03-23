@@ -41,7 +41,7 @@ final class BrowseEventController extends Controller
 
         return $this->inertiaResponse->render('Events/Show', [
             'event' => ShowResource::make($event),
-            'ticketTypes' => TicketTypeResource::collection($event->ticketTypes),
+            'ticketTypes' => TicketTypeResource::collection($event->ticketTypes->each->setRelation('event', $event)),
         ]);
     }
 }

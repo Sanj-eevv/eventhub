@@ -22,7 +22,10 @@ final class CreateEventAction
                 'starts_at' => $data->starts_at,
                 'ends_at' => $data->ends_at,
                 'timezone' => $data->timezone,
-                'location' => $data->location,
+                'venue_name' => $data->venue_name,
+                'address' => $data->address,
+                'zip' => $data->zip,
+                'map_url' => $data->map_url,
                 'status' => EventStatus::Draft,
             ]);
 

@@ -13,7 +13,10 @@ return new class() extends Migration
         Schema::table('events', function (Blueprint $table): void {
             $table->dateTime('ends_at')->nullable()->change();
             $table->string('timezone')->default('UTC')->after('ends_at');
-            $table->json('location')->nullable()->after('timezone');
+            $table->string('venue_name')->after('timezone');
+            $table->string('address')->after('venue_name');
+            $table->string('zip', 20)->after('address');
+            $table->string('map_url')->nullable()->after('zip');
         });
     }
 };

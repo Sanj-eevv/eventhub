@@ -62,13 +62,10 @@ const form = useForm({
     starts_at: props.initialValues?.starts_at ?? "",
     ends_at: props.initialValues?.ends_at ?? "",
     timezone: props.initialValues?.timezone ?? "",
-    location: {
-        venue_name: props.initialValues?.location?.venue_name ?? "",
-        address_line_1: props.initialValues?.location?.address_line_1 ?? "",
-        address_line_2: props.initialValues?.location?.address_line_2 ?? "",
-        zip: props.initialValues?.location?.zip ?? "",
-        map_url: props.initialValues?.location?.map_url ?? "",
-    },
+    venue_name: props.initialValues?.venue_name ?? "",
+    address: props.initialValues?.address ?? "",
+    zip: props.initialValues?.zip ?? "",
+    map_url: props.initialValues?.map_url ?? "",
     ticket_types: (props.initialValues?.ticket_types ?? []) as TicketType[],
 });
 
@@ -312,86 +309,57 @@ defineExpose({ scrollToSection });
                         >
                             <div class="space-y-4">
                                 <div class="grid gap-2">
-                                    <Label for="location-venue"
+                                    <Label for="venue-name" class="required"
                                         >Venue Name</Label
                                     >
                                     <Input
-                                        id="location-venue"
-                                        v-model="form.location.venue_name"
+                                        id="venue-name"
+                                        v-model="form.venue_name"
                                         type="text"
                                         placeholder="e.g. City Hall Auditorium"
                                     />
                                     <InputError
-                                        :message="
-                                            form.errors['location.venue_name']
-                                        "
+                                        :message="form.errors.venue_name"
                                     />
                                 </div>
 
                                 <div class="grid gap-2">
-                                    <Label for="location-addr1"
-                                        >Address Line 1</Label
+                                    <Label for="address" class="required"
+                                        >Address</Label
                                     >
                                     <Input
-                                        id="location-addr1"
-                                        v-model="form.location.address_line_1"
+                                        id="address"
+                                        v-model="form.address"
                                         type="text"
                                         placeholder="Street address"
                                     />
                                     <InputError
-                                        :message="
-                                            form.errors[
-                                                'location.address_line_1'
-                                            ]
-                                        "
+                                        :message="form.errors.address"
                                     />
                                 </div>
 
                                 <div class="grid gap-2">
-                                    <Label for="location-addr2"
-                                        >Address Line 2</Label
-                                    >
-                                    <Input
-                                        id="location-addr2"
-                                        v-model="form.location.address_line_2"
-                                        type="text"
-                                        placeholder="Suite, floor, etc."
-                                    />
-                                    <InputError
-                                        :message="
-                                            form.errors[
-                                                'location.address_line_2'
-                                            ]
-                                        "
-                                    />
-                                </div>
-
-                                <div class="grid gap-2">
-                                    <Label for="location-zip"
+                                    <Label for="zip" class="required"
                                         >ZIP / Postal Code</Label
                                     >
                                     <Input
-                                        id="location-zip"
-                                        v-model="form.location.zip"
+                                        id="zip"
+                                        v-model="form.zip"
                                         type="text"
                                     />
-                                    <InputError
-                                        :message="form.errors['location.zip']"
-                                    />
+                                    <InputError :message="form.errors.zip" />
                                 </div>
 
                                 <div class="grid gap-2">
-                                    <Label for="location-map">Map URL</Label>
+                                    <Label for="map-url">Map URL</Label>
                                     <Input
-                                        id="location-map"
-                                        v-model="form.location.map_url"
+                                        id="map-url"
+                                        v-model="form.map_url"
                                         type="url"
                                         placeholder="https://maps.google.com/..."
                                     />
                                     <InputError
-                                        :message="
-                                            form.errors['location.map_url']
-                                        "
+                                        :message="form.errors.map_url"
                                     />
                                 </div>
                             </div>

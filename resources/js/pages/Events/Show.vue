@@ -31,9 +31,7 @@ const hasSelection = computed(() =>
 
 const orderTotal = computed(() =>
     props.ticketTypes.reduce((sum, ticketType) => {
-        return (
-            sum + ticketType.price * (quantities[ticketType.uuid] ?? 0)
-        );
+        return sum + ticketType.price * (quantities[ticketType.uuid] ?? 0);
     }, 0),
 );
 
@@ -122,7 +120,7 @@ const formatTime = (dateStr: string): string => {
                             >— {{ formatTime(event.ends_at) }}</span
                         >
                         <span
-                            v-if="event.location?.venue_name"
+                            v-if="event.venue_name"
                             class="flex items-center gap-2 text-sf-muted"
                         >
                             <svg
@@ -143,11 +141,9 @@ const formatTime = (dateStr: string): string => {
                                     d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"
                                 />
                             </svg>
-                            {{ event.location.venue_name }}
-                            <span
-                                v-if="event.location.address_line_1"
-                                class="text-sf-tertiary"
-                                >, {{ event.location.address_line_1 }}</span
+                            {{ event.venue_name }}
+                            <span v-if="event.address" class="text-sf-tertiary"
+                                >, {{ event.address }}</span
                             >
                         </span>
                     </div>
@@ -201,7 +197,7 @@ const formatTime = (dateStr: string): string => {
                             >— {{ formatTime(event.ends_at) }}</span
                         >
                         <span
-                            v-if="event.location?.venue_name"
+                            v-if="event.venue_name"
                             class="flex items-center gap-2 text-sf-muted"
                         >
                             <svg
@@ -222,11 +218,9 @@ const formatTime = (dateStr: string): string => {
                                     d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"
                                 />
                             </svg>
-                            {{ event.location.venue_name }}
-                            <span
-                                v-if="event.location.address_line_1"
-                                class="text-sf-tertiary"
-                                >, {{ event.location.address_line_1 }}</span
+                            {{ event.venue_name }}
+                            <span v-if="event.address" class="text-sf-tertiary"
+                                >, {{ event.address }}</span
                             >
                         </span>
                     </div>
@@ -284,11 +278,7 @@ const formatTime = (dateStr: string): string => {
                     </div>
 
                     <div
-                        v-if="
-                            event.location &&
-                            (event.location.venue_name ||
-                                event.location.address_line_1)
-                        "
+                        v-if="event.venue_name || event.address"
                         class="border-t border-sf-border-subtle pt-10"
                     >
                         <div class="flex items-center gap-3 mb-6">
@@ -303,29 +293,26 @@ const formatTime = (dateStr: string): string => {
                             class="bg-sf-surface border border-sf-border-subtle rounded-xl p-6 space-y-2 transition-colors duration-200"
                         >
                             <p
-                                v-if="event.location.venue_name"
+                                v-if="event.venue_name"
                                 class="font-display text-lg font-medium text-sf-text"
                             >
-                                {{ event.location.venue_name }}
+                                {{ event.venue_name }}
                             </p>
                             <p
-                                v-if="event.location.address_line_1"
+                                v-if="event.address"
                                 class="font-body text-sm text-sf-muted"
                             >
-                                {{ event.location.address_line_1
-                                }}<span v-if="event.location.address_line_2"
-                                    >, {{ event.location.address_line_2 }}</span
-                                >
+                                {{ event.address }}
                             </p>
                             <p
-                                v-if="event.location.zip"
+                                v-if="event.zip"
                                 class="font-body text-sm text-sf-muted"
                             >
-                                {{ event.location.zip }}
+                                {{ event.zip }}
                             </p>
                             <a
-                                v-if="event.location.map_url"
-                                :href="event.location.map_url"
+                                v-if="event.map_url"
+                                :href="event.map_url"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 class="inline-flex items-center gap-2 text-xs text-sf-gold hover:text-sf-text transition-colors mt-2 font-body"
@@ -418,19 +405,27 @@ const formatTime = (dateStr: string): string => {
                                     class="h-8 w-8 flex items-center justify-center rounded border border-sf-border text-sf-muted hover:border-sf-gold hover:text-sf-gold transition-all disabled:opacity-30 disabled:pointer-events-none text-lg leading-none"
                                     :disabled="
                                         !ticketType.is_active ||
-                                        quantities[ticketType.uuid] >=
-                                            ticketType.max_per_user
+                                        (ticketType.max_per_user !== null &&
+                                            quantities[ticketType.uuid] >=
+                                                ticketType.max_per_user)
                                     "
                                     @click="
-                                        quantities[ticketType.uuid] = Math.min(
-                                            ticketType.max_per_user,
-                                            quantities[ticketType.uuid] + 1,
-                                        )
+                                        quantities[ticketType.uuid] =
+                                            ticketType.max_per_user !== null
+                                                ? Math.min(
+                                                      ticketType.max_per_user,
+                                                      quantities[
+                                                          ticketType.uuid
+                                                      ] + 1,
+                                                  )
+                                                : quantities[ticketType.uuid] +
+                                                  1
                                     "
                                 >
                                     +
                                 </button>
                                 <span
+                                    v-if="ticketType.max_per_user !== null"
                                     class="font-body text-xs text-sf-tertiary ml-auto"
                                     >max {{ ticketType.max_per_user }}</span
                                 >

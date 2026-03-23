@@ -19,7 +19,7 @@ return new class() extends Migration
             $table->text('description')->nullable();
             $table->unsignedBigInteger('price');
             $table->unsignedInteger('capacity');
-            $table->unsignedSmallInteger('max_per_user')->default(5);
+            $table->unsignedSmallInteger('max_per_user')->nullable();
             $table->unsignedSmallInteger('sort_order')->default(0);
             $table->boolean('is_active')->default(true);
             $table->timestamp('sale_starts_at')->nullable();

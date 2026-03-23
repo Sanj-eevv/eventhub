@@ -42,13 +42,10 @@ const initialValues: EventFormInitial = {
     timezone:
         props.event.timezone ??
         Intl.DateTimeFormat().resolvedOptions().timeZone,
-    location: {
-        venue_name: props.event.location?.venue_name ?? "",
-        address_line_1: props.event.location?.address_line_1 ?? "",
-        address_line_2: props.event.location?.address_line_2 ?? "",
-        zip: props.event.location?.zip ?? "",
-        map_url: props.event.location?.map_url ?? "",
-    },
+    venue_name: props.event.venue_name ?? "",
+    address: props.event.address ?? "",
+    zip: props.event.zip ?? "",
+    map_url: props.event.map_url ?? "",
     ticket_types: (props.event.ticket_types ?? []).map((ticketType) => ({
         ...ticketType,
         _key: crypto.randomUUID(),

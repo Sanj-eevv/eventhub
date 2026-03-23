@@ -22,7 +22,7 @@ const addItem = () => {
         description: null,
         price: 0,
         capacity: 0,
-        max_per_user: 1,
+        max_per_user: null,
         sort_order: 0,
         is_active: true,
         sale_starts_at: null,

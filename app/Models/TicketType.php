@@ -24,7 +24,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string|null $description
  * @property int $price
  * @property int $capacity
- * @property int $max_per_user
+ * @property int|null $max_per_user
  * @property int $sort_order
  * @property bool $is_active
  * @property CarbonImmutable|null $sale_starts_at

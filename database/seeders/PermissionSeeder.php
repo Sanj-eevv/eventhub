@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Enums\PreservedRoleList;
 use App\Models\Permission;
+use App\Models\Role;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 final class PermissionSeeder extends Seeder
 {
@@ -23,42 +22,23 @@ final class PermissionSeeder extends Seeder
             ['name' => 'user:create', 'description' => 'Create user'],
             ['name' => 'user:update', 'description' => 'Update user'],
             ['name' => 'user:delete', 'description' => 'Delete user'],
-            ['name' => 'role:create', 'description' => 'Create user'],
-            ['name' => 'role:update', 'description' => 'Update user'],
-            ['name' => 'role:delete', 'description' => 'Delete user'],
+            ['name' => 'role:create', 'description' => 'Create role'],
+            ['name' => 'role:update', 'description' => 'Update role'],
+            ['name' => 'role:delete', 'description' => 'Delete role'],
         ];
+
         Permission::upsert($permissionData, ['name'], ['description', 'updated_at']);
 
-        $roles = DB::table('roles')
-            ->whereIn('slug', array_column(PreservedRoleList::cases(), 'value'))
-            ->pluck('id', 'slug');
+        $permissions = Permission::query()->pluck('id', 'name');
 
-        $permissions = DB::table('permissions')->pluck('id', 'name');
+        $allPermissionIds = $permissions->values()->all();
+        $orgAdminPermissionIds = $permissions->only([
+            'event:create', 'event:update', 'event:delete',
+            'user:create', 'user:update', 'user:delete',
+        ])->values()->all();
 
-        $adminPermissionNames = array_column($permissionData, 'name');
-        $matrix = [
-            PreservedRoleList::SuperAdmin->value => $adminPermissionNames,
-            PreservedRoleList::Admin->value => $adminPermissionNames,
-            PreservedRoleList::OrganizationAdmin->value => [
-                'event:create',
-                'event:update',
-                'event:delete',
-                'user:create',
-                'user:update',
-                'user:delete',
-            ],
-        ];
-        foreach ($matrix as $roleSlug => $permissionNames) {
-            $roleId = $roles[$roleSlug];
-            foreach ($permissionNames as $permissionName) {
-                $permissionId = $permissions[$permissionName];
-                $rows[] = [
-                    'role_id' => $roleId,
-                    'permission_id' => $permissionId,
-                ];
-            }
-        }
-        DB::table('roles_permissions')->insertOrIgnore($rows);
-
+        Role::superAdminRole()->permissions()->sync($allPermissionIds);
+        Role::adminRole()->permissions()->sync($allPermissionIds);
+        Role::organizationAdminRole()->permissions()->sync($orgAdminPermissionIds);
     }
 }

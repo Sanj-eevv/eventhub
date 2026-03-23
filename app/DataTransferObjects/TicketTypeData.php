@@ -12,7 +12,7 @@ final readonly class TicketTypeData
         public string $name,
         public int $price,
         public int $capacity,
-        public int $max_per_user,
+        public ?int $max_per_user,
         public int $sort_order,
         public ?string $uuid = null,
         public ?string $description = null,

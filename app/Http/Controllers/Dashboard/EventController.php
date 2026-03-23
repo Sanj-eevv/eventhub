@@ -55,15 +55,6 @@ final class EventController extends Controller
         ]);
     }
 
-    public function show(Event $event): Response
-    {
-        $this->authorize('view', $event);
-
-        return $this->inertiaResponse->render('Dashboard/Events/Show', [
-            'event' => ShowResource::make($event->load(['organization', 'user'])),
-        ]);
-    }
-
     public function create(): Response
     {
         $this->authorize('create', Event::class);
@@ -81,6 +72,15 @@ final class EventController extends Controller
         $event = $this->createEventAction->execute($request->toDto());
 
         return $this->redirector->route('dashboard.events.edit', ['event' => $event, 'focus' => 'media'])->with('toast_success', 'Event created successfully.');
+    }
+
+    public function show(Event $event): Response
+    {
+        $this->authorize('view', $event);
+
+        return $this->inertiaResponse->render('Dashboard/Events/Show', [
+            'event' => ShowResource::make($event->load(['organization', 'user'])),
+        ]);
     }
 
     public function edit(Event $event): Response

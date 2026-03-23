@@ -32,7 +32,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property CarbonImmutable $starts_at
  * @property CarbonImmutable|null $ends_at
  * @property string $timezone
- * @property array<array-key, mixed>|null $location
+ * @property string $venue_name
+ * @property string $address
+ * @property string $zip
+ * @property string|null $map_url
  * @property EventStatus $status
  * @property CarbonImmutable|null $deleted_at
  * @property CarbonImmutable|null $created_at
@@ -87,7 +90,10 @@ final class Event extends Model
         'ends_at',
         'status',
         'timezone',
-        'location',
+        'venue_name',
+        'address',
+        'zip',
+        'map_url',
     ];
 
     public function ticketTypes(): HasMany
@@ -131,7 +137,6 @@ final class Event extends Model
             'status' => EventStatus::class,
             'starts_at' => 'datetime',
             'ends_at' => 'datetime',
-            'location' => 'array',
         ];
     }
 }

@@ -13,9 +13,6 @@ use Illuminate\Support\Str;
  */
 final class RoleFactory extends Factory
 {
-    /**
-     * @return array<string, mixed>
-     */
     public function definition(): array
     {
         $name = $this->faker->unique()->name;

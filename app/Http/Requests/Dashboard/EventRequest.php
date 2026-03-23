@@ -21,16 +21,14 @@ final class EventRequest extends FormRequest
             'starts_at' => ['required', 'date'],
             'ends_at' => ['nullable', 'date', 'after:starts_at'],
             'timezone' => ['required', 'string', 'timezone:all'],
-            'location' => ['nullable', 'array'],
-            'location.venue_name' => ['nullable', 'string', 'max:191'],
-            'location.address_line_1' => ['nullable', 'string', 'max:191'],
-            'location.address_line_2' => ['nullable', 'string', 'max:191'],
-            'location.zip' => ['nullable', 'string', 'max:20'],
-            'location.map_url' => ['nullable', 'url'],
+            'venue_name' => ['required', 'string', 'max:191'],
+            'address' => ['required', 'string', 'max:191'],
+            'zip' => ['required', 'string', 'max:20'],
+            'map_url' => ['nullable', 'url'],
             'ticket_types' => ['required', 'array', 'min:1'],
             'ticket_types.*.uuid' => ['nullable', 'string'],
             'ticket_types.*.name' => ['required', 'string', 'max:191'],
-            'ticket_types.*.price' => ['required', 'numeric', 'min:0.01'],
+            'ticket_types.*.price' => ['required', 'numeric', 'min:1', '/^\d*(\.\d{1,2})?$/'],
             'ticket_types.*.capacity' => ['required', 'integer', 'min:1'],
             'ticket_types.*.max_per_user' => ['nullable', 'integer', 'min:1', 'max:100'],
             'ticket_types.*.sale_starts_at' => ['nullable', 'date'],
@@ -65,15 +63,14 @@ final class EventRequest extends FormRequest
     {
         $timezone = $this->validated('timezone');
         $organizationId = Organization::where('uuid', $this->validated('organization_uuid'))->value('id');
-
         $ticketTypes = collect($this->validated('ticket_types'))
             ->map(fn (array $type, int $index) => new TicketTypeData(
-                name: $type['name'],
-                price: (int) round((float) $type['price'] * 100),
-                capacity: (int) $type['capacity'],
-                max_per_user: isset($type['max_per_user']) ? (int) $type['max_per_user'] : 5,
-                sort_order: $index,
                 uuid: $type['uuid'] ?? null,
+                name: $type['name'],
+                price: (int) round($type['price'] * 100),
+                capacity: (int) $type['capacity'],
+                max_per_user: isset($type['max_per_user']) ? (int) $type['max_per_user'] : null,
+                sort_order: $index,
                 sale_starts_at: isset($type['sale_starts_at']) ? CarbonImmutable::parse($type['sale_starts_at'], $timezone)->utc() : null,
                 sale_ends_at: isset($type['sale_ends_at']) ? CarbonImmutable::parse($type['sale_ends_at'], $timezone)->utc() : null,
             ))
@@ -87,7 +84,10 @@ final class EventRequest extends FormRequest
             starts_at: CarbonImmutable::parse($this->validated('starts_at'), $timezone)->utc(),
             ends_at: $this->validated('ends_at') ? CarbonImmutable::parse($this->validated('ends_at'), $timezone)->utc() : null,
             timezone: $timezone,
-            location: $this->validated('location'),
+            venue_name: $this->validated('venue_name'),
+            address: $this->validated('address'),
+            zip: $this->validated('zip'),
+            map_url: $this->validated('map_url'),
             ticket_types: $ticketTypes,
         );
     }

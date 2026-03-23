@@ -4,36 +4,20 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Enums\OrganizationStatus;
 use App\Models\Event;
-use App\Models\Organization;
+use App\Models\TicketType;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 final class EventSeeder extends Seeder
 {
     public function run(): void
     {
-        Organization::query()
-            ->where('status', OrganizationStatus::Approved)
-            ->with('users')
-            ->get()
-            ->each(function (Organization $organization): void {
-                $user = $organization->users->first();
-
-                Event::factory()->count(5)->create([
-                    'organization_id' => $organization->id,
-                    'user_id' => $user->id,
-                ]);
-
-                Event::factory()->count(5)->published()->create([
-                    'organization_id' => $organization->id,
-                    'user_id' => $user->id,
-                ]);
-
-                Event::factory()->count(2)->cancelled()->create([
-                    'organization_id' => $organization->id,
-                    'user_id' => $user->id,
-                ]);
-            });
+        $admin = User::factory()->organizationAdmin()->create();
+        Event::factory()
+            ->recycle($admin)
+            ->recycle($admin->organization)
+            ->has(TicketType::factory()->count(3))
+            ->create();
     }
 }

@@ -50,12 +50,12 @@ const formatDate = (dateStr: string): string =>
                 {{ props.event.title }}
             </h3>
             <p
-                v-if="props.event.location?.venue_name"
+                v-if="props.event.venue_name"
                 class="font-body text-sm text-sf-muted mb-5"
             >
-                {{ props.event.location.venue_name }}
-                <span v-if="props.event.location.address_line_1" class="text-sf-tertiary">
-                    · {{ props.event.location.address_line_1 }}
+                {{ props.event.venue_name }}
+                <span v-if="props.event.address" class="text-sf-tertiary">
+                    · {{ props.event.address }}
                 </span>
             </p>
             <div

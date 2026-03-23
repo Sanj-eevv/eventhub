@@ -9,6 +9,7 @@ import type { BreadcrumbItem } from "@/types";
 import type { Event } from "@/types/event";
 import { index as dashboardIndex } from "@/wayfinder/routes/dashboard";
 import {
+    edit as eventsEdit,
     index as eventsIndex,
     show as eventsShow,
 } from "@/wayfinder/routes/dashboard/events";
@@ -41,6 +42,11 @@ const breadcrumbs: BreadcrumbItem[] = [
                     Back
                 </Button>
                 <h1 class="text-2xl font-bold">{{ event.title }}</h1>
+                <Button variant="outline" size="sm" as-child class="ml-auto">
+                    <Link :href="eventsEdit({ event: event.uuid }).url">
+                        Edit
+                    </Link>
+                </Button>
             </div>
 
             <div class="grid gap-6 md:grid-cols-2">
