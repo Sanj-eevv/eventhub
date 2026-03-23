@@ -23,7 +23,7 @@ use Illuminate\Support\Facades\DB;
 final class ReserveTicketsAction
 {
     /**
-     * @param  array<int, array{ticket_type_id: int, quantity: int}>  $items
+     * @param  array<int, array{ticket_type_uuid: string, quantity: int}>  $items
      */
     public function execute(User $user, Event $event, array $items): Order
     {
@@ -37,7 +37,8 @@ final class ReserveTicketsAction
             foreach ($items as $item) {
                 $ticketType = TicketType::query()
                     ->lockForUpdate()
-                    ->findOrFail($item['ticket_type_id']);
+                    ->where('uuid', $item['ticket_type_uuid'])
+                    ->firstOrFail();
 
                 $saleEndsAt = $ticketType->sale_ends_at ?? $event->ends_at;
 

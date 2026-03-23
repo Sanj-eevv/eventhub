@@ -9,7 +9,7 @@ import { organization, store } from "@/wayfinder/routes/auth/register";
 <template>
     <AuthLayout
         title="Create an account"
-        description="Join Stagefront to start booking events"
+        :description="`Join ${$page.props.name} to start booking events`"
     >
         <Head title="Register" />
 

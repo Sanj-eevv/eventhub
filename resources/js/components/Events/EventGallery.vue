@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import type { MediaResource } from "@/types/event";
 import ImageLightbox from "@/components/ImageLightbox.vue";
+import type { MediaResource } from "@/types/event";
 
 const props = defineProps<{ media?: MediaResource[] }>();
 

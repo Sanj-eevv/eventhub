@@ -17,7 +17,13 @@ import HomeHeader from "@/components/Home/HomeHeader.vue";
                 fill="var(--color-sf-gold)"
                 xmlns="http://www.w3.org/2000/svg"
             >
-                <ellipse cx="34" cy="170" rx="32" ry="20" transform="rotate(-22 34 170)" />
+                <ellipse
+                    cx="34"
+                    cy="170"
+                    rx="32"
+                    ry="20"
+                    transform="rotate(-22 34 170)"
+                />
                 <rect x="60" y="18" width="8" height="155" />
                 <path d="M68,18 C130,36 134,90 84,118 C102,96 108,50 68,34 Z" />
             </svg>

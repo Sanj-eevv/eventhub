@@ -30,6 +30,13 @@ export function formatTime(iso: string | null, timezone?: string): string {
     });
 }
 
+export function formatCurrency(cents: number, currency = "USD"): string {
+    return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency,
+    }).format(cents / 100);
+}
+
 export function toDatetimeLocal(
     iso: string | null | undefined,
     timezone?: string,

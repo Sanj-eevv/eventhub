@@ -42,7 +42,7 @@
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-ring: var(--sidebar-ring);
 
-    /* Stagefront public design tokens */
+    /* public design tokens */
     --color-sf-bg: var(--sf-bg);
     --color-sf-surface: var(--sf-surface);
     --color-sf-surface-raised: var(--sf-surface-raised);
@@ -90,7 +90,7 @@
     --sidebar-border: oklch(0.922 0 0);
     --sidebar-ring: oklch(0.708 0 0);
 
-    /* Stagefront — light mode */
+    /*light mode */
     --sf-bg: #f7f4ee;
     --sf-surface: #eee9df;
     --sf-surface-raised: #e5dfd3;
@@ -137,7 +137,7 @@
     --sidebar-border: oklch(1 0 0 / 10%);
     --sidebar-ring: oklch(0.556 0 0);
 
-    /* Stagefront — dark mode */
+    /*dark mode */
     --sf-bg: #080907;
     --sf-surface: #111110;
     --sf-surface-raised: #1a1816;
@@ -171,14 +171,14 @@
     }
 
     .font-display {
-        font-family: 'Barlow Condensed', system-ui, sans-serif;
+        font-family: "Barlow Condensed", system-ui, sans-serif;
     }
 
     .font-body {
-        font-family: 'DM Sans', system-ui, sans-serif;
+        font-family: "DM Sans", system-ui, sans-serif;
     }
 
     .font-code {
-        font-family: 'Space Mono', ui-monospace, monospace;
+        font-family: "Space Mono", ui-monospace, monospace;
     }
 }

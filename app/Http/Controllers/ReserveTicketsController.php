@@ -23,6 +23,7 @@ final class ReserveTicketsController extends Controller
 
     public function __invoke(ReserveTicketsRequest $request, Event $event): RedirectResponse
     {
+        dd($request->validated('items'));
         try {
             $order = $this->reserveTicketsAction->execute(
                 $request->user(),

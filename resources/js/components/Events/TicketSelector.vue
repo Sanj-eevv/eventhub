@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useForm } from "@inertiajs/vue3";
 import { computed, reactive } from "vue";
+import { formatCurrency } from "@/lib/utils";
 import type { TicketTypeResource } from "@/types/event";
 import { reserve } from "@/wayfinder/routes/tickets";
 
@@ -19,7 +20,7 @@ const form = useForm(() => ({
     items: props.ticketTypes
         .filter((ticketType) => quantities[ticketType.uuid] > 0)
         .map((ticketType) => ({
-            ticket_type_id: ticketType.uuid,
+            ticket_type_uuid: ticketType.uuid,
             quantity: quantities[ticketType.uuid],
         })),
 }));
@@ -34,15 +35,26 @@ const orderTotal = computed(() =>
     }, 0),
 );
 
-const formatTotal = computed(() => {
-    if (orderTotal.value === 0) {
-        return null;
-    }
-    return new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-    }).format(orderTotal.value / 100);
-});
+const formatTotal = computed(() =>
+    orderTotal.value > 0 ? formatCurrency(orderTotal.value) : null,
+);
+
+function increment(ticketType: TicketTypeResource): void {
+    const max = ticketType.max_per_user;
+    quantities[ticketType.uuid] =
+        max != null
+            ? Math.min(max, quantities[ticketType.uuid] + 1)
+            : quantities[ticketType.uuid] + 1;
+}
+
+function decrement(ticketType: TicketTypeResource): void {
+    quantities[ticketType.uuid] = Math.max(0, quantities[ticketType.uuid] - 1);
+}
+
+function isAtMax(ticketType: TicketTypeResource): boolean {
+    const max = ticketType.max_per_user;
+    return max != null && quantities[ticketType.uuid] >= max;
+}
 
 function submit(): void {
     form.post(reserve({ event: props.eventSlug }).url);
@@ -56,18 +68,14 @@ function submit(): void {
             :key="ticketType.uuid"
             :class="[
                 'bg-sf-surface border rounded-xl p-5 transition-all duration-200',
-                !ticketType.is_active
-                    ? 'border-sf-border-subtle opacity-60'
-                    : quantities[ticketType.uuid] > 0
-                      ? 'border-sf-gold/40 bg-sf-gold/5'
-                      : 'border-sf-border-subtle hover:border-sf-border',
+                quantities[ticketType.uuid] > 0
+                    ? 'border-sf-gold/40 bg-sf-gold/5'
+                    : 'border-sf-border-subtle hover:border-sf-border',
             ]"
         >
             <div class="flex items-start justify-between gap-4 mb-4">
                 <div class="flex-1">
-                    <p
-                        class="font-display text-base font-medium text-sf-text"
-                    >
+                    <p class="font-display text-base font-medium text-sf-text">
                         {{ ticketType.name }}
                     </p>
                     <p
@@ -76,16 +84,10 @@ function submit(): void {
                     >
                         {{ ticketType.description }}
                     </p>
-                    <p
-                        v-if="!ticketType.is_active"
-                        class="font-body text-xs text-sf-ember mt-1"
-                    >
-                        Not available
-                    </p>
                 </div>
                 <span
                     class="font-display text-xl font-medium text-sf-text shrink-0"
-                    >${{ ticketType.price.toFixed(2) }}</span
+                    >{{ formatCurrency(ticketType.price) }}</span
                 >
             </div>
 
@@ -93,16 +95,8 @@ function submit(): void {
                 <button
                     type="button"
                     class="h-8 w-8 flex items-center justify-center rounded border border-sf-border text-sf-muted hover:border-sf-gold hover:text-sf-gold transition-all disabled:opacity-30 disabled:pointer-events-none text-lg leading-none"
-                    :disabled="
-                        !ticketType.is_active ||
-                        quantities[ticketType.uuid] === 0
-                    "
-                    @click="
-                        quantities[ticketType.uuid] = Math.max(
-                            0,
-                            quantities[ticketType.uuid] - 1,
-                        )
-                    "
+                    :disabled="quantities[ticketType.uuid] === 0"
+                    @click="decrement(ticketType)"
                 >
                     −
                 </button>
@@ -113,26 +107,13 @@ function submit(): void {
                 <button
                     type="button"
                     class="h-8 w-8 flex items-center justify-center rounded border border-sf-border text-sf-muted hover:border-sf-gold hover:text-sf-gold transition-all disabled:opacity-30 disabled:pointer-events-none text-lg leading-none"
-                    :disabled="
-                        !ticketType.is_active ||
-                        (ticketType.max_per_user !== null &&
-                            quantities[ticketType.uuid] >=
-                                ticketType.max_per_user)
-                    "
-                    @click="
-                        quantities[ticketType.uuid] =
-                            ticketType.max_per_user !== null
-                                ? Math.min(
-                                      ticketType.max_per_user,
-                                      quantities[ticketType.uuid] + 1,
-                                  )
-                                : quantities[ticketType.uuid] + 1
-                    "
+                    :disabled="isAtMax(ticketType)"
+                    @click="increment(ticketType)"
                 >
                     +
                 </button>
                 <span
-                    v-if="ticketType.max_per_user !== null"
+                    v-if="ticketType.max_per_user != null"
                     class="font-body text-xs text-sf-tertiary ml-auto"
                     >max {{ ticketType.max_per_user }}</span
                 >
@@ -175,7 +156,7 @@ function submit(): void {
                 {{ form.errors.items }}
             </p>
             <p class="font-body text-xs text-sf-tertiary text-center">
-                Free reservations · Secure Stripe checkout
+                Secure Stripe checkout
             </p>
         </div>
     </div>

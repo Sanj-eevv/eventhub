@@ -16,7 +16,7 @@ final class TicketTypeResource extends JsonResource
             'name' => $this->name,
             'slug' => $this->slug,
             'description' => $this->description,
-            'price' => $this->price / 100,
+            'price' => $this->price,
             'capacity' => $this->capacity,
             'max_per_user' => $this->max_per_user,
             'sort_order' => $this->sort_order,
