@@ -20,6 +20,13 @@ final class OrderBuilder extends AppBuilder
         return $this->where('event_id', $event->id);
     }
 
+    public function activeReservation(): self
+    {
+        return $this
+            ->where('status', OrderStatus::Reserved)
+            ->where('expires_at', '>', now());
+    }
+
     public function expired(): self
     {
         return $this->where('status', OrderStatus::Expired);

@@ -5,7 +5,7 @@ import HomeHeader from "@/components/Home/HomeHeader.vue";
 
 <template>
     <div
-        class="min-h-screen bg-sf-bg text-sf-text font-body transition-colors duration-200"
+        class="min-h-screen flex flex-col bg-sf-bg text-sf-text font-body transition-colors duration-200"
     >
         <div
             class="fixed inset-0 flex items-center justify-center pointer-events-none select-none rotate-15"
@@ -30,7 +30,7 @@ import HomeHeader from "@/components/Home/HomeHeader.vue";
         </div>
 
         <HomeHeader />
-        <main class="pt-16">
+        <main class="flex-1 pt-16">
             <slot />
         </main>
         <HomeFooter />

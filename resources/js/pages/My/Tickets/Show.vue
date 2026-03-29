@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Head, Link } from "@inertiajs/vue3";
+import PageContainer from "@/components/PageContainer.vue";
 import HomeLayout from "@/layouts/HomeLayout.vue";
 import type { OrderTicket } from "@/types/order";
 import { index as ordersIndex } from "@/wayfinder/routes/orders";
@@ -25,7 +26,7 @@ const statusConfig: Record<string, { label: string; classes: string }> = {
     <HomeLayout>
         <Head :title="ticket.booking_reference" />
 
-        <div class="mx-auto max-w-sm px-5 sm:px-8 py-16">
+        <PageContainer>
 
             <!-- Back -->
             <Link
@@ -107,6 +108,6 @@ const statusConfig: Record<string, { label: string; classes: string }> = {
             <p class="font-body text-xs text-sf-tertiary text-center mt-6">
                 Present this QR code at the venue entrance.
             </p>
-        </div>
+        </PageContainer>
     </HomeLayout>
 </template>

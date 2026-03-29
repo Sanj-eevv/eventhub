@@ -48,6 +48,11 @@ export type MediaResource = Pick<
     "uuid" | "filename" | "size" | "is_cover" | "sort_order"
 > & { url: string };
 
+export type ActiveOrderResource = {
+    uuid: string;
+    expires_at: string;
+};
+
 export type EventFilterProps = {
     search: string;
     status: EventStatusData | null;

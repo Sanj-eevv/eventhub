@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Head, Link } from "@inertiajs/vue3";
+import PageContainer from "@/components/PageContainer.vue";
 import HomeLayout from "@/layouts/HomeLayout.vue";
 import { formatDate } from "@/lib/utils";
 import type { PaginatedResponse } from "@/types";
@@ -32,7 +33,7 @@ const statusBadgeClass: Record<string, string> = {
     <HomeLayout>
         <Head title="My Orders" />
 
-        <div class="mx-auto max-w-3xl px-5 sm:px-8 py-16">
+        <PageContainer>
 
             <div class="mb-12">
                 <p class="font-body text-xs tracking-[0.3em] uppercase text-sf-gold mb-3">Account</p>
@@ -91,6 +92,6 @@ const statusBadgeClass: Record<string, string> = {
                     </div>
                 </Link>
             </div>
-        </div>
+        </PageContainer>
     </HomeLayout>
 </template>

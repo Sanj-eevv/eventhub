@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import { Head, router } from "@inertiajs/vue3";
+import PageContainer from "@/components/PageContainer.vue";
 import HomeLayout from "@/layouts/HomeLayout.vue";
 import type { Order } from "@/types/order";
 import { show as eventShow } from "@/wayfinder/routes/events";
@@ -109,7 +110,7 @@ async function submitPayment(): Promise<void> {
     <HomeLayout>
         <Head title="Checkout" />
 
-        <div class="mx-auto max-w-xl px-5 sm:px-8 py-16">
+        <PageContainer>
 
             <div class="mb-10">
                 <p class="font-body text-xs tracking-[0.3em] uppercase text-sf-gold mb-3">Secure Checkout</p>
@@ -195,6 +196,6 @@ async function submitPayment(): Promise<void> {
             <p class="mt-4 font-body text-xs text-center text-sf-tertiary">
                 Secured by Stripe · 256-bit encryption
             </p>
-        </div>
+        </PageContainer>
     </HomeLayout>
 </template>

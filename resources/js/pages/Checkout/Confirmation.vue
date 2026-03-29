@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Head, Link } from "@inertiajs/vue3";
+import PageContainer from "@/components/PageContainer.vue";
 import HomeLayout from "@/layouts/HomeLayout.vue";
 import type { Order } from "@/types/order";
 import { index as ordersIndex } from "@/wayfinder/routes/orders";
@@ -13,7 +14,7 @@ defineProps<{
     <HomeLayout>
         <Head title="Order Confirmed" />
 
-        <div class="mx-auto max-w-xl px-5 sm:px-8 py-20">
+        <PageContainer>
 
             <!-- Success mark -->
             <div class="text-center mb-12">
@@ -75,6 +76,6 @@ defineProps<{
             >
                 View My Orders
             </Link>
-        </div>
+        </PageContainer>
     </HomeLayout>
 </template>

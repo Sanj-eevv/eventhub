@@ -13,7 +13,9 @@
         "inertiajs/inertia-laravel": "^2.0",
         "intervention/image-laravel": "^1.5",
         "laravel/framework": "^13.0",
+        "laravel/horizon": "^5.45",
         "laravel/tinker": "^3.0",
+        "predis/predis": "^3.4",
         "simplesoftwareio/simple-qrcode": "^4.2",
         "stripe/stripe-php": "^19.4"
     },

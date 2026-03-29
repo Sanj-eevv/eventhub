@@ -1,14 +1,24 @@
 <script setup lang="ts">
 import { Head, Link } from "@inertiajs/vue3";
+import { computed } from "vue";
+import PageContainer from "@/components/PageContainer.vue";
 import HomeLayout from "@/layouts/HomeLayout.vue";
 import { formatDate, formatTime } from "@/lib/utils";
 import type { Order } from "@/types/order";
+import { show as checkoutShow } from "@/wayfinder/routes/checkout";
 import { index as ordersIndex } from "@/wayfinder/routes/orders";
 import { show as ticketShow } from "@/wayfinder/routes/tickets";
 
 const props = defineProps<{
     order: Order;
 }>();
+
+const isActiveReservation = computed(
+    () =>
+        props.order.status.value === "reserved" &&
+        props.order.expires_at !== null &&
+        new Date(props.order.expires_at) > new Date(),
+);
 
 const ticketStatusConfig: Record<string, { classes: string }> = {
     active: { classes: "text-sf-gold border-sf-gold/30 bg-sf-gold/10" },
@@ -23,7 +33,7 @@ const ticketStatusConfig: Record<string, { classes: string }> = {
     <HomeLayout>
         <Head :title="`Order — ${order.event.title}`" />
 
-        <div class="mx-auto max-w-2xl px-5 sm:px-8 py-16">
+        <PageContainer>
 
             <!-- Back -->
             <Link
@@ -75,6 +85,22 @@ const ticketStatusConfig: Record<string, { classes: string }> = {
                 </div>
             </div>
 
+            <!-- Complete checkout CTA -->
+            <div
+                v-if="isActiveReservation"
+                class="bg-sf-ember/10 border border-sf-ember/20 rounded-xl px-5 py-4 flex items-center justify-between gap-4 mb-6"
+            >
+                <p class="font-body text-sm text-sf-text">
+                    Your reservation is pending payment.
+                </p>
+                <Link
+                    :href="checkoutShow({ order: order.uuid })"
+                    class="shrink-0 rounded bg-sf-ember px-4 py-2 font-body text-sm text-white hover:bg-sf-ember-hover transition-colors duration-200"
+                >
+                    Complete checkout
+                </Link>
+            </div>
+
             <!-- Tickets -->
             <div class="bg-sf-surface border border-sf-border-subtle rounded-xl overflow-hidden transition-colors duration-200">
                 <div class="px-5 py-4 border-b border-sf-border-subtle flex items-center gap-3">
@@ -121,6 +147,6 @@ const ticketStatusConfig: Record<string, { classes: string }> = {
                     </div>
                 </div>
             </div>
-        </div>
+        </PageContainer>
     </HomeLayout>
 </template>

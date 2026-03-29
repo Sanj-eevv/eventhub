@@ -3,6 +3,7 @@ import { Head, InfiniteScroll } from "@inertiajs/vue3";
 import EventCard from "@/components/Home/EventCard.vue";
 import EventCardSkeleton from "@/components/Home/EventCardSkeleton.vue";
 import EventsEmptyState from "@/components/Home/EventsEmptyState.vue";
+import PageContainer from "@/components/PageContainer.vue";
 import HomeLayout from "@/layouts/HomeLayout.vue";
 import type { PaginatedResponse } from "@/types";
 import type { EventResource } from "@/types/event";
@@ -16,7 +17,7 @@ defineProps<{
     <HomeLayout>
         <Head title="Browse Events" />
 
-        <div class="mx-auto max-w-7xl px-5 sm:px-8 py-16">
+        <PageContainer>
             <div class="mb-12 flex items-end justify-between">
                 <div>
                     <p
@@ -58,6 +59,6 @@ defineProps<{
                     </div>
                 </template>
             </InfiniteScroll>
-        </div>
+        </PageContainer>
     </HomeLayout>
 </template>

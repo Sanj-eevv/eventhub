@@ -1,18 +1,22 @@
 <script setup lang="ts">
 import { Head, Link, usePage } from "@inertiajs/vue3";
 import { computed } from "vue";
+import ActiveReservationPanel from "@/components/Events/ActiveReservationPanel.vue";
 import EventAbout from "@/components/Events/EventAbout.vue";
 import EventGallery from "@/components/Events/EventGallery.vue";
 import EventHero from "@/components/Events/EventHero.vue";
 import EventVenue from "@/components/Events/EventVenue.vue";
+import ReservationBanner from "@/components/Events/ReservationBanner.vue";
 import TicketSelector from "@/components/Events/TicketSelector.vue";
+import PageContainer from "@/components/PageContainer.vue";
 import HomeLayout from "@/layouts/HomeLayout.vue";
-import type { EventResource, TicketTypeResource } from "@/types/event";
+import type { ActiveOrderResource, EventResource, TicketTypeResource } from "@/types/event";
 import { login as loginCreate } from "@/wayfinder/routes/auth";
 
 defineProps<{
     event: EventResource;
     ticketTypes: TicketTypeResource[];
+    activeOrder: ActiveOrderResource | null;
 }>();
 
 const isAuthenticated = computed(() => !!usePage().props.auth.user);
@@ -24,7 +28,9 @@ const isAuthenticated = computed(() => !!usePage().props.auth.user);
 
         <EventHero :event="event" />
 
-        <div class="mx-auto max-w-7xl px-5 sm:px-8 py-14">
+        <ReservationBanner v-if="activeOrder" :active-order="activeOrder" />
+
+        <PageContainer>
             <div class="grid lg:grid-cols-3 gap-10 lg:gap-14">
                 <div class="lg:col-span-2 space-y-10">
                     <EventAbout :description="event.description ?? ''" />
@@ -32,8 +38,12 @@ const isAuthenticated = computed(() => !!usePage().props.auth.user);
                     <EventVenue :event="event" />
                 </div>
                 <div class="lg:col-span-1">
+                    <ActiveReservationPanel
+                        v-if="activeOrder"
+                        :active-order="activeOrder"
+                    />
                     <TicketSelector
-                        v-if="isAuthenticated"
+                        v-else-if="isAuthenticated"
                         :ticket-types="ticketTypes"
                         :event-slug="event.slug"
                         :event-timezone="event.timezone"
@@ -81,6 +91,6 @@ const isAuthenticated = computed(() => !!usePage().props.auth.user);
                     </div>
                 </div>
             </div>
-        </div>
+        </PageContainer>
     </HomeLayout>
 </template>
