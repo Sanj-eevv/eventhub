@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Jobs;
 
 use App\Models\Media;
-use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
 use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Foundation\Queue\Queueable;
 use Intervention\Image\ImageManager;
 
-final class ProcessEventMedia implements ShouldQueue
+final class ProcessEventMedia implements ShouldQueueAfterCommit
 {
     use Queueable;
 

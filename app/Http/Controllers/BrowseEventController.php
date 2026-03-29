@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Enums\EventStatus;
+use App\Enums\TicketStatus;
 use App\Http\Resources\EventResource;
 use App\Http\Resources\TicketTypeResource;
 use App\Models\Event;
@@ -39,7 +40,9 @@ final class BrowseEventController extends Controller
         }
 
         $event->load([
-            'ticketTypes' => fn ($query) => $query->active()->orderBy('sort_order'),
+            'ticketTypes' => fn ($query) => $query->active()
+                ->withCount(['tickets' => fn ($query) => $query->where('status', '!=', TicketStatus::Cancelled)])
+                ->orderBy('sort_order'),
             'media',
             'coverImage',
         ]);

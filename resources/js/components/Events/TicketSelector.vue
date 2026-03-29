@@ -1,63 +1,46 @@
 <script setup lang="ts">
-import { useForm } from "@inertiajs/vue3";
-import { computed, reactive } from "vue";
-import { formatCurrency } from "@/lib/utils";
+import { useForm, usePoll } from "@inertiajs/vue3";
+import { computed } from "vue";
+import { useTicketSaleState } from "@/composables/events/useTicketSaleState";
+import { useTicketSelection } from "@/composables/events/useTicketSelection";
+import { formatCurrency, formatDate, formatTime } from "@/lib/utils";
 import type { TicketTypeResource } from "@/types/event";
 import { reserve } from "@/wayfinder/routes/tickets";
 
 const props = defineProps<{
     ticketTypes: TicketTypeResource[];
     eventSlug: string;
+    eventTimezone: string;
 }>();
 
-const quantities = reactive<Record<string, number>>(
-    Object.fromEntries(
-        props.ticketTypes.map((ticketType) => [ticketType.uuid, 0]),
-    ),
-);
+usePoll(10_000, { only: ["ticketTypes"] });
 
-const form = useForm(() => ({
-    items: props.ticketTypes
-        .filter((ticketType) => quantities[ticketType.uuid] > 0)
-        .map((ticketType) => ({
-            ticket_type_uuid: ticketType.uuid,
-            quantity: quantities[ticketType.uuid],
-        })),
-}));
+const {
+    quantities,
+    hasSelection,
+    orderTotal,
+    selectedItems,
+    increment,
+    decrement,
+    isAtMax,
+} = useTicketSelection(props.ticketTypes);
 
-const hasSelection = computed(() =>
-    props.ticketTypes.some((ticketType) => quantities[ticketType.uuid] > 0),
-);
+const { states, countdowns } = useTicketSaleState(() => props.ticketTypes);
 
-const orderTotal = computed(() =>
-    props.ticketTypes.reduce((sum, ticketType) => {
-        return sum + ticketType.price * (quantities[ticketType.uuid] ?? 0);
-    }, 0),
-);
+const form = useForm({
+    items: [] as Array<{ ticket_type_uuid: string; quantity: number }>,
+});
 
-const formatTotal = computed(() =>
+const formattedTotal = computed(() =>
     orderTotal.value > 0 ? formatCurrency(orderTotal.value) : null,
 );
 
-function increment(ticketType: TicketTypeResource): void {
-    const max = ticketType.max_per_user;
-    quantities[ticketType.uuid] =
-        max != null
-            ? Math.min(max, quantities[ticketType.uuid] + 1)
-            : quantities[ticketType.uuid] + 1;
-}
-
-function decrement(ticketType: TicketTypeResource): void {
-    quantities[ticketType.uuid] = Math.max(0, quantities[ticketType.uuid] - 1);
-}
-
-function isAtMax(ticketType: TicketTypeResource): boolean {
-    const max = ticketType.max_per_user;
-    return max != null && quantities[ticketType.uuid] >= max;
-}
-
 function submit(): void {
-    form.post(reserve({ event: props.eventSlug }).url);
+    form.transform(() => ({
+        items: selectedItems.value.filter(
+            (item) => states.value[item.ticket_type_uuid] === "on_sale",
+        ),
+    })).post(reserve({ event: props.eventSlug }).url);
 }
 </script>
 
@@ -68,9 +51,11 @@ function submit(): void {
             :key="ticketType.uuid"
             :class="[
                 'bg-sf-surface border rounded-xl p-5 transition-all duration-200',
-                quantities[ticketType.uuid] > 0
-                    ? 'border-sf-gold/40 bg-sf-gold/5'
-                    : 'border-sf-border-subtle hover:border-sf-border',
+                states[ticketType.uuid] === 'on_sale'
+                    ? quantities[ticketType.uuid] > 0
+                        ? 'border-sf-gold/40 bg-sf-gold/5'
+                        : 'border-sf-border-subtle hover:border-sf-border'
+                    : 'border-sf-border-subtle opacity-70',
             ]"
         >
             <div class="flex items-start justify-between gap-4 mb-4">
@@ -92,32 +77,77 @@ function submit(): void {
             </div>
 
             <div class="flex items-center gap-3">
-                <button
-                    type="button"
-                    class="h-8 w-8 flex items-center justify-center rounded border border-sf-border text-sf-muted hover:border-sf-gold hover:text-sf-gold transition-all disabled:opacity-30 disabled:pointer-events-none text-lg leading-none"
-                    :disabled="quantities[ticketType.uuid] === 0"
-                    @click="decrement(ticketType)"
-                >
-                    −
-                </button>
+                <template v-if="states[ticketType.uuid] === 'on_sale'">
+                    <button
+                        type="button"
+                        class="h-8 w-8 flex items-center justify-center rounded border border-sf-border text-sf-muted hover:border-sf-gold hover:text-sf-gold transition-all disabled:opacity-30 disabled:pointer-events-none text-lg leading-none"
+                        :disabled="quantities[ticketType.uuid] === 0"
+                        @click="decrement(ticketType)"
+                    >
+                        −
+                    </button>
+                    <span
+                        class="font-code text-sm text-sf-text w-6 text-center tabular-nums"
+                        >{{ quantities[ticketType.uuid] }}</span
+                    >
+                    <button
+                        type="button"
+                        class="h-8 w-8 flex items-center justify-center rounded border border-sf-border text-sf-muted hover:border-sf-gold hover:text-sf-gold transition-all disabled:opacity-30 disabled:pointer-events-none text-lg leading-none"
+                        :disabled="isAtMax(ticketType)"
+                        @click="increment(ticketType)"
+                    >
+                        +
+                    </button>
+                    <div class="ml-auto flex flex-col items-end gap-0.5">
+                        <span
+                            v-if="ticketType.max_per_user != null"
+                            class="font-body text-xs text-sf-tertiary"
+                            >max {{ ticketType.max_per_user }}</span
+                        >
+                        <span
+                            :class="[
+                                'font-body text-xs tabular-nums',
+                                ticketType.available_capacity <= 10
+                                    ? 'text-sf-gold font-medium'
+                                    : 'text-sf-tertiary',
+                            ]"
+                        >
+                            {{
+                                ticketType.available_capacity <= 10
+                                    ? `Only ${ticketType.available_capacity} left!`
+                                    : `${ticketType.available_capacity} available`
+                            }}
+                        </span>
+                    </div>
+                </template>
+
+                <template v-else-if="states[ticketType.uuid] === 'upcoming'">
+                    <span class="font-body text-xs text-sf-muted">Opens in</span>
+                    <span class="font-code text-sm text-sf-gold tabular-nums">{{
+                        countdowns[ticketType.uuid]
+                    }}</span>
+                </template>
+
                 <span
-                    class="font-code text-sm text-sf-text w-6 text-center tabular-nums"
-                    >{{ quantities[ticketType.uuid] }}</span
+                    v-else-if="states[ticketType.uuid] === 'ended'"
+                    class="font-body text-xs text-sf-tertiary"
+                    >Sale ended</span
                 >
-                <button
-                    type="button"
-                    class="h-8 w-8 flex items-center justify-center rounded border border-sf-border text-sf-muted hover:border-sf-gold hover:text-sf-gold transition-all disabled:opacity-30 disabled:pointer-events-none text-lg leading-none"
-                    :disabled="isAtMax(ticketType)"
-                    @click="increment(ticketType)"
-                >
-                    +
-                </button>
+
                 <span
-                    v-if="ticketType.max_per_user != null"
-                    class="font-body text-xs text-sf-tertiary ml-auto"
-                    >max {{ ticketType.max_per_user }}</span
+                    v-else-if="states[ticketType.uuid] === 'sold_out'"
+                    class="font-body text-xs text-sf-tertiary"
+                    >Sold out</span
                 >
             </div>
+
+            <p
+                v-if="states[ticketType.uuid] === 'on_sale' && ticketType.sale_ends_at"
+                class="font-body text-xs text-sf-tertiary mt-2"
+            >
+                Sale ends {{ formatDate(ticketType.sale_ends_at) }} ·
+                {{ formatTime(ticketType.sale_ends_at, props.eventTimezone) }}
+            </p>
         </div>
 
         <div
@@ -131,12 +161,12 @@ function submit(): void {
 
         <div v-if="ticketTypes.length > 0" class="pt-1 space-y-3">
             <div
-                v-if="formatTotal"
+                v-if="formattedTotal"
                 class="flex justify-between items-center px-1"
             >
                 <span class="font-body text-sm text-sf-muted">Total</span>
                 <span class="font-display text-xl font-medium text-sf-text">{{
-                    formatTotal
+                    formattedTotal
                 }}</span>
             </div>
             <button

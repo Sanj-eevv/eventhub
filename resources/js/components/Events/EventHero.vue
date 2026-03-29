@@ -90,9 +90,7 @@ defineProps<{ event: EventResource }>();
             <div
                 class="absolute inset-0 bg-[radial-gradient(ellipse_70%_50%_at_50%_0%,color-mix(in_srgb,var(--sf-gold)_6%,transparent),transparent)]"
             />
-            <div
-                class="relative mx-auto max-w-7xl px-5 sm:px-8 py-16 lg:py-24"
-            >
+            <div class="relative mx-auto max-w-7xl px-5 sm:px-8 py-16 lg:py-24">
                 <div class="flex items-start gap-3 mb-6">
                     <span class="h-px w-6 bg-sf-gold mt-3 shrink-0" />
                     <div>
@@ -126,8 +124,9 @@ defineProps<{ event: EventResource }>();
                         {{ formatDate(event.starts_at, event.timezone) }} ·
                         {{ formatTime(event.starts_at, event.timezone) }}
                     </span>
-                    <span v-if="event.ends_at" class="text-sf-tertiary"
-                        >— {{ formatTime(event.ends_at, event.timezone) }}</span
+                    <span v-if="event.ends_at" class="text-sf-tertiary">
+                        {{ formatDate(event.ends_at, event.timezone) }} ·
+                        {{ formatTime(event.ends_at, event.timezone) }}</span
                     >
                     <span
                         v-if="event.venue_name"
@@ -151,10 +150,10 @@ defineProps<{ event: EventResource }>();
                                 d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"
                             />
                         </svg>
-                        {{ event.venue_name }}
-                        <span v-if="event.address" class="text-sf-tertiary"
-                            >, {{ event.address }}</span
-                        >
+                        {{ event.venue_name }},
+                        <span v-if="event.address" class="text-sf-tertiary">{{
+                            event.address
+                        }}</span>
                     </span>
                 </div>
             </div>

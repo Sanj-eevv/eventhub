@@ -41,7 +41,7 @@ export type TicketTypeResource = Pick<
     | "is_active"
     | "sale_starts_at"
     | "sale_ends_at"
-> & { max_per_user?: number };
+> & { max_per_user?: number; available_capacity: number };
 
 export type MediaResource = Pick<
     App.Models.Media,

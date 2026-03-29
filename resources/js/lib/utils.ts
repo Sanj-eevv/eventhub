@@ -26,7 +26,7 @@ export function formatTime(iso: string | null, timezone?: string): string {
         timeZone: timezone,
         hour: "numeric",
         minute: "2-digit",
-        timeZoneName: "short",
+        timeZoneName: "shortGeneric",
     });
 }
 

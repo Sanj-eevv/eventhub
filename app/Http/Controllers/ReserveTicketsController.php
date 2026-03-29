@@ -23,14 +23,8 @@ final class ReserveTicketsController extends Controller
 
     public function __invoke(ReserveTicketsRequest $request, Event $event): RedirectResponse
     {
-        dd($request->validated('items'));
         try {
-            $order = $this->reserveTicketsAction->execute(
-                $request->user(),
-                $event,
-                $request->validated('items'),
-            );
-
+            $order = $this->reserveTicketsAction->execute($request->user(), $event, $request->toDto());
             $this->createPaymentIntentAction->execute($order);
 
             return $this->redirector->route('checkout.show', ['order' => $order->uuid]);

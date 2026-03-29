@@ -6,10 +6,10 @@ namespace App\Jobs;
 
 use App\Actions\ExpireOrderAction;
 use App\Models\Order;
-use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
 use Illuminate\Foundation\Queue\Queueable;
 
-final class ExpireOrderJob implements ShouldQueue
+final class ExpireOrderJob implements ShouldQueueAfterCommit
 {
     use Queueable;
 

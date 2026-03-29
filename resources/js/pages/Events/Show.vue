@@ -36,6 +36,7 @@ const isAuthenticated = computed(() => !!usePage().props.auth.user);
                         v-if="isAuthenticated"
                         :ticket-types="ticketTypes"
                         :event-slug="event.slug"
+                        :event-timezone="event.timezone"
                     />
                     <div
                         v-else

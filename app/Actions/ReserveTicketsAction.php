@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions;
 
+use App\DataTransferObjects\TicketItemData;
 use App\Enums\OrderStatus;
 use App\Enums\TicketStatus;
 use App\Exceptions\InsufficientTicketCapacityException;
@@ -18,26 +19,27 @@ use App\Models\TicketType;
 use App\Models\User;
 use App\ValueObjects\BookingReference;
 use Carbon\CarbonImmutable;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\DatabaseManager;
+use Illuminate\Support\Collection;
 
 final class ReserveTicketsAction
 {
+    public function __construct(private readonly DatabaseManager $db) {}
+
     /**
-     * @param  array<int, array{ticket_type_uuid: string, quantity: int}>  $items
+     * @param  array<int, TicketItemData>  $items
      */
     public function execute(User $user, Event $event, array $items): Order
     {
-        return DB::transaction(function () use ($user, $event, $items): Order {
+        return $this->db->transaction(function () use ($user, $event, $items): Order {
             $reservationMinutes = (int) Setting::get('ticket_reservation_minutes', default: 15);
             $now = CarbonImmutable::now();
             $expiresAt = $now->addMinutes($reservationMinutes);
-            $subtotal = 0;
-            $resolved = [];
 
-            foreach ($items as $item) {
+            $resolved = collect($items)->map(function (TicketItemData $item) use ($now, $event, $user): array {
                 $ticketType = TicketType::query()
                     ->lockForUpdate()
-                    ->where('uuid', $item['ticket_type_uuid'])
+                    ->where('uuid', $item->ticketTypeUuid)
                     ->firstOrFail();
 
                 $saleEndsAt = $ticketType->sale_ends_at ?? $event->ends_at;
@@ -54,7 +56,7 @@ final class ReserveTicketsAction
                     ->whereIn('status', [TicketStatus::Pending, TicketStatus::Active])
                     ->count();
 
-                if ($soldCount + $item['quantity'] > $ticketType->capacity) {
+                if ($soldCount + $item->quantity > $ticketType->capacity) {
                     throw new InsufficientTicketCapacityException($ticketType);
                 }
 
@@ -63,13 +65,14 @@ final class ReserveTicketsAction
                     ->whereIn('status', [TicketStatus::Pending, TicketStatus::Active])
                     ->count();
 
-                if (null !== $ticketType->max_per_user && $userCount + $item['quantity'] > $ticketType->max_per_user) {
+                if (null !== $ticketType->max_per_user && $userCount + $item->quantity > $ticketType->max_per_user) {
                     throw new TicketLimitExceededException($ticketType);
                 }
 
-                $subtotal += $ticketType->price * $item['quantity'];
-                $resolved[] = ['ticketType' => $ticketType, 'quantity' => $item['quantity']];
-            }
+                return ['ticketType' => $ticketType, 'quantity' => $item->quantity];
+            });
+
+            $subtotal = $resolved->sum(fn (array $item): int => $item['ticketType']->price * $item['quantity']);
 
             $order = Order::query()->create([
                 'user_id' => $user->id,
@@ -82,19 +85,17 @@ final class ReserveTicketsAction
                 'expires_at' => $expiresAt,
             ]);
 
-            foreach ($resolved as $item) {
-                for ($i = 0; $i < $item['quantity']; $i++) {
-                    $order->tickets()->create([
-                        'ticket_type_id' => $item['ticketType']->id,
-                        'event_id' => $event->id,
-                        'user_id' => $user->id,
-                        'booking_reference' => (string) BookingReference::generate(),
-                        'attendee_name' => $user->name,
-                        'attendee_email' => $user->email,
-                        'status' => TicketStatus::Pending,
-                    ]);
-                }
-            }
+            $resolved->each(function (array $item) use ($order, $event, $user): void {
+                Collection::times($item['quantity'], fn () => $order->tickets()->create([
+                    'ticket_type_id' => $item['ticketType']->id,
+                    'event_id' => $event->id,
+                    'user_id' => $user->id,
+                    'booking_reference' => (string) BookingReference::generate(),
+                    'attendee_name' => $user->name,
+                    'attendee_email' => $user->email,
+                    'status' => TicketStatus::Pending,
+                ]));
+            });
 
             ExpireOrderJob::dispatch($order)->delay($expiresAt);
 

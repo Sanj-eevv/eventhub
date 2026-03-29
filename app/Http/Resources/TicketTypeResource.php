@@ -18,6 +18,7 @@ final class TicketTypeResource extends JsonResource
             'description' => $this->description,
             'price' => $this->price,
             'capacity' => $this->capacity,
+            'available_capacity' => max(0, $this->capacity - ($this->tickets_count ?? 0)),
             'max_per_user' => $this->max_per_user,
             'sort_order' => $this->sort_order,
             'is_active' => $this->is_active,

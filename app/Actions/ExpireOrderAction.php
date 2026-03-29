@@ -8,17 +8,19 @@ use App\Enums\OrderStatus;
 use App\Enums\TicketStatus;
 use App\Models\Order;
 use Carbon\CarbonImmutable;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\DatabaseManager;
 
 final class ExpireOrderAction
 {
+    public function __construct(private readonly DatabaseManager $db) {}
+
     public function execute(Order $order): void
     {
         if (OrderStatus::Reserved !== $order->status) {
             return;
         }
 
-        DB::transaction(function () use ($order): void {
+        $this->db->transaction(function () use ($order): void {
             $order->update([
                 'status' => OrderStatus::Expired,
                 'cancelled_at' => CarbonImmutable::now(),

@@ -13,6 +13,7 @@ use Illuminate\Database\DatabaseManager;
 use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
+use Psr\Log\LoggerInterface;
 use Throwable;
 
 final class StoreEventMediaAction
@@ -23,6 +24,7 @@ final class StoreEventMediaAction
         private readonly FilesystemManager $filesystem,
         private readonly DatabaseManager $databaseManager,
         private readonly Config $config,
+        private readonly LoggerInterface $logger,
     ) {}
 
     public function execute(Event $event, UploadedFile $file): Media
@@ -32,7 +34,7 @@ final class StoreEventMediaAction
         $extension = $file->extension();
         $originalPath = "media/{$event->uuid}/{$uuid}.{$extension}";
 
-        $this->filesystem->put($originalPath, $file->getContent());
+        $this->filesystem->writeStream($originalPath, fopen($file->getRealPath(), 'r'));
 
         try {
             $this->databaseManager->beginTransaction();
@@ -52,13 +54,18 @@ final class StoreEventMediaAction
                 'is_cover' => 0 === $count,
                 'sort_order' => $count,
             ]);
-            // ProcessEventMedia::dispatch($media);
+            ProcessEventMedia::dispatch($media);
             $this->databaseManager->commit();
 
             return $media;
         } catch (Throwable $exception) {
             $this->databaseManager->rollBack();
-            $this->filesystem->delete($originalPath);
+
+            if ( ! $this->filesystem->delete($originalPath)) {
+                $this->logger->warning('Failed to delete orphaned media file after transaction rollback.', [
+                    'path' => $originalPath,
+                ]);
+            }
 
             throw $exception;
         }
