@@ -41,9 +41,9 @@ final class BrowseEventController extends Controller
 
         $event->load([
             'ticketTypes' => fn ($query) => $query
-                ->withCount(
-                    ['tickets' => fn ($query) => $query->where('status', '!=', TicketStatus::Cancelled)],
-                ),
+                ->withCount([
+                    'tickets' => fn ($query) => $query->where('status', '!=', TicketStatus::Cancelled),
+                ]),
             'media',
             'coverImage',
         ]);
@@ -58,7 +58,7 @@ final class BrowseEventController extends Controller
 
         return $this->inertiaResponse->render('Events/Show', [
             'event' => EventResource::make($event),
-            'activeOrder' => $activeOrder ? ['uuid' => $activeOrder->uuid, 'expires_at' => $activeOrder->expires_at] : null,
+            'activeOrder' => $activeOrder ? ['uuid' => $activeOrder->uuid, 'expires_at' => $activeOrder->expires_at->toISOString()] : null,
         ]);
     }
 }

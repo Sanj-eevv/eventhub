@@ -6,7 +6,6 @@ import EventAbout from "@/components/Events/EventAbout.vue";
 import EventGallery from "@/components/Events/EventGallery.vue";
 import EventHero from "@/components/Events/EventHero.vue";
 import EventVenue from "@/components/Events/EventVenue.vue";
-import ReservationBanner from "@/components/Events/ReservationBanner.vue";
 import TicketSelector from "@/components/Events/TicketSelector.vue";
 import PageContainer from "@/components/PageContainer.vue";
 import HomeLayout from "@/layouts/HomeLayout.vue";
@@ -24,13 +23,10 @@ const isAuthenticated = computed(() => !!usePage().props.auth.user);
 <template>
     <HomeLayout>
         <Head :title="event.title" />
-
-        <EventHero :event="event" />
-
-        <ReservationBanner v-if="activeOrder" :active-order="activeOrder" />
-
         <PageContainer>
-            <div class="grid lg:grid-cols-3 gap-10 lg:gap-14">
+            <EventHero :event="event" />
+
+            <div class="grid lg:grid-cols-3 gap-10 lg:gap-14 py-10">
                 <div class="lg:col-span-2 space-y-10">
                     <EventAbout :description="event.description ?? ''" />
                     <EventGallery :media="event.media" />

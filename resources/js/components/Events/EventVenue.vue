@@ -5,10 +5,7 @@ defineProps<{ event: EventResource }>();
 </script>
 
 <template>
-    <div
-        v-if="event.venue_name || event.address"
-        class="border-t border-sf-border-subtle pt-10"
-    >
+    <div class="border-t border-sf-border-subtle pt-10">
         <div class="flex items-center gap-3 mb-6">
             <span class="h-px w-6 bg-sf-gold" />
             <h2 class="font-display text-2xl font-medium text-sf-text">
@@ -18,19 +15,13 @@ defineProps<{ event: EventResource }>();
         <div
             class="bg-sf-surface border border-sf-border-subtle rounded-xl p-6 space-y-2 transition-colors duration-200"
         >
-            <p
-                v-if="event.venue_name"
-                class="font-display text-lg font-medium text-sf-text"
-            >
+            <p class="font-display text-lg font-medium text-sf-text">
                 {{ event.venue_name }}
             </p>
-            <p
-                v-if="event.address"
-                class="font-body text-sm text-sf-muted"
-            >
+            <p class="font-body text-sm text-sf-muted">
                 {{ event.address }}
             </p>
-            <p v-if="event.zip" class="font-body text-sm text-sf-muted">
+            <p class="font-body text-sm text-sf-muted">
                 {{ event.zip }}
             </p>
             <a

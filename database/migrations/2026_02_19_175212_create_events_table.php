@@ -21,6 +21,11 @@ return new class() extends Migration
             $table->text('description');
             $table->datetime('starts_at');
             $table->datetime('ends_at');
+            $table->string('timezone')->default('UTC');
+            $table->string('venue_name');
+            $table->string('address');
+            $table->string('zip', 20);
+            $table->string('map_url')->nullable();
             $table->string('status')->default(EventStatus::Draft->value);
             $table->softDeletes();
             $table->timestamps();

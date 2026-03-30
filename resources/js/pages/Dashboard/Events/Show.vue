@@ -65,18 +65,6 @@ function openLightbox(index: number): void {
                 </div>
             </div>
 
-            <!-- Cover image -->
-            <div
-                v-if="event.cover_image"
-                class="relative h-64 md:h-80 overflow-hidden rounded-xl border"
-            >
-                <img
-                    :src="event.cover_image.url"
-                    :alt="event.title"
-                    class="h-full w-full object-cover"
-                />
-            </div>
-
             <div class="grid gap-6 md:grid-cols-2">
                 <!-- Event details -->
                 <Card>

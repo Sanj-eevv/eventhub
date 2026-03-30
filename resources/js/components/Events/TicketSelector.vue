@@ -122,7 +122,9 @@ function submit(): void {
                 </template>
 
                 <template v-else-if="states[ticketType.uuid] === 'upcoming'">
-                    <span class="font-body text-xs text-sf-muted">Opens in</span>
+                    <span class="font-body text-xs text-sf-muted"
+                        >Opens in</span
+                    >
                     <span class="font-code text-sm text-sf-gold tabular-nums">{{
                         countdowns[ticketType.uuid]
                     }}</span>
@@ -142,7 +144,10 @@ function submit(): void {
             </div>
 
             <p
-                v-if="states[ticketType.uuid] === 'on_sale' && ticketType.sale_ends_at"
+                v-if="
+                    states[ticketType.uuid] === 'on_sale' &&
+                    ticketType.sale_ends_at
+                "
                 class="font-body text-xs text-sf-tertiary mt-2"
             >
                 Sale ends {{ formatDate(ticketType.sale_ends_at) }} ·

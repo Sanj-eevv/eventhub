@@ -1,11 +1,21 @@
 <script setup lang="ts">
-import { Link } from "@inertiajs/vue3";
+import { router, Link } from "@inertiajs/vue3";
+import { watch } from "vue";
+import { useReservationCountdown } from "@/composables/checkout/useReservationCountdown";
 import type { ActiveOrderResource } from "@/types/event";
 import { show as checkoutShow } from "@/wayfinder/routes/checkout";
 
-defineProps<{
+const props = defineProps<{
     activeOrder: ActiveOrderResource;
 }>();
+
+const { formattedCountdown, isExpired } = useReservationCountdown(
+    props.activeOrder.expires_at,
+);
+
+watch(isExpired, (expired) => {
+    if (expired) router.reload();
+});
 </script>
 
 <template>
@@ -38,6 +48,9 @@ defineProps<{
                 checkout before selecting new tickets.
             </p>
         </div>
+        <p class="font-code text-2xl font-medium text-sf-text tracking-widest">
+            {{ formattedCountdown }}
+        </p>
         <div class="space-y-3 pt-1">
             <Link
                 :href="checkoutShow({ order: activeOrder.uuid })"

@@ -60,7 +60,7 @@ useEventListener("keydown", (event: KeyboardEvent) => {
     <Dialog v-model:open="open">
         <DialogContent
             :show-close-button="false"
-            class="w-[90vh] sm:max-w-none p-0 bg-black border-0 overflow-hidden"
+            class="w-[90vh] sm:max-w-none p-0 overflow-hidden"
         >
             <DialogTitle class="sr-only">
                 {{ currentImage?.filename }}
@@ -78,14 +78,14 @@ useEventListener("keydown", (event: KeyboardEvent) => {
                         :key="currentImage.uuid"
                         :src="currentImage.url"
                         :alt="currentImage.filename"
-                        class="absolute inset-0 h-full w-full object-contain bg-black"
+                        class="absolute inset-0 h-full w-full object-contain bg-background"
                     />
                 </Transition>
 
                 <button
                     v-if="images.length > 1"
                     type="button"
-                    class="absolute left-3 top-1/2 -translate-y-1/2 h-10 w-10 flex items-center justify-center rounded-full bg-white/10 border border-white/20 text-white/70 hover:text-white hover:bg-white/20 transition-all backdrop-blur-sm disabled:opacity-30 disabled:pointer-events-none z-10"
+                    class="absolute left-3 top-1/2 -translate-y-1/2 h-10 w-10 flex items-center justify-center rounded-full bg-secondary border border-input text-muted-foreground hover:text-foreground hover:bg-secondary/80 transition-all disabled:opacity-30 disabled:pointer-events-none z-10"
                     :disabled="currentIndex === 0"
                     @click="prev"
                 >
@@ -108,7 +108,7 @@ useEventListener("keydown", (event: KeyboardEvent) => {
                 <button
                     v-if="images.length > 1"
                     type="button"
-                    class="absolute right-3 top-1/2 -translate-y-1/2 h-10 w-10 flex items-center justify-center rounded-full bg-white/10 border border-white/20 text-white/70 hover:text-white hover:bg-white/20 transition-all backdrop-blur-sm disabled:opacity-30 disabled:pointer-events-none z-10"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 h-10 w-10 flex items-center justify-center rounded-full bg-secondary border border-input text-muted-foreground hover:text-foreground hover:bg-secondary/80 transition-all disabled:opacity-30 disabled:pointer-events-none z-10"
                     :disabled="currentIndex === images.length - 1"
                     @click="next"
                 >
@@ -130,7 +130,7 @@ useEventListener("keydown", (event: KeyboardEvent) => {
 
                 <button
                     type="button"
-                    class="absolute top-3 right-3 h-8 w-8 flex items-center justify-center rounded-full bg-white/10 border border-white/20 text-white/70 hover:text-white hover:bg-white/20 transition-all backdrop-blur-sm z-10"
+                    class="absolute top-3 right-3 h-8 w-8 flex items-center justify-center rounded-full bg-secondary border border-input text-muted-foreground hover:text-foreground hover:bg-secondary/80 transition-all z-10"
                     @click="open = false"
                 >
                     <svg
