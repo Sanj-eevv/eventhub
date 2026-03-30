@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head, Link } from "@inertiajs/vue3";
+import { Head, InfiniteScroll, Link } from "@inertiajs/vue3";
 import PageContainer from "@/components/PageContainer.vue";
 import HomeLayout from "@/layouts/HomeLayout.vue";
 import { formatCurrency, formatDate } from "@/lib/utils";
@@ -55,7 +55,7 @@ const statusBadgeClass: Record<string, string> = {
             </div>
 
             <!-- Orders list -->
-            <div v-else class="space-y-3">
+            <InfiniteScroll v-else data="orders" class="space-y-3">
                 <Link
                     v-for="order in orders.data"
                     :key="order.uuid"
@@ -88,7 +88,17 @@ const statusBadgeClass: Record<string, string> = {
                         </svg>
                     </div>
                 </Link>
-            </div>
+
+                <template #loading>
+                    <div class="mt-3 space-y-3">
+                        <div
+                            v-for="i in 3"
+                            :key="i"
+                            class="h-[74px] rounded-xl bg-sf-surface-raised animate-pulse"
+                        />
+                    </div>
+                </template>
+            </InfiniteScroll>
         </PageContainer>
     </HomeLayout>
 </template>

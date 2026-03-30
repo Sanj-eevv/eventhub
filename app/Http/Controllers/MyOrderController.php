@@ -22,14 +22,14 @@ final class MyOrderController extends Controller
             ->forUser($request->user())
             ->with(['event', 'tickets.ticketType'])
             ->latest()
-            ->paginate(perPage: $request->integer('per_page', 10), page: $request->integer('page', 1));
+            ->paginate(perPage: 10, page: $request->integer('page', 1));
 
         return $this->inertiaResponse->render('My/Orders/Index', [
-            'orders' => OrderResource::collection($orders),
+            'orders' => $this->inertiaResponse->scroll(OrderResource::collection($orders)),
         ]);
     }
 
-    public function show(Request $request, Order $order): Response
+    public function show(Order $order): Response
     {
         $this->authorize('view', $order);
 
