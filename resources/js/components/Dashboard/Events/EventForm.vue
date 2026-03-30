@@ -76,6 +76,7 @@ const form = useForm({
     ticket_types:
         props.initialValues?.ticket_types.map((ticketType) => ({
             ...ticketType,
+            price: ticketType.price / 100,
             sale_starts_at: toDatetimeLocal(
                 ticketType.sale_starts_at,
                 props.initialValues?.timezone,

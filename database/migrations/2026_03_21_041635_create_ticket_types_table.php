@@ -21,7 +21,6 @@ return new class() extends Migration
             $table->unsignedInteger('capacity');
             $table->unsignedSmallInteger('max_per_user')->nullable();
             $table->unsignedSmallInteger('sort_order')->default(0);
-            $table->boolean('is_active')->default(true);
             $table->timestamp('sale_starts_at')->nullable();
             $table->timestamp('sale_ends_at')->nullable();
             $table->timestamps();

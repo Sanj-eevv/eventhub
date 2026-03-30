@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Exceptions\ActiveReservationExistsException;
 use App\Exceptions\InsufficientTicketCapacityException;
 use App\Exceptions\InvalidStatusTransitionException;
 use App\Exceptions\MediaLimitExceededException;
@@ -27,6 +28,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
+        $exceptions->render(fn (ActiveReservationExistsException $exception) => back()->with('toast_error', $exception->getMessage()));
         $exceptions->render(fn (InvalidStatusTransitionException $exception) => back()->with('toast_error', $exception->getMessage()));
         $exceptions->render(fn (InsufficientTicketCapacityException $exception) => back()->with('toast_error', $exception->getMessage()));
         $exceptions->render(fn (TicketLimitExceededException $exception) => back()->with('toast_error', $exception->getMessage()));

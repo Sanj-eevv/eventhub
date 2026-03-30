@@ -12,6 +12,7 @@ use App\Http\Controllers\Auth\ResendEmailVerificationController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\BrowseEventController;
+use App\Http\Controllers\CancelOrderController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\Dashboard\ApproveOrganizationController;
 use App\Http\Controllers\Dashboard\CancelEventController;
@@ -63,6 +64,7 @@ Route::middleware('guest')->group(function (): void {
 Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::post('events/{event:slug}/reserve', ReserveTicketsController::class)->name('tickets.reserve');
     Route::get('checkout/{order:uuid}', [CheckoutController::class, 'show'])->name('checkout.show');
+    Route::delete('checkout/{order:uuid}', CancelOrderController::class)->name('checkout.cancel');
     Route::post('checkout/{order:uuid}/pay', ProcessPaymentController::class)->name('checkout.pay');
     Route::get('checkout/{order:uuid}/confirmation', [CheckoutController::class, 'confirmation'])->name('checkout.confirmation');
     Route::get('my/orders', [MyOrderController::class, 'index'])->name('orders.index');

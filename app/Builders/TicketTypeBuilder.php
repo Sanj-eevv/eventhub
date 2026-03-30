@@ -12,9 +12,4 @@ final class TicketTypeBuilder extends AppBuilder
     {
         return $this->where('event_id', $event->id);
     }
-
-    public function active(): self
-    {
-        return $this->where('is_active', true);
-    }
 }

@@ -19,7 +19,7 @@ final readonly class BookingReference
     public static function generate(): self
     {
         do {
-            $reference = 'EVT-'.mb_strtoupper(Str::random(6));
+            $reference = 'EVT-'.Str::of(Str::random(6))->upper();
         } while (Ticket::query()->where('booking_reference', $reference)->exists());
 
         return new self($reference);

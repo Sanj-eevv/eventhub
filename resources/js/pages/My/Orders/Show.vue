@@ -3,7 +3,7 @@ import { Head, Link } from "@inertiajs/vue3";
 import { computed } from "vue";
 import PageContainer from "@/components/PageContainer.vue";
 import HomeLayout from "@/layouts/HomeLayout.vue";
-import { formatDate, formatTime } from "@/lib/utils";
+import { formatCurrency, formatDate, formatTime } from "@/lib/utils";
 import type { Order } from "@/types/order";
 import { show as checkoutShow } from "@/wayfinder/routes/checkout";
 import { index as ordersIndex } from "@/wayfinder/routes/orders";
@@ -48,7 +48,6 @@ const ticketStatusConfig: Record<string, { classes: string }> = {
 
             <!-- Header -->
             <div class="mb-10">
-                <p class="font-code text-xs text-sf-tertiary mb-3 tracking-wider">{{ order.uuid }}</p>
                 <h1 class="font-display font-semibold text-[clamp(1.75rem,4vw,3rem)] text-sf-text leading-tight">
                     {{ order.event.title }}
                 </h1>
@@ -76,7 +75,7 @@ const ticketStatusConfig: Record<string, { classes: string }> = {
                     </div>
                     <div class="flex justify-between items-center text-sm">
                         <span class="font-body text-sf-muted">Total</span>
-                        <span class="font-display text-xl font-medium text-sf-text">{{ order.total_formatted }}</span>
+                        <span class="font-display text-xl font-medium text-sf-text">{{ formatCurrency(order.total) }}</span>
                     </div>
                     <div v-if="order.paid_at" class="flex justify-between items-center text-sm">
                         <span class="font-body text-sf-muted">Paid at</span>
@@ -115,7 +114,7 @@ const ticketStatusConfig: Record<string, { classes: string }> = {
                     >
                         <div class="flex items-start justify-between gap-4">
                             <div>
-                                <p class="font-body text-sm font-medium text-sf-text">{{ ticket.ticket_type }}</p>
+                                <p class="font-body text-sm font-medium text-sf-text">{{ ticket.ticket_type.name }}</p>
                                 <p class="font-code text-xs text-sf-tertiary mt-1">{{ ticket.booking_reference }}</p>
                                 <p v-if="ticket.attendee_name" class="font-body text-xs text-sf-muted mt-1">
                                     {{ ticket.attendee_name }}

@@ -98,7 +98,7 @@ final class Event extends Model
 
     public function ticketTypes(): HasMany
     {
-        return $this->hasMany(TicketType::class)->orderBy('sort_order');
+        return $this->hasMany(TicketType::class);
     }
 
     public function orders(): HasMany

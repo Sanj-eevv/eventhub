@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head, Link } from "@inertiajs/vue3";
-import { formatDate } from "@/lib/utils";
+import { formatCurrency, formatDate } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import DashboardLayout from "@/layouts/DashboardLayout.vue";
@@ -25,7 +25,6 @@ const breadcrumbs: BreadcrumbItem[] = [
 const statusVariantMap: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
     paid: "default",
     reserved: "secondary",
-    pending: "outline",
     expired: "destructive",
     cancelled: "destructive",
 };
@@ -61,7 +60,7 @@ const statusVariantMap: Record<string, "default" | "secondary" | "destructive" |
                         </div>
                         <div class="flex items-center gap-4">
                             <div class="text-right">
-                                <p class="font-semibold">{{ order.total_formatted }}</p>
+                                <p class="font-semibold">{{ formatCurrency(order.total) }}</p>
                                 <Badge
                                     :variant="statusVariantMap[order.status.value] ?? 'outline'"
                                     class="mt-1"

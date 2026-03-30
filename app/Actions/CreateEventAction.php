@@ -37,7 +37,6 @@ final class CreateEventAction
                     'capacity' => $ticketType->capacity,
                     'max_per_user' => $ticketType->max_per_user,
                     'sort_order' => $ticketType->sort_order,
-                    'is_active' => $ticketType->is_active,
                     'sale_starts_at' => $ticketType->sale_starts_at,
                     'sale_ends_at' => $ticketType->sale_ends_at,
                 ]);

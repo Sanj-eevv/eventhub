@@ -23,7 +23,6 @@ const addItem = () => {
         price: 0,
         capacity: 0,
         sort_order: 0,
-        is_active: true,
         sale_starts_at: null,
         sale_ends_at: null,
     });

@@ -237,7 +237,7 @@ OrderStatus::labels();  // All labels as array
 
 ```php
 $message = match ($order->status) {
-    OrderStatus::Pending => 'Your order is pending',
+    OrderStatus::Reserved => 'Your order is reserved',
     OrderStatus::Processing => 'We are processing your order',
     OrderStatus::Completed => 'Your order is complete',
     OrderStatus::Cancelled => 'Your order was cancelled',

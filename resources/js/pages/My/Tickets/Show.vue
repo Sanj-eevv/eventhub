@@ -48,7 +48,7 @@ const statusConfig: Record<string, { label: string; classes: string }> = {
                         {{ ticket.event.title }}
                     </h1>
                     <p class="font-body text-xs text-sf-muted text-center tracking-wide">
-                        {{ ticket.ticket_type }}
+                        {{ ticket.ticket_type.name }}
                     </p>
                 </div>
 

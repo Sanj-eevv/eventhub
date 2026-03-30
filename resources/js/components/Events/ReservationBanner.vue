@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link } from "@inertiajs/vue3";
-import { useReservationCountdown } from "@/composables/events/useReservationCountdown";
+import { useReservationCountdown } from "@/composables/checkout/useReservationCountdown";
 import type { ActiveOrderResource } from "@/types/event";
 import { show as checkoutShow } from "@/wayfinder/routes/checkout";
 

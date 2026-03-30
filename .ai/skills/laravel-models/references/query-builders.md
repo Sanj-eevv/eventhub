@@ -34,7 +34,7 @@ class OrderBuilder extends Builder
 {
     public function pending(): self
     {
-        return $this->where('status', OrderStatus::Pending);
+        return $this->where('status', OrderStatus::Reserved);
     }
 
     public function completed(): self

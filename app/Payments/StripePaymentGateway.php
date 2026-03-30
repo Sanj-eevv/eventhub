@@ -17,7 +17,7 @@ final class StripePaymentGateway implements PaymentGateway
     {
         $intent = $this->stripe->paymentIntents->create([
             'amount' => $data->amount,
-            'currency' => mb_strtolower($data->currency),
+            'currency' => $data->currency,
             'metadata' => [
                 'order_uuid' => $data->order_uuid,
                 'user_id' => $data->user_id,

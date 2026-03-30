@@ -227,7 +227,7 @@ class Order extends Model
 {
     public function isPending(): bool
     {
-        return $this->status === OrderStatus::Pending;
+        return $this->status === OrderStatus::Reserved;
     }
 
     public function isCompleted(): bool

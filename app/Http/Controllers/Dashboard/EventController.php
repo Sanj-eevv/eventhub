@@ -82,7 +82,7 @@ final class EventController extends Controller
         $this->authorize('view', $event);
 
         return $this->inertiaResponse->render('Dashboard/Events/Show', [
-            'event' => EventResource::make($event->load(['organization', 'user'])),
+            'event' => EventResource::make($event->load(['organization', 'user', 'ticketTypes', 'media', 'coverImage'])),
         ]);
     }
 

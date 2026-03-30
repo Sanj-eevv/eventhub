@@ -49,7 +49,7 @@ defineProps<{
                 <div class="divide-y divide-sf-border-subtle">
                     <div v-for="ticket in order.tickets" :key="ticket.uuid" class="px-5 py-4 flex items-center justify-between">
                         <div>
-                            <p class="font-body text-sm font-medium text-sf-text">{{ ticket.ticket_type }}</p>
+                            <p class="font-body text-sm font-medium text-sf-text">{{ ticket.ticket_type.name }}</p>
                             <p class="font-code text-xs text-sf-tertiary mt-1">{{ ticket.booking_reference }}</p>
                         </div>
                         <span

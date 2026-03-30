@@ -19,13 +19,8 @@ final class TicketResource extends JsonResource
             'attendee_email' => $this->attendee_email,
             'qr_code_path' => $this->qr_code_path,
             'checked_in_at' => $this->checked_in_at?->toISOString(),
-            'event' => [
-                'title' => $this->event->title,
-            ],
-            'ticket_type' => [
-                'name' => $this->ticketType->name,
-                'description' => $this->ticketType->description,
-            ],
+            'event' => EventResource::make($this->whenLoaded('event')),
+            'ticket_type' => TicketTypeResource::make($this->whenLoaded('ticketType')),
         ];
     }
 }

@@ -15,7 +15,7 @@ return new class() extends Migration
             $table->uuid()->unique();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('event_id')->constrained()->cascadeOnDelete();
-            $table->string('status')->default('pending');
+            $table->string('status')->default('reserved');
             $table->char('currency', 3)->default('USD');
             $table->unsignedBigInteger('subtotal');
             $table->unsignedBigInteger('total');

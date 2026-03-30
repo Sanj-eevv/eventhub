@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head } from "@inertiajs/vue3";
-import { formatDate } from "@/lib/utils";
+import { formatCurrency, formatDate } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -63,7 +63,7 @@ const goBack = () => window.history.back();
                         </div>
                         <div class="flex justify-between text-sm">
                             <span class="text-muted-foreground">Total</span>
-                            <span class="font-semibold">{{ order.total_formatted }}</span>
+                            <span class="font-semibold">{{ formatCurrency(order.total) }}</span>
                         </div>
                         <div v-if="order.paid_at" class="flex justify-between text-sm">
                             <span class="text-muted-foreground">Paid at</span>
@@ -89,7 +89,7 @@ const goBack = () => window.history.back();
                             >
                                 <div class="flex items-start justify-between">
                                     <div>
-                                        <p class="font-medium text-sm">{{ ticket.ticket_type }}</p>
+                                        <p class="font-medium text-sm">{{ ticket.ticket_type.name }}</p>
                                         <p class="font-mono text-xs text-muted-foreground">
                                             {{ ticket.booking_reference }}
                                         </p>

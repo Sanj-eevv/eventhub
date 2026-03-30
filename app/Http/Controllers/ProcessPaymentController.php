@@ -19,7 +19,7 @@ final class ProcessPaymentController extends Controller
 
     public function __invoke(Request $request, Order $order): RedirectResponse
     {
-        abort_if($order->user_id !== $request->user()->id, 403);
+        $this->authorize('view', $order);
 
         $this->completeOrderAction->execute($order);
 

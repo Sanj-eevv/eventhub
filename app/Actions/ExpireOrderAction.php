@@ -16,7 +16,7 @@ final class ExpireOrderAction
 
     public function execute(Order $order): void
     {
-        if (OrderStatus::Reserved !== $order->status) {
+        if ( ! $order->status->canTransitionTo(OrderStatus::Expired)) {
             return;
         }
 

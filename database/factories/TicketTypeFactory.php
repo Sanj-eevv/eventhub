@@ -29,14 +29,8 @@ final class TicketTypeFactory extends Factory
             'capacity' => $this->faker->numberBetween(10, 500),
             'max_per_user' => null,
             'sort_order' => 0,
-            'is_active' => true,
             'sale_starts_at' => $saleStartsAt,
             'sale_ends_at' => $saleEndsAt,
         ];
-    }
-
-    public function inactive(): static
-    {
-        return $this->state(fn () => ['is_active' => false]);
     }
 }

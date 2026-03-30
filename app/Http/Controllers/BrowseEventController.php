@@ -7,7 +7,6 @@ namespace App\Http\Controllers;
 use App\Enums\EventStatus;
 use App\Enums\TicketStatus;
 use App\Http\Resources\EventResource;
-use App\Http\Resources\TicketTypeResource;
 use App\Models\Event;
 use App\Models\Order;
 use Illuminate\Http\Request;
@@ -41,9 +40,10 @@ final class BrowseEventController extends Controller
         }
 
         $event->load([
-            'ticketTypes' => fn ($query) => $query->active()
-                ->withCount(['tickets' => fn ($query) => $query->where('status', '!=', TicketStatus::Cancelled)])
-                ->orderBy('sort_order'),
+            'ticketTypes' => fn ($query) => $query
+                ->withCount(
+                    ['tickets' => fn ($query) => $query->where('status', '!=', TicketStatus::Cancelled)],
+                ),
             'media',
             'coverImage',
         ]);
@@ -58,7 +58,6 @@ final class BrowseEventController extends Controller
 
         return $this->inertiaResponse->render('Events/Show', [
             'event' => EventResource::make($event),
-            'ticketTypes' => TicketTypeResource::collection($event->ticketTypes->each->setRelation('event', $event)),
             'activeOrder' => $activeOrder ? ['uuid' => $activeOrder->uuid, 'expires_at' => $activeOrder->expires_at] : null,
         ]);
     }

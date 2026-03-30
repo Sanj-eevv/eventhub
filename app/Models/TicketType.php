@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Builders\TicketTypeBuilder;
+use App\Models\Scopes\SortByOrderScope;
 use App\Traits\HasAppUuid;
 use App\Traits\HasSlug;
 use Carbon\CarbonImmutable;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Attributes\UseEloquentBuilder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -26,7 +28,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int $capacity
  * @property int|null $max_per_user
  * @property int $sort_order
- * @property bool $is_active
  * @property CarbonImmutable|null $sale_starts_at
  * @property CarbonImmutable|null $sale_ends_at
  * @property CarbonImmutable|null $created_at
@@ -34,6 +35,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read Event $event
  * @property-read Collection<int, Ticket> $tickets
  */
+#[ScopedBy(SortByOrderScope::class)]
 #[UseEloquentBuilder(TicketTypeBuilder::class)]
 final class TicketType extends Model
 {
@@ -50,7 +52,6 @@ final class TicketType extends Model
         'capacity',
         'max_per_user',
         'sort_order',
-        'is_active',
         'sale_starts_at',
         'sale_ends_at',
     ];
@@ -77,7 +78,6 @@ final class TicketType extends Model
             'capacity' => 'integer',
             'max_per_user' => 'integer',
             'sort_order' => 'integer',
-            'is_active' => 'boolean',
             'sale_starts_at' => 'datetime',
             'sale_ends_at' => 'datetime',
         ];

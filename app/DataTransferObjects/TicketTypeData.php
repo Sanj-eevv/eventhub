@@ -14,7 +14,6 @@ final readonly class TicketTypeData
         public int $price,
         public int $capacity,
         public int $sort_order,
-        public bool $is_active,
         public string $uuid,
         public ?int $max_per_user,
         public ?CarbonImmutable $sale_starts_at,

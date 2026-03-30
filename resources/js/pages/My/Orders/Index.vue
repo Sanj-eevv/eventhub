@@ -2,7 +2,7 @@
 import { Head, Link } from "@inertiajs/vue3";
 import PageContainer from "@/components/PageContainer.vue";
 import HomeLayout from "@/layouts/HomeLayout.vue";
-import { formatDate } from "@/lib/utils";
+import { formatCurrency, formatDate } from "@/lib/utils";
 import type { PaginatedResponse } from "@/types";
 import type { Order } from "@/types/order";
 import { show as ordersShow } from "@/wayfinder/routes/orders";
@@ -16,7 +16,6 @@ const statusDotClass: Record<string, string> = {
     reserved: "bg-[#7ab8d4]",
     expired: "bg-sf-ember",
     cancelled: "bg-sf-ember",
-    pending: "bg-sf-tertiary",
 };
 
 const statusBadgeClass: Record<string, string> = {
@@ -24,7 +23,6 @@ const statusBadgeClass: Record<string, string> = {
     reserved: "text-[#7ab8d4] border-[#7ab8d4]/30 bg-[#7ab8d4]/10",
     expired: "text-sf-ember border-sf-ember/30 bg-sf-ember/10",
     cancelled: "text-sf-ember border-sf-ember/30 bg-sf-ember/10",
-    pending: "text-sf-muted border-sf-border",
 };
 
 </script>
@@ -73,7 +71,6 @@ const statusBadgeClass: Record<string, string> = {
                             {{ order.event.title }}
                         </p>
                         <div class="flex items-center gap-3 mt-1">
-                            <span class="font-code text-xs text-sf-tertiary truncate">{{ order.uuid }}</span>
                             <span v-if="order.paid_at" class="font-body text-xs text-sf-tertiary shrink-0">Paid {{ formatDate(order.paid_at) }}</span>
                         </div>
                     </div>
@@ -81,7 +78,7 @@ const statusBadgeClass: Record<string, string> = {
                     <!-- Right side -->
                     <div class="flex items-center gap-4 shrink-0">
                         <div class="text-right">
-                            <p class="font-display text-lg font-medium text-sf-text">{{ order.total_formatted }}</p>
+                            <p class="font-display text-lg font-medium text-sf-text">{{ formatCurrency(order.total) }}</p>
                             <span :class="['inline-block font-body text-xs px-2 py-0.5 rounded border mt-1', statusBadgeClass[order.status.value] ?? 'text-sf-muted border-sf-border']">
                                 {{ order.status.label }}
                             </span>

@@ -10,12 +10,11 @@ import ReservationBanner from "@/components/Events/ReservationBanner.vue";
 import TicketSelector from "@/components/Events/TicketSelector.vue";
 import PageContainer from "@/components/PageContainer.vue";
 import HomeLayout from "@/layouts/HomeLayout.vue";
-import type { ActiveOrderResource, EventResource, TicketTypeResource } from "@/types/event";
+import type { ActiveOrderResource, EventResource } from "@/types/event";
 import { login as loginCreate } from "@/wayfinder/routes/auth";
 
 defineProps<{
     event: EventResource;
-    ticketTypes: TicketTypeResource[];
     activeOrder: ActiveOrderResource | null;
 }>();
 
@@ -44,7 +43,7 @@ const isAuthenticated = computed(() => !!usePage().props.auth.user);
                     />
                     <TicketSelector
                         v-else-if="isAuthenticated"
-                        :ticket-types="ticketTypes"
+                        :ticket-types="event.ticket_types"
                         :event-slug="event.slug"
                         :event-timezone="event.timezone"
                     />

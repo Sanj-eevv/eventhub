@@ -38,7 +38,6 @@ export type TicketTypeResource = Pick<
     | "price"
     | "capacity"
     | "sort_order"
-    | "is_active"
     | "sale_starts_at"
     | "sale_ends_at"
 > & { max_per_user?: number; available_capacity: number };

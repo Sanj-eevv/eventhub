@@ -16,22 +16,11 @@ final class OrderResource extends JsonResource
             'status' => ['value' => $this->status->value, 'label' => $this->status->label()],
             'currency' => $this->currency,
             'total' => $this->total,
-            'total_formatted' => '$'.number_format($this->total / 100, 2),
             'reserved_at' => $this->reserved_at?->toISOString(),
             'expires_at' => $this->expires_at?->toISOString(),
             'paid_at' => $this->paid_at?->toISOString(),
-            'event' => [
-                'title' => $this->event->title,
-                'slug' => $this->event->slug,
-            ],
-            'tickets' => $this->tickets->map(fn (mixed $ticket) => [
-                'uuid' => $ticket->uuid,
-                'booking_reference' => $ticket->booking_reference,
-                'status' => $ticket->status->value,
-                'qr_code_path' => $ticket->qr_code_path,
-                'attendee_name' => $ticket->attendee_name,
-                'ticket_type' => $ticket->ticketType->name,
-            ]),
+            'event' => EventResource::make($this->whenLoaded('event')),
+            'tickets' => TicketResource::collection($this->whenLoaded('tickets')),
         ];
     }
 }

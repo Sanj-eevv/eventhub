@@ -7,6 +7,7 @@ namespace App\Actions;
 use App\DataTransferObjects\TicketItemData;
 use App\Enums\OrderStatus;
 use App\Enums\TicketStatus;
+use App\Exceptions\ActiveReservationExistsException;
 use App\Exceptions\InsufficientTicketCapacityException;
 use App\Exceptions\TicketLimitExceededException;
 use App\Exceptions\TicketSaleClosedException;
@@ -31,6 +32,10 @@ final class ReserveTicketsAction
      */
     public function execute(User $user, Event $event, array $items): Order
     {
+        if (Order::query()->forUser($user)->forEvent($event)->activeReservation()->exists()) {
+            throw new ActiveReservationExistsException();
+        }
+
         return $this->db->transaction(function () use ($user, $event, $items): Order {
             $reservationMinutes = (int) Setting::get('ticket_reservation_minutes', default: 15);
             $now = CarbonImmutable::now();
