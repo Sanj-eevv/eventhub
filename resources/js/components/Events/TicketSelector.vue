@@ -64,7 +64,6 @@ function submit(): void {
                         {{ ticketType.name }}
                     </p>
                     <p
-                        v-if="ticketType.description"
                         class="font-body text-sm text-sf-muted mt-1 leading-relaxed"
                     >
                         {{ ticketType.description }}
@@ -150,7 +149,8 @@ function submit(): void {
                 "
                 class="font-body text-xs text-sf-tertiary mt-2"
             >
-                Sale ends {{ formatDate(ticketType.sale_ends_at) }} ·
+                Sale ends
+                {{ formatDate(ticketType.sale_ends_at, props.eventTimezone) }} ·
                 {{ formatTime(ticketType.sale_ends_at, props.eventTimezone) }}
             </p>
         </div>
@@ -189,9 +189,6 @@ function submit(): void {
                 class="font-body text-xs text-sf-ember text-center"
             >
                 {{ form.errors.items }}
-            </p>
-            <p class="font-body text-xs text-sf-tertiary text-center">
-                Secure Stripe checkout
             </p>
         </div>
     </div>

@@ -3,7 +3,9 @@ import type { TicketTypeResource } from "@/types/event";
 
 export function useTicketSelection(ticketTypes: TicketTypeResource[]) {
     const quantities = reactive<Record<string, number>>(
-        Object.fromEntries(ticketTypes.map((ticketType) => [ticketType.uuid, 0])),
+        Object.fromEntries(
+            ticketTypes.map((ticketType) => [ticketType.uuid, 0]),
+        ),
     );
 
     const hasSelection = computed(() =>
@@ -12,7 +14,8 @@ export function useTicketSelection(ticketTypes: TicketTypeResource[]) {
 
     const orderTotal = computed(() =>
         ticketTypes.reduce(
-            (sum, ticketType) => sum + ticketType.price * quantities[ticketType.uuid],
+            (sum, ticketType) =>
+                sum + ticketType.price * quantities[ticketType.uuid],
             0,
         ),
     );
@@ -35,7 +38,10 @@ export function useTicketSelection(ticketTypes: TicketTypeResource[]) {
     }
 
     function decrement(ticketType: TicketTypeResource): void {
-        quantities[ticketType.uuid] = Math.max(0, quantities[ticketType.uuid] - 1);
+        quantities[ticketType.uuid] = Math.max(
+            0,
+            quantities[ticketType.uuid] - 1,
+        );
     }
 
     function isAtMax(ticketType: TicketTypeResource): boolean {

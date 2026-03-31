@@ -45,7 +45,6 @@ function openLightbox(index: number): void {
             </button>
         </div>
     </div>
-
     <ImageLightbox
         v-model:open="isOpen"
         :images="images"

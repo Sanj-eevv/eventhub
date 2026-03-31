@@ -26,7 +26,7 @@ const isAuthenticated = computed(() => !!usePage().props.auth.user);
         <PageContainer>
             <EventHero :event="event" />
 
-            <div class="grid lg:grid-cols-3 gap-10 lg:gap-14 py-10">
+            <div class="grid lg:grid-cols-3 gap-10 lg:gap-14 pt-10">
                 <div class="lg:col-span-2 space-y-10">
                     <EventAbout :description="event.description ?? ''" />
                     <EventGallery :media="event.media" />

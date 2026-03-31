@@ -21,7 +21,7 @@ const canAccessDashboard = computed(() => canDashboard("access"));
 
 <template>
     <footer
-        class="mt-28 border-t border-sf-border-subtle transition-colors duration-200"
+        class="border-t border-sf-border-subtle transition-colors duration-200"
     >
         <div
             class="mx-auto max-w-7xl px-5 sm:px-8 py-10 flex flex-col sm:flex-row items-center justify-between gap-5"

@@ -31,10 +31,10 @@ final class EventSeeder extends Seeder
         ]);
 
         $timezone = 'Asia/Kathmandu';
-        $startsAt = CarbonImmutable::now($timezone)->addDays(5)->setTime(9, 0)->utc();
+        $startsAt = CarbonImmutable::now($timezone)->addDays(5)->setTime(9, 0);
         $endsAt = $startsAt->addDay()->setTime(18, 0);
         $saleStartsAt = $startsAt->subDays(2)->setTime(9, 0);
-        $saleOpenSince = CarbonImmutable::now($timezone)->subDay()->setTime(9, 0)->utc();
+        $saleOpenSince = CarbonImmutable::now($timezone)->subDay()->setTime(9, 0);
 
         $event = Event::query()->create([
             'organization_id' => $organization->id,
@@ -83,7 +83,7 @@ final class EventSeeder extends Seeder
                 'capacity' => 30,
                 'max_per_user' => 1,
                 'sort_order' => 2,
-                'sale_starts_at' => $saleStartsAt,
+                'sale_starts_at' => $saleOpenSince,
                 'sale_ends_at' => $startsAt->subDay()->setTime(23, 59),
             ],
         ];
