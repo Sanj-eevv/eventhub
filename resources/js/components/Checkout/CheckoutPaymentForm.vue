@@ -30,7 +30,7 @@ async function handleSubmit(): Promise<void> {
 <template>
     <div>
         <div
-            class="bg-sf-surface border border-sf-border-subtle rounded-xl overflow-hidden mb-6 transition-colors duration-200"
+            class="bg-sf-surface border border-sf-border-subtle rounded-xl overflow-hidden mb-10 transition-colors duration-200"
         >
             <div class="px-5 py-4 border-b border-sf-border-subtle">
                 <h2 class="font-display text-lg font-medium text-sf-text">
@@ -61,7 +61,11 @@ async function handleSubmit(): Promise<void> {
                 v-if="isProcessing"
                 class="flex items-center justify-center gap-2"
             >
-                <svg class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                <svg
+                    class="h-4 w-4 animate-spin"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                >
                     <circle
                         class="opacity-25"
                         cx="12"
@@ -80,9 +84,5 @@ async function handleSubmit(): Promise<void> {
             </span>
             <span v-else>Pay {{ total }}</span>
         </button>
-
-        <p class="mt-4 font-body text-xs text-center text-sf-tertiary">
-            Secured by Stripe · 256-bit encryption
-        </p>
     </div>
 </template>

@@ -9,12 +9,15 @@ use App\Enums\TicketStatus;
 use App\Events\OrderCompleted;
 use App\Models\Order;
 use Carbon\CarbonImmutable;
+use Illuminate\Database\DatabaseManager;
 use Illuminate\Events\Dispatcher;
-use Illuminate\Support\Facades\DB;
 
 final class CompleteOrderAction
 {
-    public function __construct(private readonly Dispatcher $dispatcher) {}
+    public function __construct(
+        private readonly DatabaseManager $databaseManager,
+        private readonly Dispatcher $dispatcher,
+    ) {}
 
     public function execute(Order $order): Order
     {
@@ -22,7 +25,7 @@ final class CompleteOrderAction
             return $order;
         }
 
-        DB::transaction(function () use ($order): void {
+        $this->databaseManager->transaction(function () use ($order): void {
             $order->update([
                 'status' => OrderStatus::Paid,
                 'paid_at' => CarbonImmutable::now(),

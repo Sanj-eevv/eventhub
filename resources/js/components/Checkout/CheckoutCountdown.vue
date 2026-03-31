@@ -39,7 +39,9 @@ defineProps<{
             </span>
         </div>
 
-        <div class="h-px bg-sf-border-subtle mb-8 overflow-hidden rounded-full">
+        <div
+            class="h-px bg-sf-border-subtle mb-10 overflow-hidden rounded-full"
+        >
             <div
                 class="h-full transition-all duration-1000 rounded-full"
                 :class="isExpiringSoon ? 'bg-sf-ember' : 'bg-sf-gold'"

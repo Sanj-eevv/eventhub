@@ -1,14 +1,21 @@
-import { computed, onMounted, onUnmounted, shallowRef } from "vue";
+import { useNow } from "@vueuse/core";
+import { computed } from "vue";
 
-export function useReservationCountdown(expiresAt: string, reservedAt?: string) {
+const EXPIRING_SOON_THRESHOLD_SECONDS = 120;
+
+export function useReservationCountdown(
+    expiresAt: string,
+    reservedAt?: string,
+) {
     const expiresAtMs = new Date(expiresAt).getTime();
-
     const totalSeconds = reservedAt
         ? (expiresAtMs - new Date(reservedAt).getTime()) / 1000
         : null;
 
-    const secondsRemaining = shallowRef(
-        Math.max(0, Math.floor((expiresAtMs - Date.now()) / 1000)),
+    const now = useNow({ interval: 1000 });
+
+    const secondsRemaining = computed(() =>
+        Math.max(0, Math.floor((expiresAtMs - now.value.getTime()) / 1000)),
     );
 
     const formattedCountdown = computed(() => {
@@ -18,25 +25,23 @@ export function useReservationCountdown(expiresAt: string, reservedAt?: string) 
     });
 
     const isActive = computed(() => secondsRemaining.value > 0);
-    const isExpiringSoon = computed(() => secondsRemaining.value > 0 && secondsRemaining.value < 120);
+    const isExpiringSoon = computed(
+        () =>
+            secondsRemaining.value > 0 &&
+            secondsRemaining.value < EXPIRING_SOON_THRESHOLD_SECONDS,
+    );
     const isExpired = computed(() => secondsRemaining.value === 0);
     const timerProgress = computed(() =>
         totalSeconds !== null && totalSeconds > 0
             ? secondsRemaining.value / totalSeconds
-            : null,
+            : 0,
     );
 
-    let interval: ReturnType<typeof setInterval>;
-
-    onMounted(() => {
-        interval = setInterval(() => {
-            const remaining = Math.max(0, Math.floor((expiresAtMs - Date.now()) / 1000));
-            secondsRemaining.value = remaining;
-            if (remaining === 0) clearInterval(interval);
-        }, 1000);
-    });
-
-    onUnmounted(() => clearInterval(interval));
-
-    return { formattedCountdown, isActive, isExpiringSoon, isExpired, timerProgress };
+    return {
+        formattedCountdown,
+        isActive,
+        isExpiringSoon,
+        isExpired,
+        timerProgress,
+    };
 }

@@ -94,7 +94,10 @@ function confirmCancel(): void {
             </div>
         </PageContainer>
 
-        <AlertDialog :open="showCancelDialog" @update:open="showCancelDialog = $event">
+        <AlertDialog
+            :open="showCancelDialog"
+            @update:open="showCancelDialog = $event"
+        >
             <AlertDialogContent class="bg-sf-surface border-sf-border">
                 <AlertDialogHeader>
                     <AlertDialogTitle class="font-display text-sf-text">

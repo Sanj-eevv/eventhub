@@ -1,7 +1,7 @@
-import { onMounted, shallowRef } from "vue";
+import { loadStripe } from "@stripe/stripe-js";
+import type { Stripe, StripeCardElement } from "@stripe/stripe-js";
+import { onMounted, onUnmounted, shallowRef } from "vue";
 import type { Ref } from "vue";
-
-declare const Stripe: (key: string) => any;
 
 export function useStripePayment(
     publishableKey: string,
@@ -11,15 +11,18 @@ export function useStripePayment(
     const paymentError = shallowRef<string | null>(null);
     const isProcessing = shallowRef(false);
 
-    let stripeInstance: ReturnType<typeof Stripe> | null = null;
-    let cardElement: any = null;
+    let stripeInstance: Stripe | null = null;
+    let cardElement: StripeCardElement | null = null;
 
-    onMounted(() => {
+    onMounted(async () => {
         if (!mountRef.value) return;
 
         const isDark = document.documentElement.classList.contains("dark");
 
-        stripeInstance = Stripe(publishableKey);
+        stripeInstance = await loadStripe(publishableKey);
+
+        if (!stripeInstance) return;
+
         const elements = stripeInstance.elements();
 
         cardElement = elements.create("card", {
@@ -39,6 +42,8 @@ export function useStripePayment(
         cardElement.mount(mountRef.value);
     });
 
+    onUnmounted(() => cardElement?.destroy());
+
     async function submitPayment(): Promise<boolean> {
         if (!stripeInstance || !cardElement || isProcessing.value) return false;
 
@@ -56,7 +61,11 @@ export function useStripePayment(
             return false;
         }
 
-        return paymentIntent?.status === "succeeded";
+        const succeeded = paymentIntent?.status === "succeeded";
+
+        if (!succeeded) isProcessing.value = false;
+
+        return succeeded;
     }
 
     return { paymentError, isProcessing, submitPayment };

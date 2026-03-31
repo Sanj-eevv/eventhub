@@ -7,7 +7,6 @@ namespace App\Http\Controllers;
 use App\Actions\CompleteOrderAction;
 use App\Models\Order;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 
 final class ProcessPaymentController extends Controller
@@ -17,7 +16,7 @@ final class ProcessPaymentController extends Controller
         private readonly Redirector $redirector,
     ) {}
 
-    public function __invoke(Request $request, Order $order): RedirectResponse
+    public function __invoke(Order $order): RedirectResponse
     {
         $this->authorize('view', $order);
 

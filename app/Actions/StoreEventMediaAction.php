@@ -8,6 +8,7 @@ use App\Exceptions\MediaLimitExceededException;
 use App\Jobs\ProcessEventMedia;
 use App\Models\Event;
 use App\Models\Media;
+use Illuminate\Bus\Dispatcher;
 use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Filesystem\FilesystemManager;
@@ -23,6 +24,7 @@ final class StoreEventMediaAction
     public function __construct(
         private readonly FilesystemManager $filesystem,
         private readonly DatabaseManager $databaseManager,
+        private readonly Dispatcher $dispatcher,
         private readonly Config $config,
         private readonly LoggerInterface $logger,
     ) {}
@@ -54,7 +56,7 @@ final class StoreEventMediaAction
                 'is_cover' => 0 === $count,
                 'sort_order' => $count,
             ]);
-            ProcessEventMedia::dispatch($media);
+            $this->dispatcher->dispatch(new ProcessEventMedia($media));
             $this->databaseManager->commit();
 
             return $media;

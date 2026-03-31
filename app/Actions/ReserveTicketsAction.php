@@ -20,12 +20,16 @@ use App\Models\TicketType;
 use App\Models\User;
 use App\ValueObjects\BookingReference;
 use Carbon\CarbonImmutable;
+use Illuminate\Bus\Dispatcher;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Support\Collection;
 
 final class ReserveTicketsAction
 {
-    public function __construct(private readonly DatabaseManager $db) {}
+    public function __construct(
+        private readonly DatabaseManager $databaseManager,
+        private readonly Dispatcher $dispatcher,
+    ) {}
 
     /**
      * @param  array<int, TicketItemData>  $items
@@ -36,7 +40,7 @@ final class ReserveTicketsAction
             throw new ActiveReservationExistsException();
         }
 
-        return $this->db->transaction(function () use ($user, $event, $items): Order {
+        return $this->databaseManager->transaction(function () use ($user, $event, $items): Order {
             $reservationMinutes = (int) Setting::get('ticket_reservation_minutes', default: 15);
             $now = CarbonImmutable::now();
             $expiresAt = $now->addMinutes($reservationMinutes);
@@ -102,7 +106,7 @@ final class ReserveTicketsAction
                 ]));
             });
 
-            ExpireOrderJob::dispatch($order)->delay($expiresAt);
+            $this->dispatcher->dispatch((new ExpireOrderJob($order))->delay($expiresAt));
 
             return $order;
         });

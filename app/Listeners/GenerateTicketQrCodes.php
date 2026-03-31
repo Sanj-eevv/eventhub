@@ -6,11 +6,10 @@ namespace App\Listeners;
 
 use App\Events\OrderCompleted;
 use App\Models\Ticket;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Storage;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
-final class GenerateTicketQrCodes implements ShouldQueue
+final class GenerateTicketQrCodes
 {
     public function handle(OrderCompleted $event): void
     {

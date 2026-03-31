@@ -9,7 +9,7 @@ defineProps<{
 
 <template>
     <div
-        class="bg-sf-surface border border-sf-border-subtle rounded-xl overflow-hidden mb-6 transition-colors duration-200"
+        class="bg-sf-surface border border-sf-border-subtle rounded-xl overflow-hidden mb-10 transition-colors duration-200"
     >
         <div class="px-5 py-4 border-b border-sf-border-subtle">
             <h2 class="font-display text-lg font-medium text-sf-text">
