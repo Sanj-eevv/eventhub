@@ -7,7 +7,6 @@ import { formatCurrency, formatDateTime } from "@/lib/utils";
 import type { OrderResource } from "@/types/order";
 import { show as checkoutShow } from "@/wayfinder/routes/checkout";
 import { index as ordersIndex } from "@/wayfinder/routes/orders";
-import { show as ticketShow } from "@/wayfinder/routes/tickets";
 
 const props = defineProps<{
     order: OrderResource;
@@ -165,12 +164,6 @@ const ticketStatusConfig: Record<string, { classes: string }> = {
                                 >
                                     {{ ticket.status }}
                                 </span>
-                                <Link
-                                    :href="ticketShow({ ticket: ticket.uuid })"
-                                    class="font-body text-xs text-sf-gold hover:text-sf-text transition-colors"
-                                >
-                                    View ticket →
-                                </Link>
                             </div>
                         </div>
                         <img
