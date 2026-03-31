@@ -27,11 +27,6 @@ final class OrderBuilder extends AppBuilder
             ->where('expires_at', '>', now());
     }
 
-    public function expired(): self
-    {
-        return $this->where('status', OrderStatus::Expired);
-    }
-
     public function paid(): self
     {
         return $this->where('status', OrderStatus::Paid);

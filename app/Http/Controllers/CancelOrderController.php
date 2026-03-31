@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Actions\CancelOrderAction;
+use App\Actions\CancelReservedOrderAction;
 use App\Models\Order;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Redirector;
@@ -12,7 +12,7 @@ use Illuminate\Routing\Redirector;
 final class CancelOrderController extends Controller
 {
     public function __construct(
-        private readonly CancelOrderAction $cancelOrderAction,
+        private readonly CancelReservedOrderAction $cancelReservedOrderAction,
         private readonly Redirector $redirector,
     ) {}
 
@@ -20,7 +20,7 @@ final class CancelOrderController extends Controller
     {
         $this->authorize('cancel', $order);
 
-        $this->cancelOrderAction->execute($order);
+        $this->cancelReservedOrderAction->execute($order);
 
         return $this->redirector->route('events.show', ['event' => $order->event->slug])
             ->with('toastSuccess', 'Your reservation has been cancelled.');

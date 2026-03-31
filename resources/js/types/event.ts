@@ -42,6 +42,20 @@ export type TicketTypeResource = Pick<
     | "sale_ends_at"
 > & { max_per_user?: number; available_capacity: number };
 
+export type TicketResource = Pick<
+    App.Models.Ticket,
+    | "uuid"
+    | "booking_reference"
+    | "attendee_name"
+    | "attendee_email"
+    | "checked_in_at"
+> & {
+    status: App.Enums.TicketStatus;
+    qr_code_url: string | null;
+    ticket_type?: TicketTypeResource;
+    event?: EventResource;
+};
+
 export type MediaResource = Pick<
     App.Models.Media,
     "uuid" | "filename" | "size" | "is_cover" | "sort_order"

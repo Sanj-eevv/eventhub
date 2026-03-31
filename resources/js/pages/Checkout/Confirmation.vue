@@ -2,11 +2,11 @@
 import { Head, Link } from "@inertiajs/vue3";
 import PageContainer from "@/components/PageContainer.vue";
 import HomeLayout from "@/layouts/HomeLayout.vue";
-import type { Order } from "@/types/order";
+import type { OrderResource } from "@/types/order";
 import { index as ordersIndex } from "@/wayfinder/routes/orders";
 
 defineProps<{
-    order: Order;
+    order: OrderResource
 }>();
 </script>
 

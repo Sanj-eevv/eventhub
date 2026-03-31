@@ -34,6 +34,7 @@ use App\Http\Controllers\MyOrderController;
 use App\Http\Controllers\MyTicketController;
 use App\Http\Controllers\ProcessPaymentController;
 use App\Http\Controllers\ReserveTicketsController;
+use App\Http\Controllers\TicketQrCodeController;
 use App\Http\Controllers\Webhooks\StripeWebhookController;
 use Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests;
 use Illuminate\Support\Facades\Route;
@@ -70,6 +71,7 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::get('my/orders', [MyOrderController::class, 'index'])->name('orders.index');
     Route::get('my/orders/{order:uuid}', [MyOrderController::class, 'show'])->name('orders.show');
     Route::get('my/tickets/{ticket:uuid}', [MyTicketController::class, 'show'])->name('tickets.show');
+    Route::get('my/tickets/{ticket:uuid}/qr-code', TicketQrCodeController::class)->name('tickets.qr-code');
 });
 
 Route::middleware('auth')->group(function (): void {

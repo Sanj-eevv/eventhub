@@ -37,6 +37,19 @@ export function formatCurrency(cents: number, currency = "USD"): string {
     }).format(cents / 100);
 }
 
+export function formatDateTime(iso: string | null, timezone?: string): string {
+    if (!iso) return "";
+    return new Date(iso).toLocaleString("en-US", {
+        timeZone: timezone,
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+        timeZoneName: "shortGeneric",
+    });
+}
+
 export function toDatetimeLocal(
     iso: string | null | undefined,
     timezone?: string,

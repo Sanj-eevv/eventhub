@@ -7,7 +7,6 @@ namespace App\Http\Controllers;
 use App\Enums\OrderStatus;
 use App\Http\Resources\OrderResource;
 use App\Models\Order;
-use Carbon\CarbonImmutable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Redirector;
 use Inertia\Response;
@@ -27,10 +26,6 @@ final class CheckoutController extends Controller
 
         if (OrderStatus::Reserved !== $order->status) {
             return $this->redirector->route('events.show', ['event' => $order->event->slug])->with('toast_info', 'This order is no longer available for checkout.');
-        }
-
-        if ($order->expires_at->isBefore(CarbonImmutable::now())) {
-            return $this->redirector->route('events.show', ['event' => $order->event->slug])->with('toast_info', 'Your reservation has expired.');
         }
 
         $order->load(['tickets.ticketType', 'event']);

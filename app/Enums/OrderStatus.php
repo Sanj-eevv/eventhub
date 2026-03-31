@@ -8,7 +8,6 @@ enum OrderStatus: string
 {
     case Reserved = 'reserved';
     case Paid = 'paid';
-    case Expired = 'expired';
     case Cancelled = 'cancelled';
 
     public function label(): string
@@ -16,7 +15,6 @@ enum OrderStatus: string
         return match ($this) {
             self::Reserved => 'Reserved',
             self::Paid => 'Paid',
-            self::Expired => 'Expired',
             self::Cancelled => 'Cancelled',
         };
     }
@@ -24,9 +22,9 @@ enum OrderStatus: string
     public function canTransitionTo(self $status): bool
     {
         return match ($this) {
-            self::Reserved => in_array($status, [self::Paid, self::Expired, self::Cancelled], true),
+            self::Reserved => in_array($status, [self::Paid, self::Cancelled], true),
             self::Paid => self::Cancelled === $status,
-            self::Expired, self::Cancelled => false,
+            self::Cancelled => false,
         };
     }
 }

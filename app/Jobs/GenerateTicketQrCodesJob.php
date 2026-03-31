@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Jobs;
 
-use App\Actions\ExpireOrderAction;
+use App\Actions\GenerateTicketQrCodesAction;
 use App\Models\Order;
-use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 
-final class ExpireOrderJob implements ShouldQueueAfterCommit
+final class GenerateTicketQrCodesJob implements ShouldQueue
 {
     use Queueable;
 
@@ -17,7 +17,7 @@ final class ExpireOrderJob implements ShouldQueueAfterCommit
 
     public function __construct(public readonly Order $order) {}
 
-    public function handle(ExpireOrderAction $action): void
+    public function handle(GenerateTicketQrCodesAction $action): void
     {
         $action->execute($this->order);
     }

@@ -7,8 +7,10 @@ namespace App\Actions;
 use App\Enums\OrderStatus;
 use App\Enums\TicketStatus;
 use App\Events\OrderCompleted;
+use App\Jobs\GenerateTicketQrCodesJob;
 use App\Models\Order;
 use Carbon\CarbonImmutable;
+use Illuminate\Bus\Dispatcher as BusDispatcher;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Events\Dispatcher;
 
@@ -17,6 +19,7 @@ final class CompleteOrderAction
     public function __construct(
         private readonly DatabaseManager $databaseManager,
         private readonly Dispatcher $dispatcher,
+        private readonly BusDispatcher $busDispatcher,
     ) {}
 
     public function execute(Order $order): Order
@@ -37,6 +40,7 @@ final class CompleteOrderAction
         });
 
         $this->dispatcher->dispatch(new OrderCompleted($order));
+        $this->busDispatcher->dispatch(new GenerateTicketQrCodesJob($order));
 
         return $order;
     }

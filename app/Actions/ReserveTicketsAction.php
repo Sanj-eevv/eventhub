@@ -41,7 +41,7 @@ final class ReserveTicketsAction
         }
 
         return $this->databaseManager->transaction(function () use ($user, $event, $items): Order {
-            $reservationMinutes = (int) Setting::get('ticket_reservation_minutes', default: 15);
+            $reservationMinutes = (int) Setting::get('ticket_reservation_minutes', default: 5);
             $now = CarbonImmutable::now();
             $expiresAt = $now->addMinutes($reservationMinutes);
 

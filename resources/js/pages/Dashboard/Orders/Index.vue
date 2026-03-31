@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import DashboardLayout from "@/layouts/DashboardLayout.vue";
 import type { BreadcrumbItem } from "@/types";
-import type { Order } from "@/types/order";
+import type { OrderResource } from "@/types/order";
 import type { PaginatedResponse } from "@/types";
 import { index as dashboardIndex } from "@/wayfinder/routes/dashboard";
 import {
@@ -14,7 +14,7 @@ import {
 } from "@/wayfinder/routes/dashboard/orders";
 
 defineProps<{
-    orders: PaginatedResponse<Order>;
+    orders: PaginatedResponse<OrderResource>;
 }>();
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -25,7 +25,6 @@ const breadcrumbs: BreadcrumbItem[] = [
 const statusVariantMap: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
     paid: "default",
     reserved: "secondary",
-    expired: "destructive",
     cancelled: "destructive",
 };
 </script>

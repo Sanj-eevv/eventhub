@@ -18,12 +18,12 @@ import {
 import { useReservationCountdown } from "@/composables/checkout/useReservationCountdown";
 import HomeLayout from "@/layouts/HomeLayout.vue";
 import { formatCurrency } from "@/lib/utils";
-import type { Order } from "@/types/order";
+import type { OrderResource } from "@/types/order";
 import { cancel, pay } from "@/wayfinder/routes/checkout";
 import { show as eventShow } from "@/wayfinder/routes/events";
 
 const props = defineProps<{
-    order: Order;
+    order: OrderResource
     client_secret: string;
     stripe_publishable_key: string;
 }>();

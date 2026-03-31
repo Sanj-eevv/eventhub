@@ -13,7 +13,7 @@ return new class() extends Migration
         Schema::create('tickets', function (Blueprint $table): void {
             $table->id();
             $table->uuid()->unique();
-            $table->foreignId('order_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('order_id')->constrained()->restrictOnDelete();
             $table->foreignId('ticket_type_id')->constrained()->restrictOnDelete();
             $table->foreignId('event_id')->constrained()->cascadeOnDelete();
             $table->foreignId('user_id')->constrained()->restrictOnDelete();

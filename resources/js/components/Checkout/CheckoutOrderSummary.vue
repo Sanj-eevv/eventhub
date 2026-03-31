@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { formatCurrency } from "@/lib/utils";
-import type { Order } from "@/types/order";
+import type { OrderResource } from "@/types/order";
 
 defineProps<{
-    order: Order;
+    order: OrderResource
 }>();
 </script>
 

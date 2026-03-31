@@ -6,14 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import DashboardLayout from "@/layouts/DashboardLayout.vue";
 import type { BreadcrumbItem } from "@/types";
-import type { Order } from "@/types/order";
+import type { OrderResource } from "@/types/order";
 import { index as dashboardIndex } from "@/wayfinder/routes/dashboard";
 import {
     index as dashboardOrdersIndex,
 } from "@/wayfinder/routes/dashboard/orders";
 
 const props = defineProps<{
-    order: Order;
+    order: OrderResource
 }>();
 
 const breadcrumbs: BreadcrumbItem[] = [
