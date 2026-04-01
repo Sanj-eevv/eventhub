@@ -23,6 +23,8 @@ final class ScanTicketController extends Controller
 
     public function __invoke(ScanTicketRequest $request, Event $event): JsonResponse
     {
+        $this->authorize('checkIn', $event);
+
         $ticket = Ticket::query()
             ->where('event_id', $event->id)
             ->where('booking_reference', $request->validated('booking_reference'))

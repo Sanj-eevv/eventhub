@@ -9,7 +9,7 @@ use App\Models\Order;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Redirector;
 
-final class CancelOrderController extends Controller
+final class CancelReservedOrderController extends Controller
 {
     public function __construct(
         private readonly CancelReservedOrderAction $cancelReservedOrderAction,

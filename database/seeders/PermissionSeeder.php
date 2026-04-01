@@ -25,6 +25,7 @@ final class PermissionSeeder extends Seeder
             ['name' => 'role:create', 'description' => 'Create role'],
             ['name' => 'role:update', 'description' => 'Update role'],
             ['name' => 'role:delete', 'description' => 'Delete role'],
+            ['name' => 'setting:manage', 'description' => 'Manage platform settings'],
         ];
 
         Permission::upsert($permissionData, ['name'], ['description', 'updated_at']);
@@ -32,13 +33,14 @@ final class PermissionSeeder extends Seeder
         $permissions = Permission::query()->pluck('id', 'name');
 
         $allPermissionIds = $permissions->values()->all();
+        $adminPermissionIds = $permissions->except(['setting:manage'])->values()->all();
         $orgAdminPermissionIds = $permissions->only([
             'event:create', 'event:update', 'event:delete',
             'user:create', 'user:update', 'user:delete',
         ])->values()->all();
 
         Role::superAdminRole()->permissions()->sync($allPermissionIds);
-        Role::adminRole()->permissions()->sync($allPermissionIds);
+        Role::adminRole()->permissions()->sync($adminPermissionIds);
         Role::organizationAdminRole()->permissions()->sync($orgAdminPermissionIds);
     }
 }

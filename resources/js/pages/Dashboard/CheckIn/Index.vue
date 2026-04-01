@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { BrowserMultiFormatReader } from "@zxing/browser";
 import { Head } from "@inertiajs/vue3";
+import { nextTick, onUnmounted, ref } from "vue";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -34,6 +35,9 @@ type ScanResult = {
 const bookingReference = ref("");
 const isLoading = ref(false);
 const scanResult = ref<ScanResult | null>(null);
+const isCameraActive = ref(false);
+const videoRef = ref<HTMLVideoElement | null>(null);
+let scannerControls: { stop: () => void } | null = null;
 
 async function submitScan(): Promise<void> {
     if (!bookingReference.value.trim() || isLoading.value) {
@@ -61,17 +65,64 @@ async function submitScan(): Promise<void> {
         });
 
         const data = await response.json();
-        scanResult.value = data;
 
-        if (data.success) {
+        if (response.ok) {
+            scanResult.value = {
+                success: true,
+                message: "Check-in successful",
+                attendee_name: data.attendee_name,
+                ticket_type: data.ticket_type?.name,
+            };
             bookingReference.value = "";
+        } else {
+            scanResult.value = {
+                success: false,
+                message: data.error ?? "An error occurred.",
+            };
         }
     } catch {
-        scanResult.value = { success: false, message: "Network error. Please try again." };
+        scanResult.value = {
+            success: false,
+            message: "Network error. Please try again.",
+        };
     } finally {
         isLoading.value = false;
     }
 }
+
+async function startCamera(): Promise<void> {
+    isCameraActive.value = true;
+    await nextTick();
+
+    if (!videoRef.value) {
+        return;
+    }
+
+    const codeReader = new BrowserMultiFormatReader();
+
+    scannerControls = await codeReader.decodeFromVideoDevice(
+        undefined,
+        videoRef.value,
+        (result) => {
+            if (!result) {
+                return;
+            }
+            stopCamera();
+            bookingReference.value = result.getText();
+            submitScan();
+        },
+    );
+}
+
+function stopCamera(): void {
+    scannerControls?.stop();
+    scannerControls = null;
+    isCameraActive.value = false;
+}
+
+onUnmounted(() => {
+    stopCamera();
+});
 </script>
 
 <template>
@@ -83,6 +134,25 @@ async function submitScan(): Promise<void> {
 
             <div class="mx-auto max-w-md space-y-6">
                 <div class="space-y-3">
+                    <Button
+                        variant="outline"
+                        class="w-full h-12 text-base"
+                        @click="isCameraActive ? stopCamera() : startCamera()"
+                    >
+                        {{ isCameraActive ? "Stop Camera" : "Scan QR Code" }}
+                    </Button>
+                    <div
+                        v-if="isCameraActive"
+                        class="overflow-hidden rounded-lg bg-black aspect-video"
+                    >
+                        <video
+                            ref="videoRef"
+                            class="w-full h-full object-cover"
+                        />
+                    </div>
+                </div>
+
+                <div class="space-y-3">
                     <Label
                         for="booking_reference"
                         class="text-base font-medium"
@@ -93,7 +163,7 @@ async function submitScan(): Promise<void> {
                         id="booking_reference"
                         v-model="bookingReference"
                         class="h-14 text-lg tracking-widest uppercase"
-                        placeholder="e.g. ABC-123456"
+                        placeholder="e.g. EVT-123456"
                         autocomplete="off"
                         autocorrect="off"
                         autocapitalize="characters"
@@ -111,17 +181,33 @@ async function submitScan(): Promise<void> {
                 <div
                     v-if="scanResult"
                     class="rounded-lg p-5"
-                    :class="scanResult.success ? 'bg-green-50 border border-green-200' : 'bg-destructive/10 border border-destructive/20'"
+                    :class="
+                        scanResult.success
+                            ? 'bg-green-50 border border-green-200'
+                            : 'bg-destructive/10 border border-destructive/20'
+                    "
                 >
                     <p
                         class="font-semibold text-lg"
-                        :class="scanResult.success ? 'text-green-800' : 'text-destructive'"
+                        :class="
+                            scanResult.success
+                                ? 'text-green-800'
+                                : 'text-destructive'
+                        "
                     >
-                        {{ scanResult.success ? "Check-In Successful" : "Check-In Failed" }}
+                        {{
+                            scanResult.success
+                                ? "Check-In Successful"
+                                : "Check-In Failed"
+                        }}
                     </p>
                     <p
                         class="mt-1 text-sm"
-                        :class="scanResult.success ? 'text-green-700' : 'text-destructive/80'"
+                        :class="
+                            scanResult.success
+                                ? 'text-green-700'
+                                : 'text-destructive/80'
+                        "
                     >
                         {{ scanResult.message }}
                     </p>

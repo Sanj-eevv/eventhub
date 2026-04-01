@@ -16,9 +16,11 @@ use App\Listeners\SendOrganizationRejectedMail;
 use App\Listeners\VoidEventTickets;
 use App\Models\Event as EventModel;
 use App\Models\Order;
+use App\Models\Setting;
 use App\Models\Ticket;
 use App\Models\User;
 use App\Policies\OrderPolicy;
+use App\Policies\SettingPolicy;
 use App\Policies\TicketPolicy;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Middleware\Authenticate;
@@ -65,6 +67,7 @@ final class AppServiceProvider extends ServiceProvider
     private function configurePolicies(): void
     {
         Gate::policy(Order::class, OrderPolicy::class);
+        Gate::policy(Setting::class, SettingPolicy::class);
         Gate::policy(Ticket::class, TicketPolicy::class);
 
         Gate::define('access-dashboard', fn (User $user): bool => $user->hasAnyRole(PreservedRoleList::adminRoles()));

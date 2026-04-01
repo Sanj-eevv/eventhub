@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Dashboard;
 
-use App\Enums\CheckInPermissions;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\EventResource;
 use App\Models\Event;
-use Illuminate\Http\Request;
 use Inertia\Response;
 use Inertia\ResponseFactory;
 
@@ -18,9 +16,9 @@ final class CheckInController extends Controller
         private readonly ResponseFactory $inertiaResponse,
     ) {}
 
-    public function index(Request $request, Event $event): Response
+    public function index(Event $event): Response
     {
-        abort_if( ! $request->user()->hasPermission(CheckInPermissions::AllowManage), 403);
+        $this->authorize('checkIn', $event);
 
         return $this->inertiaResponse->render('Dashboard/CheckIn/Index', [
             'event' => EventResource::make($event),

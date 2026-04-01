@@ -8,6 +8,7 @@ import {
     LayoutGrid,
     LogOut,
     Receipt,
+    Settings,
     ShieldCheck,
     Users,
 } from "lucide-vue-next";
@@ -46,6 +47,7 @@ import { index as ordersIndex } from "@/wayfinder/routes/dashboard/orders";
 import { index as orgsIndex } from "@/wayfinder/routes/dashboard/organizations";
 import { index as rolesIndex } from "@/wayfinder/routes/dashboard/roles";
 import { index as usersIndex } from "@/wayfinder/routes/dashboard/users";
+import { edit as settingsEdit } from "@/wayfinder/routes/dashboard/settings";
 import AppLogo from "./AppLogo.vue";
 import UserRoleBadge from "./UserRoleBadge.vue";
 import { Avatar, AvatarFallback } from "./ui/avatar";
@@ -95,6 +97,13 @@ const mainNavItems: NavItem[] = [
         icon: ShieldCheck,
         matchPrefix: true,
         show: usePermission("role")("viewAny"),
+    },
+    {
+        title: "Settings",
+        href: settingsEdit(),
+        icon: Settings,
+        matchPrefix: true,
+        show: usePermission("setting")("update"),
     },
 ];
 const visibleNavItems = computed(() =>

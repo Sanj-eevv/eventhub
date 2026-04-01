@@ -8,6 +8,7 @@ use App\Models\Event;
 use App\Models\Order;
 use App\Models\Organization;
 use App\Models\Role;
+use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
 
@@ -33,6 +34,9 @@ final class SharedPermissionResource
             'event' => $this->abilities(Event::class),
             'order' => [
                 'viewAny' => Gate::forUser($this->user)->allows('viewAny', Order::class),
+            ],
+            'setting' => [
+                'update' => Gate::forUser($this->user)->allows('update', Setting::class),
             ],
             'dashboard' => [
                 'access' => Gate::forUser($this->user)->allows('access-dashboard'),
