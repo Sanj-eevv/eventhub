@@ -46,4 +46,14 @@ final class StripePaymentGateway implements PaymentGateway
     {
         $this->stripe->paymentIntents->cancel($paymentIntentId);
     }
+
+    public function refundPaymentIntent(string $paymentIntentId, int $amount): string
+    {
+        $refund = $this->stripe->refunds->create([
+            'payment_intent' => $paymentIntentId,
+            'amount' => $amount,
+        ]);
+
+        return $refund->id;
+    }
 }

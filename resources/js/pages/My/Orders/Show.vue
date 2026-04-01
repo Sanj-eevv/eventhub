@@ -1,12 +1,31 @@
 <script setup lang="ts">
-import { Head, Link } from "@inertiajs/vue3";
-import { computed } from "vue";
+import { Head, Link, useForm } from "@inertiajs/vue3";
+import { computed, ref } from "vue";
 import PageContainer from "@/components/PageContainer.vue";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
 import HomeLayout from "@/layouts/HomeLayout.vue";
 import { formatCurrency, formatDateTime } from "@/lib/utils";
 import type { OrderResource } from "@/types/order";
 import { show as checkoutShow } from "@/wayfinder/routes/checkout";
-import { index as ordersIndex } from "@/wayfinder/routes/orders";
+import {
+    cancel as orderCancel,
+    index as ordersIndex,
+} from "@/wayfinder/routes/orders";
 
 const props = defineProps<{
     order: OrderResource;
@@ -18,6 +37,13 @@ const isActiveReservation = computed(
         props.order.expires_at !== null &&
         new Date(props.order.expires_at) > new Date(),
 );
+
+const cancelForm = useForm({});
+const showCancelDialog = ref(false);
+
+function cancelOrder(): void {
+    cancelForm.delete(orderCancel({ order: props.order.uuid }).url);
+}
 
 const ticketStatusConfig: Record<string, { classes: string }> = {
     active: { classes: "text-sf-gold border-sf-gold/30 bg-sf-gold/10" },
@@ -34,7 +60,7 @@ const ticketStatusConfig: Record<string, { classes: string }> = {
         <PageContainer>
             <Link
                 :href="ordersIndex()"
-                class="inline-flex items-center gap-2 font-body text-sm text-sf-tertiary hover:text-sf-muted transition-colors mb-10"
+                class="inline-flex items-center gap-2 font-body text-sm text-sf-muted hover:text-sf-text transition-colors mb-10"
             >
                 <svg
                     class="h-4 w-4"
@@ -99,6 +125,67 @@ const ticketStatusConfig: Record<string, { classes: string }> = {
                         <span class="font-body text-sf-muted">Paid at</span>
                         <span class="font-body text-sm text-sf-text">{{
                             formatDateTime(order.paid_at)
+                        }}</span>
+                    </div>
+                </div>
+                <div
+                    v-if="order.status.value === 'paid'"
+                    class="px-5 py-4 border-t border-sf-border-subtle"
+                >
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger as-child>
+                                <button
+                                    :disabled="
+                                        !order.can_cancel ||
+                                        cancelForm.processing
+                                    "
+                                    class="font-body text-xs text-sf-ember hover:text-sf-text transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    @click="
+                                        order.can_cancel &&
+                                        (showCancelDialog = true)
+                                    "
+                                >
+                                    Cancel order
+                                </button>
+                            </TooltipTrigger>
+                            <TooltipContent v-if="!order.can_cancel">
+                                <p class="font-body text-xs">
+                                    The cancellation window for this order has
+                                    passed.
+                                </p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+                </div>
+            </div>
+            <div
+                v-if="order.refund_status"
+                class="bg-sf-surface border border-sf-border-subtle rounded-xl overflow-hidden mb-6 transition-colors duration-200"
+            >
+                <div
+                    class="px-5 py-4 border-b border-sf-border-subtle flex items-center gap-3"
+                >
+                    <span class="h-px w-4 bg-sf-gold" />
+                    <h2 class="font-display text-lg font-medium text-sf-text">
+                        Refund
+                    </h2>
+                </div>
+                <div class="px-5 py-4 space-y-3">
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="font-body text-sf-muted">Status</span>
+                        <span
+                            class="font-body text-sm text-sf-text capitalize"
+                            >{{ order.refund_status }}</span
+                        >
+                    </div>
+                    <div
+                        v-if="order.refunded_at"
+                        class="flex justify-between items-center text-sm"
+                    >
+                        <span class="font-body text-sf-muted">Refunded at</span>
+                        <span class="font-body text-sm text-sf-text">{{
+                            formatDateTime(order.refunded_at)
                         }}</span>
                     </div>
                 </div>
@@ -176,5 +263,36 @@ const ticketStatusConfig: Record<string, { classes: string }> = {
                 </div>
             </div>
         </PageContainer>
+        <AlertDialog
+            :open="showCancelDialog"
+            @update:open="showCancelDialog = $event"
+        >
+            <AlertDialogContent class="bg-sf-surface border-sf-border">
+                <AlertDialogHeader>
+                    <AlertDialogTitle class="font-display text-sf-text">
+                        Cancel order
+                    </AlertDialogTitle>
+                    <AlertDialogDescription class="font-body text-sf-muted">
+                        Are you sure you want to cancel this order? A refund
+                        will be issued if applicable.
+                    </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                    <AlertDialogCancel
+                        :disabled="cancelForm.processing"
+                        class="font-body border-sf-border text-sf-muted bg-transparent hover:bg-sf-surface-raised hover:text-sf-text"
+                    >
+                        Keep order
+                    </AlertDialogCancel>
+                    <AlertDialogAction
+                        :disabled="cancelForm.processing"
+                        class="font-body bg-sf-ember text-white hover:bg-sf-ember-hover"
+                        @click="cancelOrder"
+                    >
+                        Yes, cancel
+                    </AlertDialogAction>
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
     </HomeLayout>
 </template>

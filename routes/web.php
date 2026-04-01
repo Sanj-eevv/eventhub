@@ -13,9 +13,12 @@ use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\BrowseEventController;
 use App\Http\Controllers\CancelOrderController;
+use App\Http\Controllers\CancelPaidOrderController;
+use App\Http\Controllers\CheckoutConfirmationController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\Dashboard\ApproveOrganizationController;
 use App\Http\Controllers\Dashboard\CancelEventController;
+use App\Http\Controllers\Dashboard\CancelOrderController as DashboardCancelOrderController;
 use App\Http\Controllers\Dashboard\CheckInController;
 use App\Http\Controllers\Dashboard\DashboardOrderController;
 use App\Http\Controllers\Dashboard\EventController;
@@ -66,9 +69,10 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::get('checkout/{order:uuid}', [CheckoutController::class, 'show'])->name('checkout.show');
     Route::delete('checkout/{order:uuid}', CancelOrderController::class)->name('checkout.cancel');
     Route::post('checkout/{order:uuid}/pay', ProcessPaymentController::class)->name('checkout.pay');
-    Route::get('checkout/{order:uuid}/confirmation', [CheckoutController::class, 'confirmation'])->name('checkout.confirmation');
+    Route::get('checkout/{order:uuid}/confirmation', CheckoutConfirmationController::class)->name('checkout.confirmation');
     Route::get('my/orders', [MyOrderController::class, 'index'])->name('orders.index');
     Route::get('my/orders/{order:uuid}', [MyOrderController::class, 'show'])->name('orders.show');
+    Route::delete('my/orders/{order:uuid}', CancelPaidOrderController::class)->name('orders.cancel');
     Route::get('my/tickets/{ticket:uuid}/qr-code', TicketQrCodeController::class)->name('tickets.qr-code');
 });
 
@@ -95,6 +99,7 @@ Route::middleware('auth')->group(function (): void {
         Route::post('events/{event}/media/{media:uuid}/cover', SetEventMediaCoverController::class)->name('events.media.cover');
 
         Route::resource('orders', DashboardOrderController::class)->only(['index', 'show']);
+        Route::delete('orders/{order:uuid}', DashboardCancelOrderController::class)->name('orders.cancel');
         Route::get('events/{event}/check-in', [CheckInController::class, 'index'])->name('events.check-in');
         Route::post('events/{event}/check-in', ScanTicketController::class)->name('events.check-in.scan');
     });

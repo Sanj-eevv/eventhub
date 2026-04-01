@@ -14,4 +14,6 @@ interface PaymentGateway
     public function retrievePaymentIntent(string $paymentIntentId): PaymentIntentResult;
 
     public function cancelPaymentIntent(string $paymentIntentId): void;
+
+    public function refundPaymentIntent(string $paymentIntentId, int $amount): string;
 }

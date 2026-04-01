@@ -6,51 +6,81 @@ import type { OrderResource } from "@/types/order";
 import { index as ordersIndex } from "@/wayfinder/routes/orders";
 
 defineProps<{
-    order: OrderResource
+    order: OrderResource;
 }>();
 </script>
 
 <template>
     <HomeLayout>
         <Head title="Order Confirmed" />
-
         <PageContainer>
-
-            <!-- Success mark -->
             <div class="text-center mb-12">
                 <div class="inline-flex items-center justify-center mb-8">
                     <div class="relative h-20 w-20">
-                        <div class="absolute inset-0 rounded-full border border-sf-gold/30 animate-ping" />
-                        <div class="absolute inset-0 rounded-full border border-sf-gold/20" />
-                        <div class="relative h-full w-full rounded-full bg-sf-gold/10 border border-sf-gold/40 flex items-center justify-center">
-                            <svg class="h-8 w-8 text-sf-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                        <div
+                            class="absolute inset-0 rounded-full border border-sf-gold/30 animate-ping"
+                        />
+                        <div
+                            class="absolute inset-0 rounded-full border border-sf-gold/20"
+                        />
+                        <div
+                            class="relative h-full w-full rounded-full bg-sf-gold/10 border border-sf-gold/40 flex items-center justify-center"
+                        >
+                            <svg
+                                class="h-8 w-8 text-sf-gold"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                stroke-width="1.75"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M4.5 12.75l6 6 9-13.5"
+                                />
                             </svg>
                         </div>
                     </div>
                 </div>
-
-                <p class="font-body text-xs tracking-[0.3em] uppercase text-sf-gold mb-4">Booking Confirmed</p>
-                <h1 class="font-display font-semibold text-[clamp(2rem,5vw,3.5rem)] text-sf-text leading-tight mb-4">
-                    You're going<br><em>to the show.</em>
-                </h1>
-                <p class="font-body font-light text-sf-muted mb-2">
-                    Your tickets for <strong class="text-sf-text font-normal">{{ order.event.title }}</strong> are confirmed.
+                <p
+                    class="font-body text-xs tracking-[0.3em] uppercase text-sf-gold mb-4"
+                >
+                    Booking Confirmed
                 </p>
-                <p class="font-code text-xs text-sf-tertiary">Order ref: {{ order.uuid }}</p>
+                <p class="font-body font-light text-sf-muted mb-2">
+                    Your tickets for
+                    <strong class="text-sf-text font-normal">{{
+                        order.event!.title
+                    }}</strong>
+                    are confirmed.
+                </p>
             </div>
-
-            <!-- Tickets -->
-            <div class="bg-sf-surface border border-sf-border-subtle rounded-xl overflow-hidden mb-8 transition-colors duration-200">
-                <div class="px-5 py-4 border-b border-sf-border-subtle flex items-center gap-3">
+            <div
+                class="bg-sf-surface border border-sf-border-subtle rounded-xl overflow-hidden mb-8 transition-colors duration-200"
+            >
+                <div
+                    class="px-5 py-4 border-b border-sf-border-subtle flex items-center gap-3"
+                >
                     <span class="h-px w-4 bg-sf-gold" />
-                    <h2 class="font-display text-lg font-medium text-sf-text">Your Tickets</h2>
+                    <h2 class="font-display text-lg font-medium text-sf-text">
+                        Your Tickets
+                    </h2>
                 </div>
                 <div class="divide-y divide-sf-border-subtle">
-                    <div v-for="ticket in order.tickets" :key="ticket.uuid" class="px-5 py-4 flex items-center justify-between">
+                    <div
+                        v-for="ticket in order.tickets"
+                        :key="ticket.uuid"
+                        class="px-5 py-4 flex items-center justify-between"
+                    >
                         <div>
-                            <p class="font-body text-sm font-medium text-sf-text">{{ ticket.ticket_type.name }}</p>
-                            <p class="font-code text-xs text-sf-tertiary mt-1">{{ ticket.booking_reference }}</p>
+                            <p
+                                class="font-body text-sm font-medium text-sf-text"
+                            >
+                                {{ ticket.ticket_type!.name }}
+                            </p>
+                            <p class="font-code text-xs text-sf-tertiary mt-1">
+                                {{ ticket.booking_reference }}
+                            </p>
                         </div>
                         <span
                             :class="[

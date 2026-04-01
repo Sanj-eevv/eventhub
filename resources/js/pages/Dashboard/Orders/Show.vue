@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head } from "@inertiajs/vue3";
+import { Head, useForm } from "@inertiajs/vue3";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import type { OrderResource } from "@/types/order";
 import { index as dashboardIndex } from "@/wayfinder/routes/dashboard";
 import {
     index as dashboardOrdersIndex,
+    cancel as orderCancel,
 } from "@/wayfinder/routes/dashboard/orders";
 
 const props = defineProps<{
@@ -30,6 +31,12 @@ const ticketStatusVariantMap: Record<string, "default" | "secondary" | "destruct
 };
 
 const goBack = () => window.history.back();
+
+const cancelForm = useForm({});
+
+function cancelOrder() {
+    cancelForm.delete(orderCancel({ order: props.order.uuid }));
+}
 </script>
 
 <template>
@@ -73,7 +80,21 @@ const goBack = () => window.history.back();
                             <span class="text-muted-foreground">Reserved at</span>
                             <span>{{ formatDate(order.reserved_at) }}</span>
                         </div>
+                        <div v-if="order.refund_status" class="flex justify-between text-sm">
+                            <span class="text-muted-foreground">Refund</span>
+                            <span class="capitalize">{{ order.refund_status }}</span>
+                        </div>
                     </CardContent>
+                    <div v-if="order.status.value === 'paid'" class="px-6 pb-4">
+                        <Button
+                            variant="destructive"
+                            size="sm"
+                            :disabled="cancelForm.processing"
+                            @click="cancelOrder"
+                        >
+                            Cancel order
+                        </Button>
+                    </div>
                 </Card>
 
                 <Card>

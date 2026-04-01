@@ -11,7 +11,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Redirector;
 use Inertia\Response;
 use Inertia\ResponseFactory;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 final class CheckoutController extends Controller
 {
@@ -34,21 +33,6 @@ final class CheckoutController extends Controller
             'order' => OrderResource::make($order),
             'client_secret' => $order->stripe_client_secret,
             'stripe_publishable_key' => config('services.stripe.key'),
-        ]);
-    }
-
-    public function confirmation(Order $order): Response
-    {
-        $this->authorize('view', $order);
-
-        if (OrderStatus::Paid !== $order->status) {
-            throw new NotFoundHttpException();
-        }
-
-        $order->load(['tickets.ticketType', 'event']);
-
-        return $this->inertiaResponse->render('Checkout/Confirmation', [
-            'order' => OrderResource::make($order),
         ]);
     }
 }

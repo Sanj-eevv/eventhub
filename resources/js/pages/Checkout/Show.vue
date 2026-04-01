@@ -23,7 +23,7 @@ import { cancel, pay } from "@/wayfinder/routes/checkout";
 import { show as eventShow } from "@/wayfinder/routes/events";
 
 const props = defineProps<{
-    order: OrderResource
+    order: OrderResource;
     client_secret: string;
     stripe_publishable_key: string;
 }>();
@@ -35,7 +35,8 @@ const cancelling = ref(false);
 const showCancelDialog = ref(false);
 
 watch(isExpired, (expired) => {
-    if (expired) router.visit(eventShow({ event: props.order.event.slug }).url);
+    if (expired)
+        router.visit(eventShow({ event: props.order.event!.slug }).url);
 });
 
 function onPaymentSucceeded(): void {

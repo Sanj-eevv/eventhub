@@ -23,6 +23,6 @@ final class CancelOrderController extends Controller
         $this->cancelReservedOrderAction->execute($order);
 
         return $this->redirector->route('events.show', ['event' => $order->event->slug])
-            ->with('toastSuccess', 'Your reservation has been cancelled.');
+            ->with('toast_success', 'Your reservation has been cancelled.');
     }
 }
