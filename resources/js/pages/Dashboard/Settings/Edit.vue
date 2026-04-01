@@ -51,7 +51,7 @@ function submit(): void {
                 </p>
             </div>
 
-            <form class="max-w-2xl space-y-6" @submit.prevent="submit">
+            <form class="space-y-6" @submit.prevent="submit">
                 <Card>
                     <CardHeader>
                         <CardTitle>Reservations</CardTitle>
@@ -73,7 +73,7 @@ function submit(): void {
                                 type="number"
                                 min="1"
                                 max="60"
-                                class="w-40"
+                                class="w-full"
                             />
                             <p
                                 v-if="form.errors.ticket_reservation_minutes"
@@ -103,7 +103,7 @@ function submit(): void {
                                 v-model.number="form.cancellation_cutoff_hours"
                                 type="number"
                                 min="0"
-                                class="w-40"
+                                class="w-full"
                             />
                             <p
                                 v-if="form.errors.cancellation_cutoff_hours"
@@ -123,7 +123,7 @@ function submit(): void {
                                 type="number"
                                 min="0"
                                 max="100"
-                                class="w-40"
+                                class="w-full"
                             />
                             <p
                                 v-if="form.errors.refund_percentage"

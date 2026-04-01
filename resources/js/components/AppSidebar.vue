@@ -39,18 +39,18 @@ import { getInitials } from "@/composables/useInitials";
 import { usePermission } from "@/composables/usePermission";
 import { toUrl } from "@/lib/utils";
 import type { NavItem } from "@/types";
+import { home } from "@/wayfinder/routes";
 import { logout } from "@/wayfinder/routes/auth";
 import { index } from "@/wayfinder/routes/dashboard";
-import { home } from "@/wayfinder/routes";
 import { index as eventsIndex } from "@/wayfinder/routes/dashboard/events";
 import { index as ordersIndex } from "@/wayfinder/routes/dashboard/orders";
 import { index as orgsIndex } from "@/wayfinder/routes/dashboard/organizations";
 import { index as rolesIndex } from "@/wayfinder/routes/dashboard/roles";
-import { index as usersIndex } from "@/wayfinder/routes/dashboard/users";
 import { edit as settingsEdit } from "@/wayfinder/routes/dashboard/settings";
+import { index as usersIndex } from "@/wayfinder/routes/dashboard/users";
 import AppLogo from "./AppLogo.vue";
-import UserRoleBadge from "./UserRoleBadge.vue";
 import { Avatar, AvatarFallback } from "./ui/avatar";
+import UserRoleBadge from "./UserRoleBadge.vue";
 
 const pageProps = usePage<{
     auth: { user: { name: string; email: string } };
@@ -193,7 +193,9 @@ const handleLogout = () => {
                                                 {{ getInitials(user.name) }}
                                             </AvatarFallback>
                                         </Avatar>
-                                        <div class="flex flex-1 items-center gap-2 text-left">
+                                        <div
+                                            class="flex flex-1 items-center gap-2 text-left"
+                                        >
                                             <span
                                                 class="truncate text-sm font-medium"
                                                 >{{ user.name }}</span

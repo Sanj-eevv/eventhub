@@ -27,10 +27,7 @@ final class SharedPermissionResource
         return [
             'organization' => $this->abilities(Organization::class),
             'user' => $this->abilities(User::class),
-            'role' => [
-                'viewAny' => Gate::forUser($this->user)->allows('viewAny', Role::class),
-                'create' => Gate::forUser($this->user)->allows('create', Role::class),
-            ],
+            'role' => $this->abilities(Role::class),
             'event' => $this->abilities(Event::class),
             'order' => [
                 'viewAny' => Gate::forUser($this->user)->allows('viewAny', Order::class),
