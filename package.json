@@ -31,6 +31,7 @@
         "eslint-config-prettier": "^10.1.8",
         "eslint-plugin-import": "^2.32.0",
         "lucide-vue-next": "^0.563.0",
+        "puppeteer": "^24.40.0",
         "reka-ui": "^2.9.2",
         "tailwind-merge": "^3.4.0",
         "vue-sonner": "^2.0.9"

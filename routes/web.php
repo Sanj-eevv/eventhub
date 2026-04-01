@@ -32,6 +32,7 @@ use App\Http\Controllers\Dashboard\SetEventMediaCoverController;
 use App\Http\Controllers\Dashboard\UnpublishEventController;
 use App\Http\Controllers\Dashboard\UserController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DownloadOrderTicketsPdfController;
 use App\Http\Controllers\IndexController;
 use App\Http\Controllers\MyOrderController;
 use App\Http\Controllers\ProcessPaymentController;
@@ -73,6 +74,7 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::get('my/orders', [MyOrderController::class, 'index'])->name('orders.index');
     Route::get('my/orders/{order:uuid}', [MyOrderController::class, 'show'])->name('orders.show');
     Route::delete('my/orders/{order:uuid}', CancelPaidOrderController::class)->name('orders.cancel');
+    Route::get('my/orders/{order:uuid}/pdf', DownloadOrderTicketsPdfController::class)->name('orders.pdf');
     Route::get('my/tickets/{ticket:uuid}/qr-code', TicketQrCodeController::class)->name('tickets.qr-code');
 });
 

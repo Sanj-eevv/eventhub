@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Resources;
 
+use App\Enums\OrderStatus;
 use App\Models\Setting;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
@@ -24,6 +25,7 @@ final class OrderResource extends JsonResource
             'paid_at' => $this->paid_at?->toISOString(),
             'cancelled_at' => $this->cancelled_at?->toISOString(),
             'refunded_at' => $this->refunded_at?->toISOString(),
+            'can_download_pdf' => OrderStatus::Paid === $this->status,
             'can_cancel' => 'paid' === $this->status->value
                 && $this->event->starts_at->isAfter(
                     CarbonImmutable::now()->addHours((int) Setting::get('cancellation_cutoff_hours', 24))
