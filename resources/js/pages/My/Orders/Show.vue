@@ -235,12 +235,6 @@ const ticketStatusConfig: Record<string, { classes: string }> = {
                                 >
                                     {{ ticket.booking_reference }}
                                 </p>
-                                <p
-                                    v-if="ticket.attendee_name"
-                                    class="font-body text-xs text-sf-muted mt-1"
-                                >
-                                    {{ ticket.attendee_name }}
-                                </p>
                             </div>
                             <div class="flex items-center gap-3 shrink-0">
                                 <span

@@ -3,7 +3,7 @@ import { Head, Link } from "@inertiajs/vue3";
 import PageContainer from "@/components/PageContainer.vue";
 import HomeLayout from "@/layouts/HomeLayout.vue";
 import type { OrderResource } from "@/types/order";
-import { index as ordersIndex } from "@/wayfinder/routes/orders";
+import { show as orderShow } from "@/wayfinder/routes/orders";
 
 defineProps<{
     order: OrderResource;
@@ -95,16 +95,11 @@ defineProps<{
                     </div>
                 </div>
             </div>
-
-            <p class="font-body text-sm text-sf-muted text-center mb-6">
-                QR codes will be emailed to you and available in My Tickets.
-            </p>
-
             <Link
-                :href="ordersIndex()"
+                :href="orderShow({ order: order.uuid }).url"
                 class="flex items-center justify-center py-3.5 rounded bg-sf-ember text-white font-body text-sm tracking-wide hover:bg-sf-ember-hover active:scale-[0.99] transition-all duration-200"
             >
-                View My Orders
+                View Order
             </Link>
         </PageContainer>
     </HomeLayout>
