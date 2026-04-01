@@ -22,6 +22,7 @@ import HomeLayout from "@/layouts/HomeLayout.vue";
 import { formatCurrency, formatDateTime } from "@/lib/utils";
 import type { OrderResource } from "@/types/order";
 import { show as checkoutShow } from "@/wayfinder/routes/checkout";
+import { show as eventShow } from "@/wayfinder/routes/events";
 import {
     cancel as orderCancel,
     index as ordersIndex,
@@ -78,11 +79,12 @@ const ticketStatusConfig: Record<string, { classes: string }> = {
                 My Orders
             </Link>
             <div class="mb-10">
-                <h1
-                    class="font-display font-semibold text-[clamp(1.75rem,4vw,3rem)] text-sf-text leading-tight"
+                <Link
+                    :href="eventShow({ event: order.event!.slug }).url"
+                    class="font-display font-semibold text-[clamp(1.75rem,4vw,3rem)] text-sf-text leading-tight hover:text-sf-muted transition-colors"
                 >
                     {{ order.event!.title }}
-                </h1>
+                </Link>
             </div>
             <div
                 class="bg-sf-surface border border-sf-border-subtle rounded-xl overflow-hidden mb-6 transition-colors duration-200"

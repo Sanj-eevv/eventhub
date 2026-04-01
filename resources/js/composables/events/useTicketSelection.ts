@@ -29,8 +29,12 @@ export function useTicketSelection(ticketTypes: TicketTypeResource[]) {
             })),
     );
 
+    function effectiveMax(ticketType: TicketTypeResource): number | undefined {
+        return ticketType.effective_max_per_user ?? ticketType.max_per_user;
+    }
+
     function increment(ticketType: TicketTypeResource): void {
-        const max = ticketType.max_per_user;
+        const max = effectiveMax(ticketType);
         quantities[ticketType.uuid] =
             max != null
                 ? Math.min(max, quantities[ticketType.uuid] + 1)
@@ -45,10 +49,8 @@ export function useTicketSelection(ticketTypes: TicketTypeResource[]) {
     }
 
     function isAtMax(ticketType: TicketTypeResource): boolean {
-        return (
-            ticketType.max_per_user != null &&
-            quantities[ticketType.uuid] >= ticketType.max_per_user
-        );
+        const max = effectiveMax(ticketType);
+        return max != null && quantities[ticketType.uuid] >= max;
     }
 
     return {

@@ -39,10 +39,16 @@ final class BrowseEventController extends Controller
             throw new NotFoundHttpException();
         }
 
+        $user = $request->user();
+
         $event->load([
             'ticketTypes' => fn ($query) => $query
                 ->withCount([
                     'tickets' => fn ($query) => $query->where('status', '!=', TicketStatus::Cancelled),
+                    ...($user ? ['tickets as user_tickets_count' => fn ($query) => $query
+                        ->where('user_id', $user->id)
+                        ->whereIn('status', [TicketStatus::Pending, TicketStatus::Active]),
+                    ] : []),
                 ]),
             'media',
             'coverImage',

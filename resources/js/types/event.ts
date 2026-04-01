@@ -40,7 +40,11 @@ export type TicketTypeResource = Pick<
     | "sort_order"
     | "sale_starts_at"
     | "sale_ends_at"
-> & { max_per_user?: number; available_capacity: number };
+> & {
+    max_per_user?: number;
+    effective_max_per_user?: number;
+    available_capacity: number;
+};
 
 export type TicketResource = Pick<
     App.Models.Ticket,

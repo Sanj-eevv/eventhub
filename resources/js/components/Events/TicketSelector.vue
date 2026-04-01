@@ -60,6 +60,30 @@ function submit(): void {
         >
             <div class="flex items-start justify-between gap-4 mb-4">
                 <div class="flex-1">
+                    <p
+                        v-if="
+                            (ticketType.effective_max_per_user ??
+                                ticketType.max_per_user) != null
+                        "
+                        class="font-body text-xs text-sf-tertiary mb-1"
+                    >
+                        Max {{ ticketType.max_per_user }} per user
+                        <template
+                            v-if="
+                                ticketType.effective_max_per_user != null &&
+                                ticketType.max_per_user != null &&
+                                ticketType.effective_max_per_user <
+                                    ticketType.max_per_user
+                            "
+                        >
+                            ·
+                            {{
+                                ticketType.max_per_user -
+                                ticketType.effective_max_per_user
+                            }}
+                            owned
+                        </template>
+                    </p>
                     <p class="font-display text-base font-medium text-sf-text">
                         {{ ticketType.name }}
                     </p>
@@ -98,11 +122,6 @@ function submit(): void {
                         +
                     </button>
                     <div class="ml-auto flex flex-col items-end gap-0.5">
-                        <span
-                            v-if="ticketType.max_per_user != null"
-                            class="font-body text-xs text-sf-tertiary"
-                            >max {{ ticketType.max_per_user }}</span
-                        >
                         <span
                             :class="[
                                 'font-body text-xs tabular-nums',
