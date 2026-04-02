@@ -15,8 +15,7 @@ export type OrderResource = Pick<
 > & {
     status: StatusLabel<App.Enums.OrderStatus>;
     refund_status: App.Enums.RefundStatus | null;
-    can_download_pdf: boolean;
-    can_cancel: boolean;
+
     event?: EventResource;
     tickets?: TicketResource[];
 };

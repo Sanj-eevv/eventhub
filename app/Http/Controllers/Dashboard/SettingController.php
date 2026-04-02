@@ -7,15 +7,18 @@ namespace App\Http\Controllers\Dashboard;
 use App\Actions\UpdateSettingsAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Dashboard\UpdateSettingRequest;
+use App\Http\Resources\SettingResource;
 use App\Models\Setting;
+use App\Services\SettingsService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Redirector;
 use Inertia\Response;
 use Inertia\ResponseFactory;
 
-final class DashboardSettingController extends Controller
+final class SettingController extends Controller
 {
     public function __construct(
+        private readonly SettingsService $settingsService,
         private readonly UpdateSettingsAction $updateSettingsAction,
         private readonly Redirector $redirector,
         private readonly ResponseFactory $inertiaResponse,
@@ -26,11 +29,7 @@ final class DashboardSettingController extends Controller
         $this->authorize('update', Setting::class);
 
         return $this->inertiaResponse->render('Dashboard/Settings/Edit', [
-            'settings' => [
-                'ticket_reservation_minutes' => (int) Setting::get('ticket_reservation_minutes', 5),
-                'cancellation_cutoff_hours' => (int) Setting::get('cancellation_cutoff_hours', 24),
-                'refund_percentage' => (int) Setting::get('refund_percentage', 100),
-            ],
+            'settings' => new SettingResource($this->settingsService->get()),
         ]);
     }
 
@@ -38,8 +37,8 @@ final class DashboardSettingController extends Controller
     {
         $this->authorize('update', Setting::class);
 
-        $this->updateSettingsAction->execute($request->validated());
+        $this->updateSettingsAction->execute($request->toDto());
 
-        return $this->redirector->back()->with('toastSuccess', 'Settings saved successfully.');
+        return $this->redirector->back()->with('toast_success', 'Settings saved successfully.');
     }
 }

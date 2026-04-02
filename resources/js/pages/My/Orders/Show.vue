@@ -30,7 +30,10 @@ import {
 } from "@/wayfinder/routes/orders";
 
 const props = defineProps<{
-    order: OrderResource;
+    order: OrderResource & {
+        can_download_pdf: boolean;
+        can_cancel: boolean;
+    };
 }>();
 
 const isActiveReservation = computed(

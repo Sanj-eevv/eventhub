@@ -15,9 +15,9 @@ use App\Exceptions\TicketSaleNotOpenException;
 use App\Jobs\ExpireOrderJob;
 use App\Models\Event;
 use App\Models\Order;
-use App\Models\Setting;
 use App\Models\TicketType;
 use App\Models\User;
+use App\Services\SettingsService;
 use App\ValueObjects\BookingReference;
 use Carbon\CarbonImmutable;
 use Illuminate\Bus\Dispatcher;
@@ -29,6 +29,7 @@ final class ReserveTicketsAction
     public function __construct(
         private readonly DatabaseManager $databaseManager,
         private readonly Dispatcher $dispatcher,
+        private readonly SettingsService $settingsService,
     ) {}
 
     /**
@@ -41,7 +42,7 @@ final class ReserveTicketsAction
         }
 
         return $this->databaseManager->transaction(function () use ($user, $event, $items): Order {
-            $reservationMinutes = (int) Setting::get('ticket_reservation_minutes', default: 5);
+            $reservationMinutes = $this->settingsService->get()->ticketReservationMinutes;
             $now = CarbonImmutable::now();
             $expiresAt = $now->addMinutes($reservationMinutes);
 

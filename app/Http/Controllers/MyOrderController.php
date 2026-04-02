@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Enums\OrderStatus;
 use App\Http\Resources\OrderResource;
 use App\Models\Order;
+use App\Services\SettingsService;
+use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
 use Inertia\Response;
 use Inertia\ResponseFactory;
@@ -14,6 +17,7 @@ final class MyOrderController extends Controller
 {
     public function __construct(
         private readonly ResponseFactory $inertiaResponse,
+        private readonly SettingsService $settingsService,
     ) {}
 
     public function index(Request $request): Response
@@ -35,8 +39,16 @@ final class MyOrderController extends Controller
 
         $order->load(['tickets.ticketType', 'event']);
 
+        $settings = $this->settingsService->get();
+
         return $this->inertiaResponse->render('My/Orders/Show', [
-            'order' => OrderResource::make($order),
+            'order' => OrderResource::make($order)->additional([
+                'can_download_pdf' => OrderStatus::Paid === $order->status,
+                'can_cancel' => OrderStatus::Paid === $order->status
+                    && $order->event->starts_at->isAfter(
+                        CarbonImmutable::now()->addHours($settings->cancellationCutoffHours)
+                    ),
+            ]),
         ]);
     }
 }

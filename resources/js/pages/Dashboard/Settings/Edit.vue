@@ -12,25 +12,18 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import DashboardLayout from "@/layouts/DashboardLayout.vue";
 import type { BreadcrumbItem } from "@/types";
+import type { SettingResource } from "@/types/setting";
 import { index as dashboardIndex } from "@/wayfinder/routes/dashboard";
 import { update } from "@/wayfinder/routes/dashboard/settings";
 
-type SettingsProps = {
-    settings: {
-        ticket_reservation_minutes: number;
-        cancellation_cutoff_hours: number;
-        refund_percentage: number;
-    };
-};
-
-const props = defineProps<SettingsProps>();
+const props = defineProps<{ settings: SettingResource }>();
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: "Dashboard", href: dashboardIndex().url },
     { title: "Settings" },
 ];
 
-const form = useForm({
+const form = useForm<SettingResource>({
     ticket_reservation_minutes: props.settings.ticket_reservation_minutes,
     cancellation_cutoff_hours: props.settings.cancellation_cutoff_hours,
     refund_percentage: props.settings.refund_percentage,
@@ -67,9 +60,7 @@ function submit(): void {
                             </Label>
                             <Input
                                 id="ticket_reservation_minutes"
-                                v-model.number="
-                                    form.ticket_reservation_minutes
-                                "
+                                v-model.number="form.ticket_reservation_minutes"
                                 type="number"
                                 min="1"
                                 max="60"

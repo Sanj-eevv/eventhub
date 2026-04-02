@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Dashboard;
 
+use App\DataTransferObjects\SettingsData;
 use Illuminate\Foundation\Http\FormRequest;
 
 final class UpdateSettingRequest extends FormRequest
@@ -15,5 +16,10 @@ final class UpdateSettingRequest extends FormRequest
             'cancellation_cutoff_hours' => ['required', 'integer', 'min:0'],
             'refund_percentage' => ['required', 'integer', 'min:0', 'max:100'],
         ];
+    }
+
+    public function toDto(): SettingsData
+    {
+        return SettingsData::fromArray($this->validated());
     }
 }

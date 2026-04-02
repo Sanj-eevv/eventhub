@@ -22,6 +22,7 @@ use App\Models\User;
 use App\Policies\OrderPolicy;
 use App\Policies\SettingPolicy;
 use App\Policies\TicketPolicy;
+use App\Services\SettingsService;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Auth\Notifications\ResetPassword;
@@ -46,7 +47,10 @@ use Illuminate\Validation\Rules\Password;
 
 final class AppServiceProvider extends ServiceProvider
 {
-    public function register(): void {}
+    public function register(): void
+    {
+        $this->app->singleton(SettingsService::class);
+    }
 
     public function boot(): void
     {

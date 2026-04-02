@@ -21,7 +21,7 @@ use App\Http\Controllers\Dashboard\CancelEventController;
 use App\Http\Controllers\Dashboard\CancelOrderController as DashboardCancelOrderController;
 use App\Http\Controllers\Dashboard\CheckInController;
 use App\Http\Controllers\Dashboard\DashboardOrderController;
-use App\Http\Controllers\Dashboard\DashboardSettingController;
+use App\Http\Controllers\Dashboard\SettingController;
 use App\Http\Controllers\Dashboard\EventController;
 use App\Http\Controllers\Dashboard\EventMediaController;
 use App\Http\Controllers\Dashboard\OrganizationController;
@@ -106,7 +106,7 @@ Route::middleware('auth')->group(function (): void {
         Route::get('events/{event}/check-in', [CheckInController::class, 'index'])->name('events.check-in');
         Route::post('events/{event}/check-in', ScanTicketController::class)->name('events.check-in.scan');
 
-        Route::get('settings', [DashboardSettingController::class, 'edit'])->name('settings.edit');
-        Route::put('settings', [DashboardSettingController::class, 'update'])->name('settings.update');
+        Route::get('settings', [SettingController::class, 'edit'])->name('settings.edit');
+        Route::put('settings', [SettingController::class, 'update'])->name('settings.update');
     });
 });

@@ -7,7 +7,7 @@ namespace App\Http\Controllers;
 use App\Actions\CancelPaidOrderAction;
 use App\Jobs\ProcessRefundJob;
 use App\Models\Order;
-use App\Models\Setting;
+use App\Services\SettingsService;
 use Carbon\CarbonImmutable;
 use Illuminate\Bus\Dispatcher;
 use Illuminate\Http\RedirectResponse;
@@ -20,15 +20,14 @@ final class CancelPaidOrderController extends Controller
         private readonly CancelPaidOrderAction $cancelPaidOrderAction,
         private readonly Dispatcher $dispatcher,
         private readonly Redirector $redirector,
+        private readonly SettingsService $settingsService,
     ) {}
 
     public function __invoke(Order $order): RedirectResponse
     {
         $this->authorize('cancel', $order);
 
-        $cutoffHours = (int) Setting::get('cancellation_cutoff_hours', default: 24);
-
-        if ($order->event->starts_at->isBefore(CarbonImmutable::now()->addHours($cutoffHours))) {
+        if ($order->event->starts_at->isBefore(CarbonImmutable::now()->addHours($this->settingsService->get()->cancellationCutoffHours))) {
             throw new HttpException(422, 'The cancellation window for this order has passed.');
         }
 

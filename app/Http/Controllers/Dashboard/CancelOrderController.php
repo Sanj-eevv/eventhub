@@ -8,12 +8,9 @@ use App\Actions\CancelPaidOrderAction;
 use App\Http\Controllers\Controller;
 use App\Jobs\ProcessRefundJob;
 use App\Models\Order;
-use App\Models\Setting;
-use Carbon\CarbonImmutable;
 use Illuminate\Bus\Dispatcher;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Redirector;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
 final class CancelOrderController extends Controller
 {
@@ -26,12 +23,6 @@ final class CancelOrderController extends Controller
     public function __invoke(Order $order): RedirectResponse
     {
         $this->authorize('cancel', $order);
-
-        $cutoffHours = (int) Setting::get('cancellation_cutoff_hours', default: 24);
-
-        if ($order->event->starts_at->isBefore(CarbonImmutable::now()->addHours($cutoffHours))) {
-            throw new HttpException(422, 'Cancellations are no longer accepted this close to the event.');
-        }
 
         $this->cancelPaidOrderAction->execute($order);
 
