@@ -25,6 +25,8 @@ final class PermissionSeeder extends Seeder
             ['name' => 'role:create', 'description' => 'Create role'],
             ['name' => 'role:update', 'description' => 'Update role'],
             ['name' => 'role:delete', 'description' => 'Delete role'],
+            ['name' => 'order:view', 'description' => 'View order'],
+            ['name' => 'order:cancel', 'description' => 'Cancel order'],
             ['name' => 'setting:manage', 'description' => 'Manage platform settings'],
         ];
 
