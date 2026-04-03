@@ -20,7 +20,7 @@ use App\Http\Controllers\Dashboard\ApproveOrganizationController;
 use App\Http\Controllers\Dashboard\CancelEventController;
 use App\Http\Controllers\Dashboard\CancelOrderController as DashboardCancelOrderController;
 use App\Http\Controllers\Dashboard\CheckInController;
-use App\Http\Controllers\Dashboard\DashboardOrderController;
+use App\Http\Controllers\Dashboard\OrderController as DashboardOrderController;
 use App\Http\Controllers\Dashboard\SettingController;
 use App\Http\Controllers\Dashboard\EventController;
 use App\Http\Controllers\Dashboard\EventMediaController;

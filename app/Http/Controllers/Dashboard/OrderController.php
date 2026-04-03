@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Order\IndexResource;
 use App\Http\Resources\OrderResource;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Inertia\Response;
 use Inertia\ResponseFactory;
 
-final class DashboardOrderController extends Controller
+final class OrderController extends Controller
 {
     public function __construct(
         private readonly ResponseFactory $inertiaResponse,
@@ -21,13 +22,20 @@ final class DashboardOrderController extends Controller
     {
         $this->authorize('viewAny', Order::class);
 
+        $search = $request->input('search');
+        $sortBy = $request->array('sort_by');
+
         $orders = Order::query()
-            ->with(['event', 'tickets.ticketType', 'user'])
-            ->latest()
+            ->forIndex()
+            ->search($search)
+            ->sortBy($sortBy)
             ->paginate(perPage: $request->integer('per_page', 10), page: $request->integer('page', 1));
 
         return $this->inertiaResponse->render('Dashboard/Orders/Index', [
-            'orders' => OrderResource::collection($orders),
+            'orders' => IndexResource::collection($orders)->additional([
+                'meta' => ['sort' => $sortBy],
+                'filters' => ['search' => $search],
+            ]),
         ]);
     }
 

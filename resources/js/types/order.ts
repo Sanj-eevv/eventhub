@@ -15,7 +15,21 @@ export type OrderResource = Pick<
 > & {
     status: StatusLabel<App.Enums.OrderStatus>;
     refund_status: App.Enums.RefundStatus | null;
-
     event?: EventResource;
     tickets?: TicketResource[];
+};
+
+export type OrderIndexItem = {
+    uuid: string;
+    status: StatusLabel<App.Enums.OrderStatus>;
+    total: number;
+    currency: string;
+    paid_at: string | null;
+    created_at: string;
+    event: { title: string } | null;
+    user: { name: string; email: string } | null;
+};
+
+export type OrderFilterProps = {
+    search?: string;
 };

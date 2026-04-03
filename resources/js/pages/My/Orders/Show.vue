@@ -30,10 +30,9 @@ import {
 } from "@/wayfinder/routes/orders";
 
 const props = defineProps<{
-    order: OrderResource & {
-        can_download_pdf: boolean;
-        can_cancel: boolean;
-    };
+    order: OrderResource;
+    can_download_pdf: boolean;
+    can_cancel: boolean;
 }>();
 
 const isActiveReservation = computed(
@@ -139,7 +138,7 @@ const ticketStatusConfig: Record<string, { classes: string }> = {
                     class="px-5 py-4 border-t border-sf-border-subtle flex items-center justify-between gap-4"
                 >
                     <a
-                        v-if="order.can_download_pdf"
+                        v-if="can_download_pdf"
                         :href="orderPdf({ order: order.uuid }).url"
                         class="inline-flex items-center gap-1.5 font-body text-xs text-sf-muted hover:text-sf-text transition-colors"
                     >
@@ -163,19 +162,19 @@ const ticketStatusConfig: Record<string, { classes: string }> = {
                             <TooltipTrigger as-child>
                                 <button
                                     :disabled="
-                                        !order.can_cancel ||
+                                        !can_cancel ||
                                         cancelForm.processing
                                     "
                                     class="font-body text-xs text-sf-ember hover:text-sf-text transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                     @click="
-                                        order.can_cancel &&
+                                        can_cancel &&
                                         (showCancelDialog = true)
                                     "
                                 >
                                     Cancel order
                                 </button>
                             </TooltipTrigger>
-                            <TooltipContent v-if="!order.can_cancel">
+                            <TooltipContent v-if="!can_cancel">
                                 <p class="font-body text-xs">
                                     The cancellation window for this order has
                                     passed.

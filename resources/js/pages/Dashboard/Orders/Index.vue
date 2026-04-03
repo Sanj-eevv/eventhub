@@ -1,32 +1,30 @@
 <script setup lang="ts">
-import { Head, Link } from "@inertiajs/vue3";
-import { formatCurrency, formatDate } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
+import { Head } from "@inertiajs/vue3";
+import { XIcon } from "lucide-vue-next";
+import DataTable from "@/components/DataTable.vue";
+import { Input } from "@/components/ui/input";
+import { useOrderTable } from "@/composables/orders/useOrders";
 import DashboardLayout from "@/layouts/DashboardLayout.vue";
-import type { BreadcrumbItem } from "@/types";
-import type { OrderResource } from "@/types/order";
-import type { PaginatedResponse } from "@/types";
+import type { BreadcrumbItem, FilteredResponse } from "@/types";
+import type { OrderFilterProps, OrderIndexItem } from "@/types/order";
 import { index as dashboardIndex } from "@/wayfinder/routes/dashboard";
-import {
-    index as dashboardOrdersIndex,
-    show as dashboardOrdersShow,
-} from "@/wayfinder/routes/dashboard/orders";
+import { index as ordersIndex } from "@/wayfinder/routes/dashboard/orders";
 
-defineProps<{
-    orders: PaginatedResponse<OrderResource>;
-}>();
+type PageProps = {
+    orders: FilteredResponse<OrderIndexItem, OrderFilterProps>;
+};
+
+const props = defineProps<PageProps>();
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: "Dashboard", href: dashboardIndex().url },
-    { title: "Orders", href: dashboardOrdersIndex().url },
+    { title: "Orders", href: ordersIndex().url },
 ];
 
-const statusVariantMap: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
-    paid: "default",
-    reserved: "secondary",
-    cancelled: "destructive",
-};
+const { isLoading, sorting, pagination, columns, search } = useOrderTable(
+    props.orders.meta,
+    props.orders.filters,
+);
 </script>
 
 <template>
@@ -35,48 +33,33 @@ const statusVariantMap: Record<string, "default" | "secondary" | "destructive" |
         <div class="space-y-4 p-6">
             <h1 class="text-2xl font-bold">Orders</h1>
 
-            <div
-                v-if="orders.data.length === 0"
-                class="text-center text-muted-foreground py-16"
+            <DataTable
+                :isLoading="isLoading"
+                :columns="columns"
+                :data="orders"
+                :sorting="sorting"
+                :pagination="pagination"
+                @update:sorting="(newSorting) => (sorting = newSorting)"
+                @update:pagination="(newPagination) => (pagination = newPagination)"
             >
-                No orders found.
-            </div>
-
-            <div v-else class="space-y-3">
-                <Card
-                    v-for="order in orders.data"
-                    :key="order.uuid"
-                >
-                    <CardContent class="flex items-center justify-between py-4">
-                        <div class="space-y-0.5">
-                            <p class="font-medium">{{ order.event.title }}</p>
-                            <p class="font-mono text-xs text-muted-foreground">
-                                {{ order.uuid }}
-                            </p>
-                            <p v-if="order.paid_at" class="text-xs text-muted-foreground">
-                                Paid: {{ formatDate(order.paid_at) }}
-                            </p>
-                        </div>
-                        <div class="flex items-center gap-4">
-                            <div class="text-right">
-                                <p class="font-semibold">{{ formatCurrency(order.total) }}</p>
-                                <Badge
-                                    :variant="statusVariantMap[order.status.value] ?? 'outline'"
-                                    class="mt-1"
-                                >
-                                    {{ order.status.label }}
-                                </Badge>
-                            </div>
-                            <Link
-                                :href="dashboardOrdersShow({ order: order.uuid }).url"
-                                class="text-sm text-primary hover:underline"
-                            >
-                                View
-                            </Link>
-                        </div>
-                    </CardContent>
-                </Card>
-            </div>
+                <template #filterSlot>
+                    <div class="relative max-w-sm">
+                        <Input
+                            v-model="search"
+                            placeholder="Search by customer or event..."
+                            :class="search ? 'pr-8' : ''"
+                        />
+                        <button
+                            v-if="search"
+                            type="button"
+                            class="absolute inset-y-0 right-2 flex items-center text-muted-foreground hover:text-foreground"
+                            @click="search = ''"
+                        >
+                            <XIcon class="size-4" />
+                        </button>
+                    </div>
+                </template>
+            </DataTable>
         </div>
     </DashboardLayout>
 </template>

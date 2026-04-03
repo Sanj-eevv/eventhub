@@ -42,13 +42,12 @@ final class MyOrderController extends Controller
         $settings = $this->settingsService->get();
 
         return $this->inertiaResponse->render('My/Orders/Show', [
-            'order' => OrderResource::make($order)->additional([
-                'can_download_pdf' => OrderStatus::Paid === $order->status,
-                'can_cancel' => OrderStatus::Paid === $order->status
-                    && $order->event->starts_at->isAfter(
-                        CarbonImmutable::now()->addHours($settings->cancellationCutoffHours)
-                    ),
-            ]),
+            'order' => OrderResource::make($order),
+            'can_download_pdf' => OrderStatus::Paid === $order->status,
+            'can_cancel' => OrderStatus::Paid === $order->status
+                && $order->event->starts_at->isAfter(
+                    CarbonImmutable::now()->addHours($settings->cancellationCutoffHours)
+                ),
         ]);
     }
 }
