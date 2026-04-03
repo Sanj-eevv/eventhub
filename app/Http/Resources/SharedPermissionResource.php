@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Resources;
 
+use App\Enums\CheckInPermissions;
 use App\Models\Event;
 use App\Models\Order;
 use App\Models\Organization;
@@ -29,7 +30,8 @@ final class SharedPermissionResource
      *     event: array{viewAny: bool, create: bool, update: bool, delete: bool, publish: bool, cancel: bool},
      *     order: array{viewAny: bool, cancel: bool},
      *     setting: array{update: bool},
-     *     dashboard: array{access: bool}
+     *     dashboard: array{access: bool},
+     *     checkIn: array{manage: bool}
      * }
      */
     public function toArray(): array
@@ -42,6 +44,7 @@ final class SharedPermissionResource
             'order' => $this->checksFor(Order::class, ['viewAny', 'cancel']),
             'setting' => $this->checksFor(Setting::class, ['update']),
             'dashboard' => ['access' => Gate::forUser($this->user)->allows('access-dashboard')],
+            'checkIn' => ['manage' => $this->user->hasPermission(CheckInPermissions::Manage)],
         ];
     }
 

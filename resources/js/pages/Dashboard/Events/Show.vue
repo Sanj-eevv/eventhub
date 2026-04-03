@@ -1,23 +1,32 @@
 <script setup lang="ts">
 import { Head, Link } from "@inertiajs/vue3";
-import { ArrowLeftIcon } from "lucide-vue-next";
+import { ArrowLeftIcon, ScanLine } from "lucide-vue-next";
 import { computed, ref } from "vue";
 import EventStatusBadge from "@/components/Dashboard/Events/EventStatusBadge.vue";
 import ImageLightbox from "@/components/ImageLightbox.vue";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { usePermission } from "@/composables/usePermission";
 import DashboardLayout from "@/layouts/DashboardLayout.vue";
-import { formatCurrency, formatDate, formatTime } from "@/lib/utils";
+import {
+    formatCurrency,
+    withTimezone,
+    formatDate,
+    formatTime,
+} from "@/lib/utils";
 import type { BreadcrumbItem } from "@/types";
 import type { EventResource, MediaResource } from "@/types/event";
 import { index as dashboardIndex } from "@/wayfinder/routes/dashboard";
 import {
+    checkIn as eventsCheckIn,
     edit as eventsEdit,
     index as eventsIndex,
     show as eventsShow,
 } from "@/wayfinder/routes/dashboard/events";
 import { show as orgsShow } from "@/wayfinder/routes/dashboard/organizations";
 import { show as usersShow } from "@/wayfinder/routes/dashboard/users";
+
+const canCheckIn = usePermission("checkIn")("manage");
 
 const props = defineProps<{
     event: EventResource;
@@ -50,7 +59,6 @@ function openLightbox(index: number): void {
         <Head :title="event.title" />
 
         <div class="space-y-6 p-6">
-            <!-- Header -->
             <div class="flex items-center gap-4">
                 <Button variant="outline" size="sm" as-child>
                     <Link :href="eventsIndex().url">
@@ -63,6 +71,17 @@ function openLightbox(index: number): void {
                 </h1>
                 <div class="flex items-center gap-2 shrink-0">
                     <EventStatusBadge :status="event.status" />
+                    <Button
+                        v-if="canCheckIn"
+                        variant="outline"
+                        size="sm"
+                        as-child
+                    >
+                        <Link :href="eventsCheckIn({ event: event.uuid }).url">
+                            <ScanLine class="size-4" />
+                            Check In
+                        </Link>
+                    </Button>
                     <Button variant="outline" size="sm" as-child>
                         <Link :href="eventsEdit({ event: event.uuid }).url"
                             >Edit</Link
@@ -78,23 +97,30 @@ function openLightbox(index: number): void {
                         <div>
                             <p class="text-sm text-muted-foreground">Starts</p>
                             <p class="font-medium">
-                                {{ formatDate(event.starts_at) }} ·
-                                {{ formatTime(event.starts_at) }}
+                                {{
+                                    formatDate(event.starts_at, event.timezone)
+                                }}
+                                ·
+                                {{
+                                    withTimezone(formatTime)(
+                                        event.starts_at,
+                                        event.timezone,
+                                    )
+                                }}
                             </p>
                         </div>
                         <div>
                             <p class="text-sm text-muted-foreground">Ends</p>
                             <p class="font-medium">
-                                {{ formatDate(event.ends_at) }}
+                                {{ formatDate(event.ends_at, event.timezone) }}
                                 ·
-                                {{ formatTime(event.ends_at) }}
+                                {{
+                                    withTimezone(formatTime)(
+                                        event.ends_at,
+                                        event.timezone,
+                                    )
+                                }}
                             </p>
-                        </div>
-                        <div>
-                            <p class="text-sm text-muted-foreground">
-                                Timezone
-                            </p>
-                            <p class="font-medium">{{ event.timezone }}</p>
                         </div>
                         <div>
                             <p class="text-sm text-muted-foreground">Created</p>
