@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { usePermission } from "@/composables/usePermission";
 import DashboardLayout from "@/layouts/DashboardLayout.vue";
 import type { BreadcrumbItem } from "@/types";
-import type { UserShowProps } from "@/types/user";
+import type { UserResource } from "@/types/user";
 import { index as dashboardIndex } from "@/wayfinder/routes/dashboard";
 import { show as orgsShow } from "@/wayfinder/routes/dashboard/organizations";
 import {
@@ -16,7 +16,7 @@ import {
     show as usersShow,
 } from "@/wayfinder/routes/dashboard/users";
 
-const props = defineProps<UserShowProps>();
+const props = defineProps<{ user: UserResource }>();
 
 const can = usePermission("organization");
 

@@ -41,7 +41,7 @@ const gradients = [
             <p
                 class="font-code text-[11px] tracking-[0.2em] uppercase text-sf-gold mb-3"
             >
-                {{ formatDate(props.event.starts_at, props.event.timezone) }}
+                {{ formatDate(props.event.starts_at) }}
             </p>
             <h3
                 class="font-display font-semibold text-sf-text text-lg leading-snug mb-3 group-hover:text-sf-gold transition-colors duration-200"

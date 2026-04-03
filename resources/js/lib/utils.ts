@@ -26,15 +26,7 @@ export function formatTime(iso: string | null, timezone?: string): string {
         timeZone: timezone,
         hour: "numeric",
         minute: "2-digit",
-        timeZoneName: "shortGeneric",
     });
-}
-
-export function formatCurrency(cents: number, currency = "USD"): string {
-    return new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency,
-    }).format(cents / 100);
 }
 
 export function formatDateTime(iso: string | null, timezone?: string): string {
@@ -46,8 +38,15 @@ export function formatDateTime(iso: string | null, timezone?: string): string {
         year: "numeric",
         hour: "numeric",
         minute: "2-digit",
-        timeZoneName: "shortGeneric",
     });
+}
+
+
+export function formatCurrency(cents: number, currency = "USD"): string {
+    return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency,
+    }).format(cents / 100);
 }
 
 export function toDatetimeLocal(
@@ -59,4 +58,21 @@ export function toDatetimeLocal(
         .toLocaleString("sv-SE", { timeZone: timezone })
         .slice(0, 16)
         .replace(" ", "T");
+}
+
+export function withTimezone(
+    formatter: (iso: string | null, timezone?: string) => string,
+): (iso: string | null, timezone?: string) => string {
+    return (iso: string | null, timezone?: string) => {
+        if (!iso) return "";
+        const base = formatter(iso, timezone);
+        const tzPart =
+            new Intl.DateTimeFormat("en-US", {
+                timeZone: timezone,
+                timeZoneName: "shortGeneric",
+            })
+                .formatToParts(new Date(iso))
+                .find((part) => part.type === "timeZoneName")?.value ?? "";
+        return tzPart ? `${base} ${tzPart}` : base;
+    };
 }

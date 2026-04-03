@@ -1,10 +1,21 @@
 <script setup lang="ts">
 import { Head, useForm } from "@inertiajs/vue3";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { ref } from "vue";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import DashboardLayout from "@/layouts/DashboardLayout.vue";
+import { formatCurrency, formatDate } from "@/lib/utils";
 import type { BreadcrumbItem } from "@/types";
 import type { OrderResource } from "@/types/order";
 import { index as dashboardIndex } from "@/wayfinder/routes/dashboard";
@@ -14,7 +25,7 @@ import {
 } from "@/wayfinder/routes/dashboard/orders";
 
 const props = defineProps<{
-    order: OrderResource
+    order: OrderResource;
 }>();
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -23,32 +34,29 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: `Order #${props.order.uuid}` },
 ];
 
-const ticketStatusVariantMap: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
+const ticketStatusVariantMap: Record<
+    string,
+    "default" | "secondary" | "destructive" | "outline"
+> = {
     active: "default",
     pending: "outline",
     used: "secondary",
     cancelled: "destructive",
 };
 
-const goBack = () => window.history.back();
-
 const cancelForm = useForm({});
+const showCancelDialog = ref(false);
 
-function cancelOrder() {
-    cancelForm.delete(orderCancel({ order: props.order.uuid }));
+function cancelOrder(): void {
+    cancelForm.delete(orderCancel({ order: props.order.uuid }).url);
 }
 </script>
 
 <template>
     <DashboardLayout :breadcrumbs="breadcrumbs">
-        <Head :title="`Order #${order.uuid}`" />
+        <Head title="Order Details" />
         <div class="space-y-6 p-6">
-            <div class="flex items-center gap-4">
-                <Button variant="outline" size="sm" @click="goBack">
-                    Back
-                </Button>
-                <h1 class="text-2xl font-bold">Order Details</h1>
-            </div>
+            <h1 class="text-2xl font-bold">Order Details</h1>
 
             <div class="grid gap-6 md:grid-cols-2">
                 <Card>
@@ -58,31 +66,66 @@ function cancelOrder() {
                     <CardContent class="space-y-3">
                         <div class="flex justify-between text-sm">
                             <span class="text-muted-foreground">Event</span>
-                            <span class="font-medium">{{ order.event.title }}</span>
+                            <span class="font-medium">{{
+                                order.event!.title
+                            }}</span>
                         </div>
                         <div class="flex justify-between text-sm">
-                            <span class="text-muted-foreground">Order ID</span>
-                            <span class="font-mono">{{ order.uuid }}</span>
-                        </div>
-                        <div class="flex justify-between text-sm">
-                            <span class="text-muted-foreground">Status</span>
+                            <span class="text-muted-foreground"
+                                >Order Status</span
+                            >
                             <Badge>{{ order.status.label }}</Badge>
                         </div>
                         <div class="flex justify-between text-sm">
                             <span class="text-muted-foreground">Total</span>
-                            <span class="font-semibold">{{ formatCurrency(order.total) }}</span>
+                            <span class="font-semibold">{{
+                                formatCurrency(order.total)
+                            }}</span>
                         </div>
-                        <div v-if="order.paid_at" class="flex justify-between text-sm">
+                        <div
+                            v-if="order.paid_at"
+                            class="flex justify-between text-sm"
+                        >
                             <span class="text-muted-foreground">Paid at</span>
                             <span>{{ formatDate(order.paid_at) }}</span>
                         </div>
-                        <div v-if="order.reserved_at" class="flex justify-between text-sm">
-                            <span class="text-muted-foreground">Reserved at</span>
+                        <div
+                            v-if="order.status.value === 'reserved'"
+                            class="flex justify-between text-sm"
+                        >
+                            <span class="text-muted-foreground"
+                                >Reserved at</span
+                            >
                             <span>{{ formatDate(order.reserved_at) }}</span>
                         </div>
-                        <div v-if="order.refund_status" class="flex justify-between text-sm">
-                            <span class="text-muted-foreground">Refund</span>
-                            <span class="capitalize">{{ order.refund_status }}</span>
+                        <div
+                            v-if="order.cancelled_at"
+                            class="flex justify-between text-sm"
+                        >
+                            <span class="text-muted-foreground"
+                                >Cancelled at</span
+                            >
+                            <span>{{ formatDate(order.cancelled_at) }}</span>
+                        </div>
+                        <div
+                            v-if="order.refund_status"
+                            class="flex justify-between text-sm"
+                        >
+                            <span class="text-muted-foreground"
+                                >Refund status</span
+                            >
+                            <Badge variant="secondary" class="capitalize">
+                                {{ order.refund_status }}
+                            </Badge>
+                        </div>
+                        <div
+                            v-if="order.refunded_at"
+                            class="flex justify-between text-sm"
+                        >
+                            <span class="text-muted-foreground"
+                                >Refunded at</span
+                            >
+                            <span>{{ formatDate(order.refunded_at) }}</span>
                         </div>
                     </CardContent>
                     <div v-if="order.status.value === 'paid'" class="px-6 pb-4">
@@ -90,7 +133,7 @@ function cancelOrder() {
                             variant="destructive"
                             size="sm"
                             :disabled="cancelForm.processing"
-                            @click="cancelOrder"
+                            @click="showCancelDialog = true"
                         >
                             Cancel order
                         </Button>
@@ -99,7 +142,9 @@ function cancelOrder() {
 
                 <Card>
                     <CardHeader>
-                        <CardTitle>Tickets ({{ order.tickets.length }})</CardTitle>
+                        <CardTitle
+                            >Tickets ({{ order.tickets!.length }})</CardTitle
+                        >
                     </CardHeader>
                     <CardContent>
                         <div class="divide-y">
@@ -110,8 +155,12 @@ function cancelOrder() {
                             >
                                 <div class="flex items-start justify-between">
                                     <div>
-                                        <p class="font-medium text-sm">{{ ticket.ticket_type.name }}</p>
-                                        <p class="font-mono text-xs text-muted-foreground">
+                                        <p class="font-medium text-sm">
+                                            {{ ticket.ticket_type!.name }}
+                                        </p>
+                                        <p
+                                            class="font-mono text-xs text-muted-foreground"
+                                        >
                                             {{ ticket.booking_reference }}
                                         </p>
                                         <p
@@ -122,7 +171,11 @@ function cancelOrder() {
                                         </p>
                                     </div>
                                     <Badge
-                                        :variant="ticketStatusVariantMap[ticket.status] ?? 'outline'"
+                                        :variant="
+                                            ticketStatusVariantMap[
+                                                ticket.status
+                                            ] ?? 'outline'
+                                        "
                                     >
                                         {{ ticket.status }}
                                     </Badge>
@@ -133,5 +186,31 @@ function cancelOrder() {
                 </Card>
             </div>
         </div>
+
+        <AlertDialog
+            :open="showCancelDialog"
+            @update:open="showCancelDialog = $event"
+        >
+            <AlertDialogContent>
+                <AlertDialogHeader>
+                    <AlertDialogTitle>Cancel order</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        Are you sure you want to cancel this order? A refund
+                        will be issued if applicable.
+                    </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                    <AlertDialogCancel :disabled="cancelForm.processing">
+                        Keep order
+                    </AlertDialogCancel>
+                    <AlertDialogAction
+                        :disabled="cancelForm.processing"
+                        @click="cancelOrder"
+                    >
+                        Yes, cancel
+                    </AlertDialogAction>
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
     </DashboardLayout>
 </template>

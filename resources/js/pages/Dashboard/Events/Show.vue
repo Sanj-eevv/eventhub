@@ -26,7 +26,10 @@ const props = defineProps<{
 const breadcrumbs: BreadcrumbItem[] = [
     { title: "Dashboard", href: dashboardIndex().url },
     { title: "Events", href: eventsIndex().url },
-    { title: props.event.title, href: eventsShow({ event: props.event.uuid }).url },
+    {
+        title: props.event.title,
+        href: eventsShow({ event: props.event.uuid }).url,
+    },
 ];
 
 const galleryImages = computed<MediaResource[]>(
@@ -40,7 +43,6 @@ function openLightbox(index: number): void {
     lightboxIndex.value = index;
     lightboxOpen.value = true;
 }
-
 </script>
 
 <template>
@@ -56,62 +58,75 @@ function openLightbox(index: number): void {
                         Back
                     </Link>
                 </Button>
-                <h1 class="flex-1 min-w-0 text-2xl font-bold truncate">{{ event.title }}</h1>
+                <h1 class="flex-1 min-w-0 text-2xl font-bold truncate">
+                    {{ event.title }}
+                </h1>
                 <div class="flex items-center gap-2 shrink-0">
                     <EventStatusBadge :status="event.status" />
                     <Button variant="outline" size="sm" as-child>
-                        <Link :href="eventsEdit({ event: event.uuid }).url">Edit</Link>
+                        <Link :href="eventsEdit({ event: event.uuid }).url"
+                            >Edit</Link
+                        >
                     </Button>
                 </div>
             </div>
 
             <div class="grid gap-6 md:grid-cols-2">
-                <!-- Event details -->
                 <Card>
                     <CardHeader><CardTitle>Details</CardTitle></CardHeader>
                     <CardContent class="space-y-4">
                         <div>
                             <p class="text-sm text-muted-foreground">Starts</p>
                             <p class="font-medium">
-                                {{ formatDate(event.starts_at, event.timezone) }} ·
-                                {{ formatTime(event.starts_at, event.timezone) }}
+                                {{ formatDate(event.starts_at) }} ·
+                                {{ formatTime(event.starts_at) }}
                             </p>
                         </div>
                         <div>
                             <p class="text-sm text-muted-foreground">Ends</p>
                             <p class="font-medium">
-                                {{ formatDate(event.ends_at, event.timezone) }} ·
-                                {{ formatTime(event.ends_at, event.timezone) }}
+                                {{ formatDate(event.ends_at) }}
+                                ·
+                                {{ formatTime(event.ends_at) }}
                             </p>
                         </div>
                         <div>
-                            <p class="text-sm text-muted-foreground">Timezone</p>
+                            <p class="text-sm text-muted-foreground">
+                                Timezone
+                            </p>
                             <p class="font-medium">{{ event.timezone }}</p>
                         </div>
                         <div>
                             <p class="text-sm text-muted-foreground">Created</p>
-                            <p class="font-medium">{{ formatDate(event.created_at) }}</p>
+                            <p class="font-medium">
+                                {{ formatDate(event.created_at) }}
+                            </p>
                         </div>
                     </CardContent>
                 </Card>
 
                 <div class="space-y-6">
-                    <!-- Organization -->
                     <Card v-if="event.organization">
-                        <CardHeader><CardTitle>Organization</CardTitle></CardHeader>
+                        <CardHeader
+                            ><CardTitle>Organization</CardTitle></CardHeader
+                        >
                         <CardContent>
                             <Link
-                                :href="orgsShow({ organization: event.organization.uuid })"
+                                :href="
+                                    orgsShow({
+                                        organization: event.organization.uuid,
+                                    })
+                                "
                                 class="font-medium text-blue-600 hover:underline"
                             >
                                 {{ event.organization.title }}
                             </Link>
                         </CardContent>
                     </Card>
-
-                    <!-- Creator -->
                     <Card v-if="event.user">
-                        <CardHeader><CardTitle>Created By</CardTitle></CardHeader>
+                        <CardHeader
+                            ><CardTitle>Created By</CardTitle></CardHeader
+                        >
                         <CardContent>
                             <Link
                                 :href="usersShow({ user: event.user.uuid })"
@@ -123,12 +138,12 @@ function openLightbox(index: number): void {
                     </Card>
                 </div>
             </div>
-
-            <!-- Description -->
             <Card v-if="event.description">
                 <CardHeader><CardTitle>About</CardTitle></CardHeader>
                 <CardContent>
-                    <p class="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
+                    <p
+                        class="text-sm text-muted-foreground leading-relaxed whitespace-pre-line"
+                    >
                         {{ event.description }}
                     </p>
                 </CardContent>
@@ -138,9 +153,18 @@ function openLightbox(index: number): void {
             <Card v-if="event.venue_name || event.address">
                 <CardHeader><CardTitle>Venue</CardTitle></CardHeader>
                 <CardContent class="space-y-1">
-                    <p v-if="event.venue_name" class="font-medium">{{ event.venue_name }}</p>
-                    <p v-if="event.address" class="text-sm text-muted-foreground">{{ event.address }}</p>
-                    <p v-if="event.zip" class="text-sm text-muted-foreground">{{ event.zip }}</p>
+                    <p v-if="event.venue_name" class="font-medium">
+                        {{ event.venue_name }}
+                    </p>
+                    <p
+                        v-if="event.address"
+                        class="text-sm text-muted-foreground"
+                    >
+                        {{ event.address }}
+                    </p>
+                    <p v-if="event.zip" class="text-sm text-muted-foreground">
+                        {{ event.zip }}
+                    </p>
                     <a
                         v-if="event.map_url"
                         :href="event.map_url"
@@ -165,14 +189,37 @@ function openLightbox(index: number): void {
                         >
                             <div class="space-y-1">
                                 <p class="font-medium">{{ ticketType.name }}</p>
-                                <p v-if="ticketType.description" class="text-sm text-muted-foreground">
+                                <p
+                                    v-if="ticketType.description"
+                                    class="text-sm text-muted-foreground"
+                                >
                                     {{ ticketType.description }}
                                 </p>
-                                <div class="flex flex-wrap gap-4 text-xs text-muted-foreground mt-1">
-                                    <span>Capacity: {{ ticketType.capacity }}</span>
-                                    <span v-if="ticketType.max_per_user">Max per user: {{ ticketType.max_per_user }}</span>
-                                    <span v-if="ticketType.sale_starts_at">Sale starts: {{ formatDate(ticketType.sale_starts_at) }}</span>
-                                    <span v-if="ticketType.sale_ends_at">Sale ends: {{ formatDate(ticketType.sale_ends_at) }}</span>
+                                <div
+                                    class="flex flex-wrap gap-4 text-xs text-muted-foreground mt-1"
+                                >
+                                    <span
+                                        >Capacity:
+                                        {{ ticketType.capacity }}</span
+                                    >
+                                    <span v-if="ticketType.max_per_user"
+                                        >Max per user:
+                                        {{ ticketType.max_per_user }}</span
+                                    >
+                                    <span v-if="ticketType.sale_starts_at"
+                                        >Sale starts:
+                                        {{
+                                            formatDate(
+                                                ticketType.sale_starts_at,
+                                            )
+                                        }}</span
+                                    >
+                                    <span v-if="ticketType.sale_ends_at"
+                                        >Sale ends:
+                                        {{
+                                            formatDate(ticketType.sale_ends_at)
+                                        }}</span
+                                    >
                                 </div>
                             </div>
                             <p class="font-semibold text-lg shrink-0">
@@ -183,11 +230,12 @@ function openLightbox(index: number): void {
                 </CardContent>
             </Card>
 
-            <!-- Gallery -->
             <Card v-if="galleryImages.length">
                 <CardHeader><CardTitle>Gallery</CardTitle></CardHeader>
                 <CardContent>
-                    <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+                    <div
+                        class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4"
+                    >
                         <button
                             v-for="(image, index) in galleryImages"
                             :key="image.uuid"

@@ -169,8 +169,8 @@ function submit(): void {
                 class="font-body text-xs text-sf-tertiary mt-2"
             >
                 Sale ends
-                {{ formatDate(ticketType.sale_ends_at, props.eventTimezone) }} ·
-                {{ formatTime(ticketType.sale_ends_at, props.eventTimezone) }}
+                {{ formatDate(ticketType.sale_ends_at) }} ·
+                {{ formatTime(ticketType.sale_ends_at) }}
             </p>
         </div>
 

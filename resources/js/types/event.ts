@@ -1,6 +1,7 @@
 import type { StatusLabel } from "@/types";
 import type { OrganizationResource } from "@/types/organization";
 import type { App } from "@/wayfinder/types";
+import type { UserResource } from "./user";
 
 export type Event = App.Models.Event;
 export type EventStatus = App.Enums.EventStatus;
@@ -26,6 +27,7 @@ export type EventResource = Pick<
     organization: OrganizationResource;
     ticket_types: TicketTypeResource[];
     media?: MediaResource[];
+    user?: UserResource;
     cover_image?: MediaResource;
 };
 

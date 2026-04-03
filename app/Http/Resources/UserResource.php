@@ -2,14 +2,16 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Resources\User;
+namespace App\Http\Resources;
 
 use App\Http\Resources\Organization\ShowResource as OrganizationShowResource;
 use App\Http\Resources\Role\ShowResource as RoleShowResource;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-final class ShowResource extends JsonResource
+/** @mixin User */
+final class UserResource extends JsonResource
 {
     public function toArray(Request $request): array
     {

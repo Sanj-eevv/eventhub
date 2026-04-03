@@ -12,7 +12,7 @@ use App\Http\Requests\Dashboard\UserRequest;
 use App\Http\Resources\Organization\PickerResource as OrganizationPickerResource;
 use App\Http\Resources\Role\PickerResource as RolePickerResource;
 use App\Http\Resources\User\IndexResource;
-use App\Http\Resources\User\ShowResource;
+use App\Http\Resources\UserResource;
 use App\Models\Organization;
 use App\Models\Role;
 use App\Models\User;
@@ -63,7 +63,7 @@ final class UserController extends Controller
         $this->authorize('view', $user);
 
         return $this->inertiaResponse->render('Dashboard/Users/Show', [
-            'user' => ShowResource::make($user->load(['role', 'organization'])),
+            'user' => UserResource::make($user->load(['role', 'organization'])),
         ]);
     }
 

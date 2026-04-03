@@ -44,12 +44,12 @@ defineProps<{ event: EventResource }>();
                     </span>
                     <span class="text-sm text-sf-muted">
                         <span class="text-sf-text font-medium">{{
-                            formatDate(event.starts_at, event.timezone)
+                            formatDate(event.starts_at)
                         }}</span>
-                        · {{ formatTime(event.starts_at, event.timezone) }}
+                        · {{ formatTime(event.starts_at) }}
                         <span v-if="event.ends_at" class="text-sf-tertiary">
-                            - {{ formatDate(event.ends_at, event.timezone) }}
-                            {{ formatTime(event.ends_at, event.timezone) }}
+                            - {{ formatDate(event.ends_at) }}
+                            {{ formatTime(event.ends_at) }}
                         </span>
                     </span>
                 </div>

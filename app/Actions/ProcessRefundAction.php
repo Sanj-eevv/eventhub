@@ -7,16 +7,19 @@ namespace App\Actions;
 use App\Contracts\PaymentGateway;
 use App\Enums\RefundStatus;
 use App\Models\Order;
-use App\Models\Setting;
+use App\Services\SettingsService;
 use Carbon\CarbonImmutable;
 
 final class ProcessRefundAction
 {
-    public function __construct(private readonly PaymentGateway $paymentGateway) {}
+    public function __construct(
+        private readonly PaymentGateway $paymentGateway,
+        private readonly SettingsService $settingsService,
+    ) {}
 
     public function execute(Order $order): void
     {
-        $refundPercentage = (int) Setting::get('refund_percentage', default: 100);
+        $refundPercentage = $this->settingsService->get()->refundPercentage;
         $refundAmount = (int) round($order->total * $refundPercentage / 100);
 
         $refundId = $this->paymentGateway->refundPaymentIntent(
