@@ -6,5 +6,5 @@ namespace App\Enums;
 
 enum SettingPermissions: string
 {
-    case AllowManage = 'setting:manage';
+    case Manage = 'setting:manage';
 }

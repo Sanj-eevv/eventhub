@@ -11,8 +11,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Dashboard\RoleRequest;
 use App\Http\Resources\Role\IndexResource;
 use App\Http\Resources\Role\ShowResource;
-use App\Models\Permission;
 use App\Models\Role;
+use App\Services\PermissionService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
@@ -25,6 +25,7 @@ final class RoleController extends Controller
         private readonly CreateRoleAction $createRoleAction,
         private readonly UpdateRoleAction $updateRoleAction,
         private readonly DeleteRoleAction $deleteRoleAction,
+        private readonly PermissionService $permissionService,
         private readonly Redirector $redirector,
         private readonly ResponseFactory $inertiaResponse,
     ) {}
@@ -58,7 +59,7 @@ final class RoleController extends Controller
         $this->authorize('create', Role::class);
 
         return $this->inertiaResponse->render('Dashboard/Roles/Create', [
-            'groupedPermissions' => Permission::grouped(),
+            'groupedPermissions' => $this->permissionService->grouped(),
         ]);
     }
 
@@ -79,7 +80,7 @@ final class RoleController extends Controller
 
         return $this->inertiaResponse->render('Dashboard/Roles/Show', [
             'role' => ShowResource::make($role),
-            'groupedPermissions' => Permission::grouped($role) ?: null,
+            'groupedPermissions' => $this->permissionService->grouped($role) ?: null,
         ]);
     }
 
@@ -91,7 +92,7 @@ final class RoleController extends Controller
 
         return $this->inertiaResponse->render('Dashboard/Roles/Edit', [
             'role' => ShowResource::make($role),
-            'groupedPermissions' => Permission::grouped(),
+            'groupedPermissions' => $this->permissionService->grouped(),
         ]);
     }
 

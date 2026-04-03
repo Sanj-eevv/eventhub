@@ -6,5 +6,5 @@ namespace App\Enums;
 
 enum CheckInPermissions: string
 {
-    case AllowManage = 'check-in:manage';
+    case Manage = 'check-in:manage';
 }

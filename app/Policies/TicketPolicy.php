@@ -8,10 +8,10 @@ use App\Enums\CheckInPermissions;
 use App\Models\Ticket;
 use App\Models\User;
 
-final class TicketPolicy
+final class TicketPolicy extends BasePolicy
 {
     public function view(User $user, Ticket $ticket): bool
     {
-        return $ticket->user_id === $user->id || $user->hasPermission(CheckInPermissions::AllowManage);
+        return $ticket->user_id === $user->id || $user->hasPermission(CheckInPermissions::Manage);
     }
 }

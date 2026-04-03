@@ -4,20 +4,19 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
-use App\Enums\PreservedRoleList;
 use App\Enums\RolePermissions;
 use App\Models\Role;
 use App\Models\User;
 
-final class RolePolicy
+final class RolePolicy extends BasePolicy
 {
     public function viewAny(User $user): bool
     {
-        return $user->hasAnyPermission([
-            RolePermissions::AllowCreate,
-            RolePermissions::AllowUpdate,
-            RolePermissions::AllowDelete,
-        ]);
+        return $user->hasAnyPermission(
+            RolePermissions::Create,
+            RolePermissions::Update,
+            RolePermissions::Delete,
+        );
     }
 
     public function view(User $user): bool
@@ -27,16 +26,16 @@ final class RolePolicy
 
     public function create(User $user): bool
     {
-        return $user->hasPermission(RolePermissions::AllowCreate);
+        return $user->hasPermission(RolePermissions::Create);
     }
 
     public function update(User $user, Role $role): bool
     {
-        return $user->hasPermission(RolePermissions::AllowUpdate) && $role->slug !== PreservedRoleList::SuperAdmin->value;
+        return $user->hasPermission(RolePermissions::Update) && ! $role->preserved;
     }
 
     public function delete(User $user, Role $role): bool
     {
-        return $user->hasPermission(RolePermissions::AllowDelete) && ! $role->preserved;
+        return $user->hasPermission(RolePermissions::Delete) && ! $role->preserved;
     }
 }

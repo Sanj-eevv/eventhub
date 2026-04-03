@@ -8,7 +8,7 @@ use App\Exceptions\InvalidStatusTransitionException;
 use App\Exceptions\MediaLimitExceededException;
 use App\Exceptions\TicketLimitExceededException;
 use App\Http\Middleware\HandleInertiaRequests;
-use App\Http\Middleware\RoleAccessMiddleware;
+use App\Http\Middleware\LoadPermissionsMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -21,10 +21,8 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->web([
+            LoadPermissionsMiddleware::class,
             HandleInertiaRequests::class,
-        ]);
-        $middleware->alias([
-            'role' => RoleAccessMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

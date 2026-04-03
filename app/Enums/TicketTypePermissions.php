@@ -6,7 +6,7 @@ namespace App\Enums;
 
 enum TicketTypePermissions: string
 {
-    case AllowCreate = 'ticket-type:create';
-    case AllowUpdate = 'ticket-type:update';
-    case AllowDelete = 'ticket-type:delete';
+    case Create = 'ticket-type:create';
+    case Update = 'ticket-type:update';
+    case Delete = 'ticket-type:delete';
 }

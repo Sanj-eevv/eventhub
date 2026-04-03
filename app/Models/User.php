@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Builders\UserBuilder;
+use App\Contracts\Authorizable;
+use App\Enums\PreservedRoleList;
 use App\Notifications\QueueableVerifyEmail;
 use App\Traits\HasAppUuid;
 use BackedEnum;
@@ -21,7 +23,6 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Notifications\DatabaseNotificationCollection;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
 /**
@@ -67,7 +68,7 @@ use Illuminate\Support\Collection;
  * @mixin Eloquent
  */
 #[UseEloquentBuilder(UserBuilder::class)]
-final class User extends Authenticatable implements MustVerifyEmail
+final class User extends Authenticatable implements Authorizable, MustVerifyEmail
 {
     use HasAppUuid;
 
@@ -113,39 +114,33 @@ final class User extends Authenticatable implements MustVerifyEmail
     /** @return Collection<int, string> */
     public function getAllPermissions(): Collection
     {
-        $this->loadMissing('role.permissions');
-
-        return $this->role->permissions
-            ->pluck('name')
-            ->map(fn (string $name): string => mb_strtolower($name));
+        return once(fn () => $this->role->permissions->pluck('name'));
     }
 
-    public function hasPermission(string|BackedEnum $permission): bool
+    public function hasPermission(BackedEnum $permission): bool
     {
-        $value = $permission instanceof BackedEnum ? $permission->value : $permission;
-
-        return $this->getAllPermissions()->contains($value);
+        return $this->getAllPermissions()->contains($permission->value);
     }
 
-    public function hasAllPermissions(array $permissions): bool
+    public function hasAllPermissions(BackedEnum ...$permissions): bool
     {
-        $normalised = collect($permissions)
-            ->map(fn ($permission) => $permission instanceof BackedEnum ? $permission->value : $permission);
+        $normalised = collect($permissions)->map(fn (BackedEnum $permission) => $permission->value);
 
         return $normalised->diff($this->getAllPermissions())->isEmpty();
     }
 
-    public function hasAnyPermission(array $permissions): bool
+    public function hasAnyPermission(BackedEnum ...$permissions): bool
     {
-        $normalised = collect($permissions)
-            ->map(fn ($permission) => $permission instanceof BackedEnum ? $permission->value : $permission);
+        $normalised = collect($permissions)->map(fn (BackedEnum $permission) => $permission->value);
 
         return $this->getAllPermissions()->intersect($normalised)->isNotEmpty();
     }
 
-    public function hasAnyRole(string|array $roles): bool
+    public function hasAnyRole(PreservedRoleList ...$roles): bool
     {
-        return in_array($this->role->slug, Arr::wrap($roles));
+        $slugs = collect($roles)->map(fn (PreservedRoleList $role) => $role->value);
+
+        return $slugs->contains($this->role->slug);
     }
 
     protected function casts(): array

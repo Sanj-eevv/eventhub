@@ -4,45 +4,66 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Enums\CheckInPermissions;
+use App\Enums\DashboardPermissions;
+use App\Enums\EventPermissions;
+use App\Enums\OrderPermissions;
+use App\Enums\OrganizationPermissions;
+use App\Enums\RolePermissions;
+use App\Enums\SettingPermissions;
+use App\Enums\TicketTypePermissions;
+use App\Enums\UserPermissions;
 use App\Models\Permission;
 use App\Models\Role;
+use BackedEnum;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 final class PermissionSeeder extends Seeder
 {
     public function run(): void
     {
-        $permissionData = [
-            ['name' => 'event:create', 'description' => 'Create event'],
-            ['name' => 'event:update', 'description' => 'Update event'],
-            ['name' => 'event:delete', 'description' => 'Delete event'],
-            ['name' => 'organization:create', 'description' => 'Create organization'],
-            ['name' => 'organization:update', 'description' => 'Update organization'],
-            ['name' => 'organization:delete', 'description' => 'Delete organization'],
-            ['name' => 'user:create', 'description' => 'Create user'],
-            ['name' => 'user:update', 'description' => 'Update user'],
-            ['name' => 'user:delete', 'description' => 'Delete user'],
-            ['name' => 'role:create', 'description' => 'Create role'],
-            ['name' => 'role:update', 'description' => 'Update role'],
-            ['name' => 'role:delete', 'description' => 'Delete role'],
-            ['name' => 'order:view', 'description' => 'View order'],
-            ['name' => 'order:cancel', 'description' => 'Cancel order'],
-            ['name' => 'setting:manage', 'description' => 'Manage platform settings'],
-        ];
+        DB::transaction(function (): void {
+            $allCases = collect([
+                ...EventPermissions::cases(),
+                ...UserPermissions::cases(),
+                ...RolePermissions::cases(),
+                ...OrganizationPermissions::cases(),
+                ...TicketTypePermissions::cases(),
+                ...CheckInPermissions::cases(),
+                ...OrderPermissions::cases(),
+                ...SettingPermissions::cases(),
+                ...DashboardPermissions::cases(),
+            ]);
 
-        Permission::upsert($permissionData, ['name'], ['description', 'updated_at']);
+            Permission::upsert(
+                $allCases->map(fn (BackedEnum $case) => ['name' => $case->value, 'description' => ''])->all(),
+                ['name'],
+                ['updated_at'],
+            );
 
-        $permissions = Permission::query()->pluck('id', 'name');
+            $permissions = Permission::query()->pluck('id', 'name');
 
-        $allPermissionIds = $permissions->values()->all();
-        $adminPermissionIds = $permissions->except(['setting:manage'])->values()->all();
-        $orgAdminPermissionIds = $permissions->only([
-            'event:create', 'event:update', 'event:delete',
-            'user:create', 'user:update', 'user:delete',
-        ])->values()->all();
+            $idsFor = fn (array $cases): array => $permissions
+                ->only(collect($cases)->map(fn (BackedEnum $case) => $case->value)->all())
+                ->values()
+                ->all();
 
-        Role::superAdminRole()->permissions()->sync($allPermissionIds);
-        Role::adminRole()->permissions()->sync($adminPermissionIds);
-        Role::organizationAdminRole()->permissions()->sync($orgAdminPermissionIds);
+            $adminCases = $allCases
+                ->reject(fn (BackedEnum $case) => SettingPermissions::Manage === $case)
+                ->all();
+
+            $orgAdminCases = [
+                ...EventPermissions::cases(),
+                ...UserPermissions::cases(),
+                ...TicketTypePermissions::cases(),
+                CheckInPermissions::Manage,
+                OrderPermissions::View,
+                DashboardPermissions::Access,
+            ];
+
+            Role::adminRole()->permissions()->sync($idsFor($adminCases));
+            Role::organizationAdminRole()->permissions()->sync($idsFor($orgAdminCases));
+        });
     }
 }

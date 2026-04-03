@@ -12,6 +12,7 @@ use App\Models\Order;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Filesystem\FilesystemManager;
+use Illuminate\Support\Facades\Log;
 
 final class CancelPaidOrderAction
 {
@@ -39,5 +40,11 @@ final class CancelPaidOrderAction
         });
 
         $this->filesystemManager->disk('local')->deleteDirectory("tickets/{$order->uuid}");
+
+        Log::warning('Order cancelled', [
+            'order_id' => $order->id,
+            'order_uuid' => $order->uuid,
+            'actor_id' => auth()->id(),
+        ]);
     }
 }

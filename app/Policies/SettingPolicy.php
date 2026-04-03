@@ -7,10 +7,10 @@ namespace App\Policies;
 use App\Enums\SettingPermissions;
 use App\Models\User;
 
-final class SettingPolicy
+final class SettingPolicy extends BasePolicy
 {
     public function update(User $user): bool
     {
-        return $user->hasPermission(SettingPermissions::AllowManage);
+        return $user->hasPermission(SettingPermissions::Manage);
     }
 }

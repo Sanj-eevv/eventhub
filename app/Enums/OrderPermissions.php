@@ -6,6 +6,6 @@ namespace App\Enums;
 
 enum OrderPermissions: string
 {
-    case AllowView = 'order:view';
-    case AllowCancel = 'order:cancel';
+    case View = 'order:view';
+    case Cancel = 'order:cancel';
 }

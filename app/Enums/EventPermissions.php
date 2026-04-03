@@ -6,7 +6,10 @@ namespace App\Enums;
 
 enum EventPermissions: string
 {
-    case AllowCreate = 'event:create';
-    case AllowDelete = 'event:delete';
-    case AllowUpdate = 'event:update';
+    case View = 'event:view';
+    case Create = 'event:create';
+    case Update = 'event:update';
+    case Delete = 'event:delete';
+    case Publish = 'event:publish';
+    case Cancel = 'event:cancel';
 }

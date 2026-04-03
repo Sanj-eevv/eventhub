@@ -6,7 +6,7 @@ namespace App\Enums;
 
 enum RolePermissions: string
 {
-    case AllowCreate = 'role:create';
-    case AllowDelete = 'role:delete';
-    case AllowUpdate = 'role:update';
+    case Create = 'role:create';
+    case Update = 'role:update';
+    case Delete = 'role:delete';
 }

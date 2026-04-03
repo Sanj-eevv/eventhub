@@ -8,20 +8,20 @@ use App\Enums\OrderPermissions;
 use App\Models\Order;
 use App\Models\User;
 
-final class OrderPolicy
+final class OrderPolicy extends BasePolicy
 {
     public function viewAny(User $user): bool
     {
-        return $user->hasPermission(OrderPermissions::AllowView);
+        return $user->hasPermission(OrderPermissions::View);
     }
 
     public function view(User $user, Order $order): bool
     {
-        return $user->hasPermission(OrderPermissions::AllowView) || $order->user_id === $user->id;
+        return $user->hasPermission(OrderPermissions::View) || $order->user_id === $user->id;
     }
 
     public function cancel(User $user, Order $order): bool
     {
-        return $order->user_id === $user->id || $user->hasPermission(OrderPermissions::AllowCancel);
+        return $order->user_id === $user->id || $user->hasPermission(OrderPermissions::Cancel);
     }
 }

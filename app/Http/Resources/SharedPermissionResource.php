@@ -21,32 +21,37 @@ final class SharedPermissionResource
         return new self($user);
     }
 
-    /** @return array{organization: array{viewAny: bool, create: bool}, user: array{viewAny: bool, create: bool}, role: array{viewAny: bool, create: bool}, event: array{viewAny: bool, create: bool}} */
+    /**
+     * @return array{
+     *     organization: array{viewAny: bool, create: bool, update: bool, delete: bool},
+     *     user: array{viewAny: bool, create: bool, update: bool, delete: bool},
+     *     role: array{viewAny: bool, create: bool, update: bool, delete: bool},
+     *     event: array{viewAny: bool, create: bool, update: bool, delete: bool, publish: bool, cancel: bool},
+     *     order: array{viewAny: bool, cancel: bool},
+     *     setting: array{update: bool},
+     *     dashboard: array{access: bool}
+     * }
+     */
     public function toArray(): array
     {
         return [
-            'organization' => $this->abilities(Organization::class),
-            'user' => $this->abilities(User::class),
-            'role' => $this->abilities(Role::class),
-            'event' => $this->abilities(Event::class),
-            'order' => [
-                'viewAny' => Gate::forUser($this->user)->allows('viewAny', Order::class),
-            ],
-            'setting' => [
-                'update' => Gate::forUser($this->user)->allows('update', Setting::class),
-            ],
-            'dashboard' => [
-                'access' => Gate::forUser($this->user)->allows('access-dashboard'),
-            ],
+            'organization' => $this->checksFor(Organization::class, ['viewAny', 'create', 'update', 'delete']),
+            'user' => $this->checksFor(User::class, ['viewAny', 'create', 'update', 'delete']),
+            'role' => $this->checksFor(Role::class, ['viewAny', 'create', 'update', 'delete']),
+            'event' => $this->checksFor(Event::class, ['viewAny', 'create', 'update', 'delete', 'publish', 'cancel']),
+            'order' => $this->checksFor(Order::class, ['viewAny', 'cancel']),
+            'setting' => $this->checksFor(Setting::class, ['update']),
+            'dashboard' => ['access' => Gate::forUser($this->user)->allows('access-dashboard')],
         ];
     }
 
-    /** @return array{viewAny: bool, create: bool} */
-    private function abilities(string $model): array
+    /** @return array<string, bool> */
+    private function checksFor(string $model, array $abilities): array
     {
-        return [
-            'viewAny' => Gate::forUser($this->user)->allows('viewAny', $model),
-            'create' => Gate::forUser($this->user)->allows('create', $model),
-        ];
+        return collect($abilities)
+            ->mapWithKeys(fn (string $ability) => [
+                $ability => Gate::forUser($this->user)->allows($ability, $model),
+            ])
+            ->all();
     }
 }
