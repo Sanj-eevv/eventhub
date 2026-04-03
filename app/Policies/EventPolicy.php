@@ -20,6 +20,11 @@ final class EventPolicy extends BasePolicy
         return $user->hasPermission(EventPermissions::View);
     }
 
+    public function view(User $user): bool
+    {
+        return $user->hasPermission(EventPermissions::View);
+    }
+
     public function create(User $user): bool
     {
         return $user->hasPermission(EventPermissions::Create);
