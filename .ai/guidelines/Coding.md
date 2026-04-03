@@ -23,7 +23,7 @@ Every controller must follow these rules without exception:
 2. **RESTful methods only** — resource controllers may only contain: `index`, `create`, `store`, `show`, `edit`, `update`, `destroy`. No custom method names (e.g. `cover`, `publish`, `approve`).
 3. **Invokable controllers for non-RESTful actions** — any action that does not map to a standard RESTful method must be its own `final class FooController extends Controller` with a single `__invoke()` method.
 4. **Authorize every method** — call `$this->authorize()` as the first line of every public method.
-5. **Flash `toastSuccess` on all redirects** — every redirect must chain `.with('toastSuccess', '...')`.
+5. **Flash `toast_success` on all redirects** — every redirect must chain `.with('toast_success', '...')`.
 
 ```php
 // ✅ Non-RESTful action → invokable controller
@@ -35,7 +35,7 @@ final class SetEventMediaCoverController extends Controller
 
         $this->setCoverAction->execute($event, $media);
 
-        return $this->redirector->back()->with('toastSuccess', 'Cover image updated successfully.');
+        return $this->redirector->back()->with('toast_success', 'Cover image updated successfully.');
     }
 }
 ```
