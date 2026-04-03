@@ -9,6 +9,7 @@ import { h, ref, watch } from "vue";
 import RoleActions from "@/components/Dashboard/Roles/RoleActions.vue";
 import { Badge } from "@/components/ui/badge";
 import { useDialogState } from "@/composables/useDialogState";
+import { formatDate } from "@/lib/utils";
 import type { PaginatedResponseMeta } from "@/types";
 import type { Role, RoleFilterProps } from "@/types/role";
 import {
@@ -122,6 +123,7 @@ export function useRoleTable(
             header: "Created",
             enableSorting: true,
             enableHiding: true,
+            cell: ({ row }) => formatDate(row.original.created_at),
         },
         {
             id: "actions",

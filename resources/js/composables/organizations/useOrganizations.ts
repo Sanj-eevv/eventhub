@@ -4,7 +4,11 @@ import { createOrganizationColumns } from "@/composables/organizations/organizat
 import { useDialogState } from "@/composables/useDialogState";
 import { useTableState } from "@/composables/useTableState";
 import type { PaginatedResponseMeta } from "@/types";
-import type { Organization, OrganizationFilterProps, OrganizationStatus } from "@/types/organization";
+import type {
+    Organization,
+    OrganizationFilterProps,
+    OrganizationStatus,
+} from "@/types/organization";
 import { index } from "@/wayfinder/routes/dashboard/organizations";
 
 export function useOrganizationTable(
@@ -17,13 +21,17 @@ export function useOrganizationTable(
     const rejectDialog = useDialogState();
     const deleteDialog = useDialogState();
 
-    const search = shallowRef<OrganizationFilterProps["search"]>(filters.search ?? "");
+    const search = shallowRef<OrganizationFilterProps["search"]>(
+        filters.search ?? "",
+    );
     const debouncedSearch = refDebounced(search, 300);
-    const statusFilter = shallowRef<OrganizationStatus | "">(filters.status ?? "");
+    const statusFilter = shallowRef<OrganizationStatus | "">(
+        filters.status ?? "",
+    );
 
     const { isLoading, pagination, sorting } = useTableState(
         pageMeta,
-        index(),
+        index().url,
         () => ({ search: search.value, status: statusFilter.value }),
         [debouncedSearch, statusFilter],
     );

@@ -3,6 +3,7 @@ import type { ColumnDef } from "@tanstack/vue-table";
 import { h } from "vue";
 import OrganizationActions from "@/components/Dashboard/Organizations/OrganizationActions.vue";
 import OrganizationStatusBadge from "@/components/Dashboard/Organizations/OrganizationStatusBadge.vue";
+import { formatDate } from "@/lib/utils";
 import type { Organization } from "@/types/organization";
 import { show as orgsShow } from "@/wayfinder/routes/dashboard/organizations";
 
@@ -13,7 +14,9 @@ export interface OrganizationColumnActions {
     onDelete: (org: Organization) => void;
 }
 
-export function createOrganizationColumns(actions: OrganizationColumnActions): ColumnDef<Organization>[] {
+export function createOrganizationColumns(
+    actions: OrganizationColumnActions,
+): ColumnDef<Organization>[] {
     return [
         {
             accessorKey: "title",
@@ -41,13 +44,15 @@ export function createOrganizationColumns(actions: OrganizationColumnActions): C
             header: "Status",
             enableSorting: true,
             enableHiding: true,
-            cell: ({ row }) => h(OrganizationStatusBadge, { status: row.original.status }),
+            cell: ({ row }) =>
+                h(OrganizationStatusBadge, { status: row.original.status }),
         },
         {
             accessorKey: "created_at",
             header: "Created",
             enableSorting: true,
             enableHiding: true,
+            cell: ({ row }) => formatDate(row.original.created_at),
         },
         {
             id: "actions",

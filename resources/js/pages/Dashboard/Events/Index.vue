@@ -13,8 +13,8 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { useEventTable } from "@/composables/events/useEvents";
-import { eventStatusLabels } from "@/lib/statusLabels";
 import DashboardLayout from "@/layouts/DashboardLayout.vue";
+import { eventStatusLabels } from "@/lib/statusLabels";
 import type { BreadcrumbItem, FilteredResponse } from "@/types";
 import type { Event, EventFilterProps } from "@/types/event";
 import { index as dashboardIndex } from "@/wayfinder/routes/dashboard";

@@ -1,9 +1,9 @@
 import { Link } from "@inertiajs/vue3";
-import { formatDate } from "@/lib/utils";
 import type { ColumnDef } from "@tanstack/vue-table";
 import { h } from "vue";
 import EventActions from "@/components/Dashboard/Events/EventActions.vue";
 import EventStatusBadge from "@/components/Dashboard/Events/EventStatusBadge.vue";
+import { withTimezone, formatDateTime } from "@/lib/utils";
 import type { Event } from "@/types/event";
 import { show as eventsShow } from "@/wayfinder/routes/dashboard/events";
 
@@ -14,7 +14,9 @@ export interface EventColumnActions {
     onDelete: (event: Event) => void;
 }
 
-export function createEventColumns(actions: EventColumnActions): ColumnDef<Event>[] {
+export function createEventColumns(
+    actions: EventColumnActions,
+): ColumnDef<Event>[] {
     return [
         {
             accessorKey: "title",
@@ -43,21 +45,24 @@ export function createEventColumns(actions: EventColumnActions): ColumnDef<Event
             header: "Status",
             enableSorting: true,
             enableHiding: true,
-            cell: ({ row }) => h(EventStatusBadge, { status: row.original.status }),
+            cell: ({ row }) =>
+                h(EventStatusBadge, { status: row.original.status }),
         },
         {
             accessorKey: "starts_at",
             header: "Starts At",
             enableSorting: true,
             enableHiding: true,
-            cell: ({ row }) => formatDate(row.original.starts_at, row.original.timezone),
+            cell: ({ row }) =>
+                withTimezone(formatDateTime)(row.original.starts_at),
         },
         {
             accessorKey: "ends_at",
             header: "Ends At",
             enableSorting: true,
             enableHiding: true,
-            cell: ({ row }) => formatDate(row.original.ends_at, row.original.timezone),
+            cell: ({ row }) =>
+                withTimezone(formatDateTime)(row.original.ends_at),
         },
         {
             id: "actions",

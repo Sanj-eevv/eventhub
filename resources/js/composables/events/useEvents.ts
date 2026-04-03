@@ -23,11 +23,13 @@ export function useEventTable(
 
     const search = shallowRef<string>(filters.search ?? "");
     const debouncedSearch = refDebounced(search, 300);
-    const statusFilter = shallowRef<EventStatus | "">(filters.status?.value ?? "");
+    const statusFilter = shallowRef<EventStatus | "">(
+        filters.status?.value ?? "",
+    );
 
     const { isLoading, pagination, sorting } = useTableState(
         pageMeta,
-        index(),
+        index().url,
         () => ({ search: search.value, status: statusFilter.value }),
         [debouncedSearch, statusFilter],
     );
@@ -35,20 +37,43 @@ export function useEventTable(
     const columns = createEventColumns({
         onEdit: (event) => router.visit(eventsEdit(event.uuid).url),
         onPublish: (event) =>
-            router.post(publish(event.uuid).url, {}, {
-                preserveScroll: true,
-                onError: () => toast.error("Failed to publish event. Please try again."),
-            }),
+            router.post(
+                publish(event.uuid).url,
+                {},
+                {
+                    preserveScroll: true,
+                    onError: () =>
+                        toast.error(
+                            "Failed to publish event. Please try again.",
+                        ),
+                },
+            ),
         onCancel: (event) =>
-            router.post(cancel(event.uuid).url, {}, {
-                preserveScroll: true,
-                onError: () => toast.error("Failed to cancel event. Please try again."),
-            }),
+            router.post(
+                cancel(event.uuid).url,
+                {},
+                {
+                    preserveScroll: true,
+                    onError: () =>
+                        toast.error(
+                            "Failed to cancel event. Please try again.",
+                        ),
+                },
+            ),
         onDelete: (event) => {
             activeEvent.value = event;
             deleteDialog.open();
         },
     });
 
-    return { isLoading, deleteDialog, activeEvent, sorting, pagination, columns, search, statusFilter };
+    return {
+        isLoading,
+        deleteDialog,
+        activeEvent,
+        sorting,
+        pagination,
+        columns,
+        search,
+        statusFilter,
+    };
 }

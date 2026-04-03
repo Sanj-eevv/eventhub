@@ -3,6 +3,7 @@ import type { ColumnDef } from "@tanstack/vue-table";
 import { h } from "vue";
 import UserActions from "@/components/Dashboard/Users/UserActions.vue";
 import { Badge } from "@/components/ui/badge";
+import { formatDate } from "@/lib/utils";
 import type { User } from "@/types/user";
 import { show as usersShow } from "@/wayfinder/routes/dashboard/users";
 
@@ -11,7 +12,9 @@ export interface UserColumnActions {
     onDelete: (user: User) => void;
 }
 
-export function createUserColumns(actions: UserColumnActions): ColumnDef<User>[] {
+export function createUserColumns(
+    actions: UserColumnActions,
+): ColumnDef<User>[] {
     return [
         {
             accessorKey: "name",
@@ -58,6 +61,7 @@ export function createUserColumns(actions: UserColumnActions): ColumnDef<User>[]
             header: "Created",
             enableSorting: true,
             enableHiding: true,
+            cell: ({ row }) => formatDate(row.original.created_at),
         },
         {
             id: "actions",
