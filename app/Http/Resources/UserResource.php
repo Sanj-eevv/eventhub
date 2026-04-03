@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Http\Resources;
 
-use App\Http\Resources\Organization\ShowResource as OrganizationShowResource;
 use App\Http\Resources\Role\ShowResource as RoleShowResource;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -22,7 +21,7 @@ final class UserResource extends JsonResource
             'email_verified' => (bool) $this->email_verified_at,
             'created_at' => $this->created_at->toISOString(),
             'role' => RoleShowResource::make($this->whenLoaded('role')),
-            'organization' => OrganizationShowResource::make($this->whenLoaded('organization')),
+            'organization' => OrganizationResource::make($this->whenLoaded('organization')),
         ];
     }
 }

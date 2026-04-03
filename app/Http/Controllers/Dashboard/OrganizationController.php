@@ -10,7 +10,7 @@ use App\Actions\UpdateOrganizationAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Dashboard\OrganizationRequest;
 use App\Http\Resources\Organization\IndexResource;
-use App\Http\Resources\Organization\ShowResource;
+use App\Http\Resources\OrganizationResource;
 use App\Models\Organization;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -61,7 +61,7 @@ final class OrganizationController extends Controller
         $this->authorize('view', $organization);
 
         return $this->inertiaResponse->render('Dashboard/Organizations/Show', [
-            'organization' => ShowResource::make($organization),
+            'organization' => OrganizationResource::make($organization),
         ]);
     }
 

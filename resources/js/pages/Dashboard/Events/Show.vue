@@ -26,7 +26,7 @@ import {
 import { show as orgsShow } from "@/wayfinder/routes/dashboard/organizations";
 import { show as usersShow } from "@/wayfinder/routes/dashboard/users";
 
-const canCheckIn = usePermission("checkIn")("manage");
+const canCheckIn = usePermission("event")("checkIn");
 
 const props = defineProps<{
     event: EventResource;

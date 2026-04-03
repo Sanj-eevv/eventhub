@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Http\Resources;
 
-use App\Http\Resources\Organization\ShowResource as OrganizationShowResource;
 use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -29,7 +28,7 @@ final class EventResource extends JsonResource
             'status' => ['value' => $this->status->value, 'label' => $this->status->label()],
             'created_at' => $this->created_at->toISOString(),
             'updated_at' => $this->updated_at->toISOString(),
-            'organization' => OrganizationShowResource::make($this->whenLoaded('organization')),
+            'organization' => OrganizationResource::make($this->whenLoaded('organization')),
             'user' => UserResource::make($this->whenLoaded('user')),
             'ticket_types' => TicketTypeResource::collection($this->whenLoaded('ticketTypes')),
             'cover_image' => MediaResource::make($this->whenLoaded('coverImage')),

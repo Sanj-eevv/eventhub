@@ -12,4 +12,5 @@ enum EventPermissions: string
     case Delete = 'event:delete';
     case Publish = 'event:publish';
     case Cancel = 'event:cancel';
+    case CheckIn = 'event:check-in';
 }

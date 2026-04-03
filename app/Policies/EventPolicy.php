@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
-use App\Enums\CheckInPermissions;
 use App\Enums\EventPermissions;
 use App\Enums\PreservedRoleList;
 use App\Models\Event;
@@ -57,7 +56,7 @@ final class EventPolicy extends BasePolicy
 
     public function checkIn(User $user, Event $event): bool
     {
-        if ( ! $user->hasPermission(CheckInPermissions::Manage)) {
+        if ( ! $user->hasPermission(EventPermissions::CheckIn)) {
             return false;
         }
 

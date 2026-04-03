@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import DashboardLayout from "@/layouts/DashboardLayout.vue";
 import type { BreadcrumbItem } from "@/types";
-import type { Organization } from "@/types/organization";
+import type { OrganizationResource } from "@/types/organization";
 import { index as dashboardIndex } from "@/wayfinder/routes/dashboard";
 import {
     index as orgsIndex,
@@ -14,7 +14,7 @@ import {
 } from "@/wayfinder/routes/dashboard/organizations";
 
 const props = defineProps<{
-    organization: Organization;
+    organization: OrganizationResource;
 }>();
 
 const goBack = () => window.history.back();

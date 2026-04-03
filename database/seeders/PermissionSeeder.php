@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Enums\CheckInPermissions;
 use App\Enums\DashboardPermissions;
 use App\Enums\EventPermissions;
 use App\Enums\OrderPermissions;
@@ -30,7 +29,6 @@ final class PermissionSeeder extends Seeder
                 ...RolePermissions::cases(),
                 ...OrganizationPermissions::cases(),
                 ...TicketTypePermissions::cases(),
-                ...CheckInPermissions::cases(),
                 ...OrderPermissions::cases(),
                 ...SettingPermissions::cases(),
                 ...DashboardPermissions::cases(),
@@ -57,7 +55,7 @@ final class PermissionSeeder extends Seeder
                 ...EventPermissions::cases(),
                 ...UserPermissions::cases(),
                 ...TicketTypePermissions::cases(),
-                CheckInPermissions::Manage,
+                EventPermissions::CheckIn,
                 OrderPermissions::View,
                 DashboardPermissions::Access,
             ];

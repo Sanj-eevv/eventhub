@@ -1,229 +1,219 @@
 <script setup lang="ts">
-import { BrowserMultiFormatReader } from "@zxing/browser";
 import { Head } from "@inertiajs/vue3";
-import { nextTick, onUnmounted, ref } from "vue";
+import {
+    CheckCircle2,
+    QrCode,
+    ScanLine,
+    UserCheck,
+    XCircle,
+} from "lucide-vue-next";
+import { useTemplateRef } from "vue";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useCheckIn } from "@/composables/events/useCheckIn";
 import DashboardLayout from "@/layouts/DashboardLayout.vue";
 import type { BreadcrumbItem } from "@/types";
+import type { EventResource } from "@/types/event";
 import { index as dashboardIndex } from "@/wayfinder/routes/dashboard";
 import {
     index as eventsIndex,
     show as eventsShow,
 } from "@/wayfinder/routes/dashboard/events";
-import { scan } from "@/wayfinder/routes/dashboard/events/check-in";
 
 const props = defineProps<{
-    event: { uuid: string; title: string; slug: string };
+    event: EventResource;
 }>();
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: "Dashboard", href: dashboardIndex().url },
     { title: "Events", href: eventsIndex().url },
-    { title: props.event.title, href: eventsShow({ event: props.event.uuid }).url },
+    {
+        title: props.event.title,
+        href: eventsShow({ event: props.event.uuid }).url,
+    },
     { title: "Check-In" },
 ];
 
-type ScanResult = {
-    success: boolean;
-    message: string;
-    attendee_name?: string;
-    ticket_type?: string;
-};
+const videoRef = useTemplateRef<HTMLVideoElement>("videoRef");
 
-const bookingReference = ref("");
-const isLoading = ref(false);
-const scanResult = ref<ScanResult | null>(null);
-const isCameraActive = ref(false);
-const videoRef = ref<HTMLVideoElement | null>(null);
-let scannerControls: { stop: () => void } | null = null;
+const {
+    bookingReference,
+    isLoading,
+    scanResult,
+    isCameraActive,
+    cameraError,
+    submitScan,
+    startCamera,
+    stopCamera,
+} = useCheckIn(props.event.uuid);
 
-async function submitScan(): Promise<void> {
-    if (!bookingReference.value.trim() || isLoading.value) {
-        return;
-    }
-
-    isLoading.value = true;
-    scanResult.value = null;
-
-    try {
-        const response = await fetch(scan({ event: props.event.uuid }).url, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Accept: "application/json",
-                "X-Requested-With": "XMLHttpRequest",
-                "X-XSRF-TOKEN": decodeURIComponent(
-                    document.cookie
-                        .split("; ")
-                        .find((row) => row.startsWith("XSRF-TOKEN="))
-                        ?.split("=")[1] ?? "",
-                ),
-            },
-            body: JSON.stringify({ booking_reference: bookingReference.value }),
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-            scanResult.value = {
-                success: true,
-                message: "Check-in successful",
-                attendee_name: data.attendee_name,
-                ticket_type: data.ticket_type?.name,
-            };
-            bookingReference.value = "";
-        } else {
-            scanResult.value = {
-                success: false,
-                message: data.error ?? "An error occurred.",
-            };
-        }
-    } catch {
-        scanResult.value = {
-            success: false,
-            message: "Network error. Please try again.",
-        };
-    } finally {
-        isLoading.value = false;
+function toggleCamera(): void {
+    if (isCameraActive.value) {
+        stopCamera();
+    } else {
+        startCamera(videoRef);
     }
 }
-
-async function startCamera(): Promise<void> {
-    isCameraActive.value = true;
-    await nextTick();
-
-    if (!videoRef.value) {
-        return;
-    }
-
-    const codeReader = new BrowserMultiFormatReader();
-
-    scannerControls = await codeReader.decodeFromVideoDevice(
-        undefined,
-        videoRef.value,
-        (result) => {
-            if (!result) {
-                return;
-            }
-            stopCamera();
-            bookingReference.value = result.getText();
-            submitScan();
-        },
-    );
-}
-
-function stopCamera(): void {
-    scannerControls?.stop();
-    scannerControls = null;
-    isCameraActive.value = false;
-}
-
-onUnmounted(() => {
-    stopCamera();
-});
 </script>
 
 <template>
     <DashboardLayout :breadcrumbs="breadcrumbs">
         <Head :title="`Check-In — ${event.title}`" />
-        <div class="p-6">
-            <h1 class="mb-2 text-2xl font-bold">Check-In</h1>
-            <p class="mb-8 text-muted-foreground">{{ event.title }}</p>
 
-            <div class="mx-auto max-w-md space-y-6">
-                <div class="space-y-3">
-                    <Button
-                        variant="outline"
-                        class="w-full h-12 text-base"
-                        @click="isCameraActive ? stopCamera() : startCamera()"
-                    >
-                        {{ isCameraActive ? "Stop Camera" : "Scan QR Code" }}
-                    </Button>
-                    <div
-                        v-if="isCameraActive"
-                        class="overflow-hidden rounded-lg bg-black aspect-video"
-                    >
-                        <video
-                            ref="videoRef"
-                            class="w-full h-full object-cover"
-                        />
+        <div class="flex flex-col gap-6 p-6 h-full">
+            <div>
+                <h1 class="text-2xl font-semibold tracking-tight">Check-In</h1>
+                <p class="text-sm text-muted-foreground mt-1">
+                    {{ event.title }}
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1">
+                <div class="flex flex-col gap-6">
+                    <div class="rounded-xl border bg-card p-6 space-y-4">
+                        <div class="flex items-center gap-2">
+                            <QrCode class="size-4 text-muted-foreground" />
+                            <span class="text-sm font-medium">QR Scanner</span>
+                        </div>
+
+                        <Button
+                            :variant="isCameraActive ? 'destructive' : 'outline'"
+                            class="w-full h-11"
+                            @click="toggleCamera"
+                        >
+                            <ScanLine class="size-4 mr-2" />
+                            {{ isCameraActive ? "Stop Camera" : "Start Camera" }}
+                        </Button>
+
+                        <div
+                            v-if="isCameraActive"
+                            class="overflow-hidden rounded-lg bg-black aspect-video w-full"
+                        >
+                            <video ref="videoRef" class="w-full h-full object-cover" />
+                        </div>
+
+                        <div
+                            v-else-if="cameraError"
+                            class="rounded-lg border-2 border-dashed border-destructive/30 bg-destructive/5 aspect-video flex items-center justify-center px-6"
+                        >
+                            <div class="text-center space-y-2">
+                                <XCircle class="size-10 text-destructive/50 mx-auto" />
+                                <p class="text-sm text-destructive/80">
+                                    {{ cameraError }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div
+                            v-else
+                            class="rounded-lg border-2 border-dashed border-muted aspect-video flex items-center justify-center"
+                        >
+                            <div class="text-center space-y-2">
+                                <QrCode class="size-10 text-muted-foreground/40 mx-auto" />
+                                <p class="text-xs text-muted-foreground">
+                                    Camera inactive
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="rounded-xl border bg-card p-6 space-y-4">
+                        <div class="flex items-center gap-2">
+                            <UserCheck class="size-4 text-muted-foreground" />
+                            <span class="text-sm font-medium">Manual Entry</span>
+                        </div>
+
+                        <div class="space-y-2">
+                            <Label
+                                for="booking_reference"
+                                class="text-xs text-muted-foreground uppercase tracking-wide"
+                            >
+                                Booking Reference
+                            </Label>
+                            <Input
+                                id="booking_reference"
+                                v-model="bookingReference"
+                                class="h-12 text-base font-mono tracking-widest uppercase"
+                                placeholder="EVT-123456"
+                                autocomplete="off"
+                                autocorrect="off"
+                                autocapitalize="characters"
+                                @keydown.enter="submitScan"
+                            />
+                        </div>
+
+                        <Button
+                            class="w-full h-11"
+                            :disabled="!bookingReference.trim() || isLoading"
+                            @click="submitScan"
+                        >
+                            {{ isLoading ? "Checking in…" : "Check In" }}
+                        </Button>
                     </div>
                 </div>
 
-                <div class="space-y-3">
-                    <Label
-                        for="booking_reference"
-                        class="text-base font-medium"
-                    >
-                        Booking Reference
-                    </Label>
-                    <Input
-                        id="booking_reference"
-                        v-model="bookingReference"
-                        class="h-14 text-lg tracking-widest uppercase"
-                        placeholder="e.g. EVT-123456"
-                        autocomplete="off"
-                        autocorrect="off"
-                        autocapitalize="characters"
-                        @keydown.enter="submitScan"
-                    />
-                    <Button
-                        class="w-full h-12 text-base"
-                        :disabled="!bookingReference.trim() || isLoading"
-                        @click="submitScan"
-                    >
-                        {{ isLoading ? "Checking in..." : "Check In" }}
-                    </Button>
-                </div>
-
-                <div
-                    v-if="scanResult"
-                    class="rounded-lg p-5"
-                    :class="
-                        scanResult.success
-                            ? 'bg-green-50 border border-green-200'
-                            : 'bg-destructive/10 border border-destructive/20'
-                    "
-                >
-                    <p
-                        class="font-semibold text-lg"
-                        :class="
-                            scanResult.success
-                                ? 'text-green-800'
-                                : 'text-destructive'
-                        "
-                    >
-                        {{
-                            scanResult.success
-                                ? "Check-In Successful"
-                                : "Check-In Failed"
-                        }}
-                    </p>
-                    <p
-                        class="mt-1 text-sm"
-                        :class="
-                            scanResult.success
-                                ? 'text-green-700'
-                                : 'text-destructive/80'
-                        "
-                    >
-                        {{ scanResult.message }}
-                    </p>
+                <div class="rounded-xl border bg-card overflow-hidden flex flex-col">
                     <div
-                        v-if="scanResult.success && scanResult.attendee_name"
-                        class="mt-3 space-y-1"
+                        v-if="!scanResult"
+                        class="flex-1 flex flex-col items-center justify-center gap-4 p-8 text-center"
                     >
-                        <p class="text-sm font-medium text-green-800">
-                            {{ scanResult.attendee_name }}
-                        </p>
-                        <p
-                            v-if="scanResult.ticket_type"
-                            class="text-sm text-green-700"
+                        <div class="size-16 rounded-full bg-muted flex items-center justify-center">
+                            <ScanLine class="size-7 text-muted-foreground" />
+                        </div>
+                        <div>
+                            <p class="font-medium text-foreground">Awaiting scan</p>
+                            <p class="text-sm text-muted-foreground mt-1">
+                                Scan a QR code or enter a booking reference to check in an attendee.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div
+                        v-else-if="scanResult.success"
+                        class="flex-1 flex flex-col items-center justify-center gap-6 p-8 text-center bg-green-50 dark:bg-green-950/20"
+                    >
+                        <CheckCircle2 class="size-16 text-green-500" />
+                        <div class="space-y-1">
+                            <p class="text-2xl font-semibold text-green-700 dark:text-green-400">
+                                Check-In Successful
+                            </p>
+                            <p class="text-sm text-green-600/80 dark:text-green-500/80">
+                                {{ scanResult.message }}
+                            </p>
+                        </div>
+                        <div
+                            v-if="scanResult.attendee_name"
+                            class="w-full max-w-xs rounded-lg border border-green-200 dark:border-green-800 bg-white dark:bg-green-950/40 p-4 space-y-1"
                         >
-                            {{ scanResult.ticket_type }}
-                        </p>
+                            <p class="text-xs uppercase tracking-wide text-green-600/70 dark:text-green-500/70">
+                                Attendee
+                            </p>
+                            <p class="font-semibold text-green-800 dark:text-green-300">
+                                {{ scanResult.attendee_name }}
+                            </p>
+                            <p
+                                v-if="scanResult.ticket_type"
+                                class="text-sm text-green-600 dark:text-green-400"
+                            >
+                                {{ scanResult.ticket_type }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div
+                        v-else
+                        class="flex-1 flex flex-col items-center justify-center gap-6 p-8 text-center bg-destructive/5"
+                    >
+                        <XCircle class="size-16 text-destructive" />
+                        <div class="space-y-1">
+                            <p class="text-2xl font-semibold text-destructive">
+                                Check-In Failed
+                            </p>
+                            <p class="text-sm text-destructive/70">
+                                {{ scanResult.message }}
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
