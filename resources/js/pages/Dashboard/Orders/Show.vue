@@ -31,7 +31,7 @@ const props = defineProps<{
 const breadcrumbs: BreadcrumbItem[] = [
     { title: "Dashboard", href: dashboardIndex().url },
     { title: "Orders", href: dashboardOrdersIndex().url },
-    { title: `Order #${props.order.uuid}` },
+    { title: props.order.event!.title },
 ];
 
 const ticketStatusVariantMap: Record<
