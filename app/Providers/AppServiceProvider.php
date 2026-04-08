@@ -7,11 +7,9 @@ namespace App\Providers;
 use App\Enums\DashboardPermissions;
 use App\Enums\PreservedRoleList;
 use App\Events\EventCancelled;
-use App\Events\OrderCompleted;
 use App\Events\OrganizationApproved;
 use App\Events\OrganizationRejected;
 use App\Listeners\NotifyEventTicketHolders;
-use App\Listeners\SendOrderConfirmationNotification;
 use App\Listeners\SendOrganizationApprovedMail;
 use App\Listeners\SendOrganizationRejectedMail;
 use App\Listeners\VoidEventTickets;
@@ -82,8 +80,6 @@ final class AppServiceProvider extends ServiceProvider
     {
         Event::listen(OrganizationApproved::class, SendOrganizationApprovedMail::class);
         Event::listen(OrganizationRejected::class, SendOrganizationRejectedMail::class);
-
-        Event::listen(OrderCompleted::class, SendOrderConfirmationNotification::class);
 
         Event::listen(EventCancelled::class, VoidEventTickets::class);
         Event::listen(EventCancelled::class, NotifyEventTicketHolders::class);

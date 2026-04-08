@@ -41,15 +41,12 @@ use App\Http\Controllers\MyOrderController;
 use App\Http\Controllers\ProcessPaymentController;
 use App\Http\Controllers\ReserveTicketsController;
 use App\Http\Controllers\TicketQrCodeController;
-use App\Http\Controllers\Webhooks\StripeWebhookController;
 use Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', IndexController::class)->name('home');
 Route::get('events', [BrowseEventController::class, 'index'])->name('events.index');
 Route::get('events/{event:slug}', [BrowseEventController::class, 'show'])->name('events.show');
-
-Route::post('webhooks/stripe', StripeWebhookController::class)->name('webhooks.stripe');
 
 Route::middleware('guest')->group(function (): void {
     Route::as('auth.')->group(function (): void {

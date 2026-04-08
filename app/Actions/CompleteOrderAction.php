@@ -9,6 +9,7 @@ use App\Enums\TicketStatus;
 use App\Events\OrderCompleted;
 use App\Jobs\GenerateTicketQrCodesJob;
 use App\Models\Order;
+use App\Notifications\OrderConfirmedNotification;
 use Carbon\CarbonImmutable;
 use Illuminate\Bus\Dispatcher as BusDispatcher;
 use Illuminate\Database\DatabaseManager;
@@ -39,7 +40,8 @@ final class CompleteOrderAction
                 ->update(['status' => TicketStatus::Active]);
         });
 
-        $this->dispatcher->dispatch(new OrderCompleted($order));
+        $order->loadMissing('user');
+        $order->user->notify(new OrderConfirmedNotification($order));
         $this->busDispatcher->dispatch(new GenerateTicketQrCodesJob($order));
 
         return $order;
