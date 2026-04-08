@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Link, router, usePage } from "@inertiajs/vue3";
 import { computed, ref } from "vue";
+import NotificationBell from "@/components/NotificationBell.vue";
 import { usePermission } from "@/composables/usePermission";
 import { useTheme } from "@/composables/useTheme";
 import { home } from "@/wayfinder/routes";
@@ -113,6 +114,7 @@ const handleLogout = (): void => {
                     </button>
 
                     <template v-if="user">
+                        <NotificationBell variant="home" />
                         <span class="text-sm text-sf-muted font-light">{{
                             user.name
                         }}</span>
@@ -143,6 +145,7 @@ const handleLogout = (): void => {
                 </div>
 
                 <div class="md:hidden flex items-center gap-2">
+                    <NotificationBell v-if="user" variant="home" />
                     <button
                         type="button"
                         class="p-2 text-sf-muted hover:text-sf-text transition-colors"

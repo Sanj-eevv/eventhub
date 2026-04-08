@@ -2,6 +2,7 @@
 import { usePage } from "@inertiajs/vue3";
 import AppSidebar from "@/components/AppSidebar.vue";
 import Breadcrumbs from "@/components/Breadcrumbs.vue";
+import NotificationBell from "@/components/NotificationBell.vue";
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { useTheme } from "@/composables/useTheme";
 import type { BreadcrumbItem } from "@/types";
@@ -34,7 +35,8 @@ const { isDark, toggle } = useTheme();
                             <Breadcrumbs :breadcrumbs="breadcrumbs" />
                         </template>
                     </div>
-                    <div class="ml-auto">
+                    <div class="ml-auto flex items-center gap-1">
+                        <NotificationBell />
                         <button
                             type="button"
                             class="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"

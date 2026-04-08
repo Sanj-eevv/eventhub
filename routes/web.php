@@ -20,21 +20,23 @@ use App\Http\Controllers\Dashboard\ApproveOrganizationController;
 use App\Http\Controllers\Dashboard\CancelEventController;
 use App\Http\Controllers\Dashboard\CancelOrderController as DashboardCancelOrderController;
 use App\Http\Controllers\Dashboard\CheckInController;
-use App\Http\Controllers\Dashboard\OrderController as DashboardOrderController;
-use App\Http\Controllers\Dashboard\SettingController;
 use App\Http\Controllers\Dashboard\EventController;
 use App\Http\Controllers\Dashboard\EventMediaController;
+use App\Http\Controllers\Dashboard\OrderController as DashboardOrderController;
 use App\Http\Controllers\Dashboard\OrganizationController;
 use App\Http\Controllers\Dashboard\PublishEventController;
 use App\Http\Controllers\Dashboard\RejectOrganizationController;
 use App\Http\Controllers\Dashboard\RoleController;
 use App\Http\Controllers\Dashboard\ScanTicketController;
 use App\Http\Controllers\Dashboard\SetEventMediaCoverController;
+use App\Http\Controllers\Dashboard\SettingController;
 use App\Http\Controllers\Dashboard\UnpublishEventController;
 use App\Http\Controllers\Dashboard\UserController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DownloadOrderTicketsPdfController;
 use App\Http\Controllers\IndexController;
+use App\Http\Controllers\MarkAllNotificationsReadController;
+use App\Http\Controllers\MarkNotificationReadController;
 use App\Http\Controllers\MyOrderController;
 use App\Http\Controllers\ProcessPaymentController;
 use App\Http\Controllers\ReserveTicketsController;
@@ -80,6 +82,9 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
 });
 
 Route::middleware('auth')->group(function (): void {
+    Route::patch('notifications/{notificationId}/read', MarkNotificationReadController::class)->name('notifications.read');
+    Route::delete('notifications', MarkAllNotificationsReadController::class)->name('notifications.read-all');
+
     Route::as('auth.')->group(function (): void {
         Route::post('logout', LogoutController::class)->name('logout');
         Route::get('email/verify', [EmailVerificationController::class, 'index'])->name('verification.notice');

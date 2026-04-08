@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
+use App\Http\Resources\NotificationResource;
 use App\Http\Resources\SharedPermissionResource;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -40,7 +41,12 @@ final class HandleInertiaRequests extends Middleware
                 'toast_error' => fn () => $request->session()->get('toast_error'),
             ],
             'can' => fn () => $request->user() ? SharedPermissionResource::make($request->user())->toArray() : null,
-
+            'notifications' => fn () => $request->user()
+                ? NotificationResource::collection(
+                    $request->user()->unreadNotifications()->latest()->limit(10)->get()
+                )
+                : [],
+            'unread_notifications_count' => fn () => $request->user()?->unreadNotifications()->count() ?? 0,
         ];
     }
 }

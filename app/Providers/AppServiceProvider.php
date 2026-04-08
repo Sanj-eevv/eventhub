@@ -91,7 +91,6 @@ final class AppServiceProvider extends ServiceProvider
 
     private function configureDatabase(): void
     {
-
         Schema::defaultStringLength(191);
     }
 
