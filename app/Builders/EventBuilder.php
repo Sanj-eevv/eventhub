@@ -48,8 +48,23 @@ final class EventBuilder extends AppBuilder
         return $this->when($status, fn (self $query) => $query->where('events.status', $status));
     }
 
+    public function draft(): self
+    {
+        return $this->where('events.status', EventStatus::Draft);
+    }
+
     public function published(): self
     {
         return $this->where('events.status', EventStatus::Published);
+    }
+
+    public function cancelled(): self
+    {
+        return $this->where('events.status', EventStatus::Cancelled);
+    }
+
+    public function forOrganization(int $organizationId): self
+    {
+        return $this->where('events.organization_id', $organizationId);
     }
 }

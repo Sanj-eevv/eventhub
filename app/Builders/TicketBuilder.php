@@ -6,6 +6,7 @@ namespace App\Builders;
 
 use App\Enums\TicketStatus;
 use App\Models\Event;
+use Illuminate\Database\Eloquent\Builder;
 
 final class TicketBuilder extends AppBuilder
 {
@@ -19,8 +20,23 @@ final class TicketBuilder extends AppBuilder
         return $this->where('status', TicketStatus::Active);
     }
 
+    public function used(): self
+    {
+        return $this->where('status', TicketStatus::Used);
+    }
+
     public function byBookingReference(string $reference): self
     {
         return $this->where('booking_reference', $reference);
+    }
+
+    public function sold(): self
+    {
+        return $this->whereIn('status', [TicketStatus::Active, TicketStatus::Used]);
+    }
+
+    public function forOrganization(int $organizationId): self
+    {
+        return $this->whereHas('event', fn (Builder $query) => $query->where('organization_id', $organizationId));
     }
 }

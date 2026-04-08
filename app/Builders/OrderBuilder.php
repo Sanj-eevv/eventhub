@@ -53,4 +53,14 @@ final class OrderBuilder extends AppBuilder
     {
         return $this->where('status', OrderStatus::Paid);
     }
+
+    public function cancelled(): self
+    {
+        return $this->where('status', OrderStatus::Cancelled);
+    }
+
+    public function forOrganization(int $organizationId): self
+    {
+        return $this->whereHas('event', fn (Builder $query) => $query->where('organization_id', $organizationId));
+    }
 }

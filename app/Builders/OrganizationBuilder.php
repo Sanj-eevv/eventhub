@@ -16,6 +16,11 @@ final class OrganizationBuilder extends AppBuilder
         return $this->where('status', OrganizationStatus::Approved);
     }
 
+    public function pending(): self
+    {
+        return $this->where('status', OrganizationStatus::Pending);
+    }
+
     public function forIndex(): self
     {
         return $this->select(['uuid', 'title', 'contact_email', 'status', 'created_at']);
