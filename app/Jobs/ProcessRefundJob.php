@@ -15,10 +15,13 @@ final class ProcessRefundJob implements ShouldQueue
 
     public bool $deleteWhenMissingModels = true;
 
-    public function __construct(public readonly Order $order) {}
+    public function __construct(
+        public readonly Order $order,
+        public readonly ?int $refundAmount = null,
+    ) {}
 
     public function handle(ProcessRefundAction $action): void
     {
-        $action->execute($this->order);
+        $action->execute($this->order, refundAmount: $this->refundAmount);
     }
 }
