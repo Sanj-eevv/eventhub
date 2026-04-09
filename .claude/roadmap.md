@@ -19,13 +19,6 @@ Each item targets a gap in flows that already have partial infrastructure.
 - Add: `OrderCancelled → SendOrderCancelledNotification`
 - Add: `RefundCompleted → SendRefundConfirmationNotification`
 
-
-### 8. Activity / Audit Log
-- `Gate::after()` already logs denied authorizations — pattern exists
-- Add `activity_log` table with polymorphic `subject`
-- Track: published event, approved org, cancelled order, processed refund
-
-
 ### 11. Telescope (Local Dev Only)
 - Install `laravel/telescope` restricted to non-production
 - Valuable for inspecting Stripe webhook payloads, job payloads, slow queries

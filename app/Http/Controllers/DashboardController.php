@@ -32,6 +32,7 @@ final class DashboardController extends Controller
             'draftEventsNearStartDate' => fn () => $this->getDashboardStatsAction->draftEventsNearStartDate($user),
             'recentCancelledOrders' => Inertia::defer(fn () => $this->getDashboardStatsAction->recentCancelledOrders($user)),
             'eventsCheckInRates' => Inertia::defer(fn () => $this->getDashboardStatsAction->eventsCheckInRates($user)),
+            'recentActivity' => Inertia::defer(fn () => $this->getDashboardStatsAction->recentActivity($user)),
         ]);
     }
 }

@@ -2,6 +2,7 @@
 import { Deferred, Head } from "@inertiajs/vue3";
 import { Building2, Ticket, TrendingUp, XCircle } from "lucide-vue-next";
 import { computed } from "vue";
+import ActivityFeed from "@/components/Dashboard/ActivityFeed.vue";
 import CancelledOrdersTable from "@/components/Dashboard/CancelledOrdersTable.vue";
 import CheckInRatesTable from "@/components/Dashboard/CheckInRatesTable.vue";
 import DraftEventsAlert from "@/components/Dashboard/DraftEventsAlert.vue";
@@ -11,34 +12,16 @@ import { usePermission } from "@/composables/usePermission";
 import DashboardLayout from "@/layouts/DashboardLayout.vue";
 import { formatCurrency } from "@/lib/utils";
 import type { BreadcrumbItem } from "@/types";
+import type { ActivityItem } from "@/types/activity";
+import type {
+    CancelledOrder,
+    DraftEvent,
+    EventCheckInRate,
+} from "@/types/dashboard";
 import { index } from "@/wayfinder/routes/dashboard";
 import { index as eventsIndex } from "@/wayfinder/routes/dashboard/events";
 import { index as ordersIndex } from "@/wayfinder/routes/dashboard/orders";
 import { index as organizationsIndex } from "@/wayfinder/routes/dashboard/organizations";
-
-interface CancelledOrder {
-    uuid: string;
-    customer_name: string;
-    customer_email: string;
-    event_title: string;
-    total: number;
-    currency: string;
-    cancelled_at: string | null;
-}
-
-interface EventCheckInRate {
-    uuid: string;
-    title: string;
-    starts_at: string;
-    total_tickets: number;
-    checked_in_count: number;
-}
-
-interface DraftEvent {
-    uuid: string;
-    title: string;
-    starts_at: string;
-}
 
 const props = defineProps<{
     pendingOrganizationsCount: number;
@@ -49,6 +32,7 @@ const props = defineProps<{
     ticketsSoldThisMonth: number;
     draftEventsNearStartDate: DraftEvent[];
     eventsByStatus: { draft: number; published: number; cancelled: number };
+    recentActivity?: ActivityItem[] | null;
 }>();
 
 const canOrg = usePermission("organization");
@@ -151,6 +135,13 @@ const primaryStats = computed(() => {
                     "
                     :events="props.eventsCheckInRates"
                 />
+            </Deferred>
+
+            <Deferred data="recentActivity">
+                <template #fallback>
+                    <div class="h-40 animate-pulse rounded-lg bg-muted" />
+                </template>
+                <ActivityFeed :items="props.recentActivity ?? []" />
             </Deferred>
 
             <Deferred data="recentCancelledOrders">

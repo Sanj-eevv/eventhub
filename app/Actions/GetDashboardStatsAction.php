@@ -6,6 +6,7 @@ namespace App\Actions;
 
 use App\Builders\TicketBuilder;
 use App\Enums\PreservedRoleList;
+use App\Models\ActivityLog;
 use App\Models\Event;
 use App\Models\Order;
 use App\Models\Organization;
@@ -147,6 +148,33 @@ final class GetDashboardStatsAction
                 'uuid' => $event->uuid,
                 'title' => $event->title,
                 'starts_at' => $event->starts_at->toISOString(),
+            ])
+            ->all();
+    }
+
+    public function recentActivity(User $user): array
+    {
+        if ($user->hasAnyRole(PreservedRoleList::OrganizationAdmin)) {
+            return [];
+        }
+
+        return ActivityLog::query()
+            ->with(['causer', 'subject'])
+            ->latest('created_at')
+            ->limit(10)
+            ->get()
+            ->map(fn (ActivityLog $log) => [
+                'uuid' => $log->uuid,
+                'event' => ['value' => $log->event->value, 'label' => $log->event->label()],
+                'causer_name' => $log->causer?->name,
+                'subject_label' => match (true) {
+                    $log->subject instanceof Event => $log->subject->title,
+                    $log->subject instanceof Order => $log->subject->uuid,
+                    $log->subject instanceof Organization => $log->subject->title,
+                    default => null,
+                },
+                'properties' => $log->properties,
+                'created_at' => $log->created_at->toISOString(),
             ])
             ->all();
     }

@@ -11,6 +11,7 @@ use App\Services\SettingsService;
 use Carbon\CarbonImmutable;
 use Illuminate\Bus\Dispatcher;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -23,7 +24,7 @@ final class CancelPaidOrderController extends Controller
         private readonly SettingsService $settingsService,
     ) {}
 
-    public function __invoke(Order $order): RedirectResponse
+    public function __invoke(Order $order, Request $request): RedirectResponse
     {
         $this->authorize('cancel', $order);
 
@@ -31,7 +32,7 @@ final class CancelPaidOrderController extends Controller
             throw new HttpException(422, 'The cancellation window for this order has passed.');
         }
 
-        $this->cancelPaidOrderAction->execute($order);
+        $this->cancelPaidOrderAction->execute($order, $request->user());
 
         $this->dispatcher->dispatch(new ProcessRefundJob($order));
 

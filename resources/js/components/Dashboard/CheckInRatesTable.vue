@@ -8,14 +8,7 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { formatDate } from "@/lib/utils";
-
-interface EventCheckInRate {
-    uuid: string;
-    title: string;
-    starts_at: string;
-    total_tickets: number;
-    checked_in_count: number;
-}
+import type { EventCheckInRate } from "@/types/dashboard";
 
 defineProps<{
     events: EventCheckInRate[];

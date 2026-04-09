@@ -11,12 +11,7 @@ import {
 } from "@/components/ui/table";
 import { index as eventsIndex } from "@/wayfinder/routes/dashboard/events";
 import { formatDate } from "@/lib/utils";
-
-interface DraftEvent {
-    uuid: string;
-    title: string;
-    starts_at: string;
-}
+import type { DraftEvent } from "@/types/dashboard";
 
 defineProps<{
     events: DraftEvent[];

@@ -8,16 +8,7 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { formatCurrency, formatDate } from "@/lib/utils";
-
-interface CancelledOrder {
-    uuid: string;
-    customer_name: string;
-    customer_email: string;
-    event_title: string;
-    total: number;
-    currency: string;
-    cancelled_at: string | null;
-}
+import type { CancelledOrder } from "@/types/dashboard";
 
 defineProps<{
     orders: CancelledOrder[];

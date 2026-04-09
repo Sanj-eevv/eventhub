@@ -10,6 +10,7 @@ use App\Jobs\ProcessRefundJob;
 use App\Models\Order;
 use Illuminate\Bus\Dispatcher;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 
 final class CancelOrderController extends Controller
@@ -20,11 +21,11 @@ final class CancelOrderController extends Controller
         private readonly Redirector $redirector,
     ) {}
 
-    public function __invoke(Order $order): RedirectResponse
+    public function __invoke(Order $order, Request $request): RedirectResponse
     {
         $this->authorize('cancel', $order);
 
-        $this->cancelPaidOrderAction->execute($order);
+        $this->cancelPaidOrderAction->execute($order, $request->user());
 
         $this->dispatcher->dispatch(new ProcessRefundJob($order));
 
