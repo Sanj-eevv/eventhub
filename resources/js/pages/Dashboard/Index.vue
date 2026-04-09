@@ -43,8 +43,8 @@ interface DraftEvent {
 const props = defineProps<{
     pendingOrganizationsCount: number;
     cancelledOrdersCount: number;
-    recentCancelledOrders: CancelledOrder[] | null;
-    eventsCheckInRates: EventCheckInRate[] | null;
+    recentCancelledOrders?: CancelledOrder[] | null;
+    eventsCheckInRates?: EventCheckInRate[] | null;
     revenueThisMonth: { amount: number; currency: string };
     ticketsSoldThisMonth: number;
     draftEventsNearStartDate: DraftEvent[];

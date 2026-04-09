@@ -16,6 +16,8 @@ final class IndexResource extends JsonResource
             'title' => $this->title,
             'status' => ['value' => $this->status->value, 'label' => $this->status->label()],
             'organization' => $this->organization_title ? ['uuid' => $this->organization_uuid, 'title' => $this->organization_title] : null,
+            'venue_name' => $this->venue_name,
+            'address' => $this->address,
             'starts_at' => $this->starts_at->toISOString(),
             'ends_at' => $this->ends_at?->toISOString(),
             'created_at' => $this->created_at->toISOString(),

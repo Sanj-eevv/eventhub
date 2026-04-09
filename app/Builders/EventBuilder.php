@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Builders;
 
 use App\Enums\EventStatus;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\JoinClause;
 
@@ -25,6 +26,8 @@ final class EventBuilder extends AppBuilder
                 'events.status',
                 'events.starts_at',
                 'events.ends_at',
+                'events.venue_name',
+                'events.address',
                 'events.created_at',
                 'o.uuid as organization_uuid',
                 'o.title as organization_title',
@@ -40,7 +43,13 @@ final class EventBuilder extends AppBuilder
         return $this->when($search, fn (self $query) => $query->where(fn (Builder $query) => $query
             ->where('events.title', 'like', "%{$search}%")
             ->orWhere('events.description', 'like', "%{$search}%")
-            ->orWhere('o.title', 'like', "%{$search}%")));
+            ->orWhere('events.venue_name', 'like', "%{$search}%")
+            ->orWhere('events.address', 'like', "%{$search}%")));
+    }
+
+    public function upcoming(): self
+    {
+        return $this->where('events.starts_at', '>=', CarbonImmutable::now());
     }
 
     public function filterByStatus(?string $status): self

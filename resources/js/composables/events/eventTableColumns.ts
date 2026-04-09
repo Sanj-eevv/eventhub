@@ -41,6 +41,18 @@ export function createEventColumns(
             cell: ({ row }) => row.original.organization?.title ?? "—",
         },
         {
+            accessorKey: "venue_name",
+            header: "Venue",
+            enableSorting: false,
+            cell: ({ row }) => row.original.venue_name,
+        },
+        {
+            accessorKey: "address",
+            header: "Address",
+            enableSorting: false,
+            cell: ({ row }) => row.original.address,
+        },
+        {
             accessorKey: "status",
             header: "Status",
             enableSorting: true,

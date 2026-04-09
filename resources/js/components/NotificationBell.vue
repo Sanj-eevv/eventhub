@@ -10,7 +10,11 @@ import {
 } from "@/components/ui/popover";
 import type { NotificationResource } from "@/types/notification";
 import { index as dashboardNotificationsIndex } from "@/wayfinder/routes/dashboard/notifications";
-import { index as notificationsIndex, read, readAll } from "@/wayfinder/routes/notifications";
+import {
+    index as notificationsIndex,
+    read,
+    readAll,
+} from "@/wayfinder/routes/notifications";
 
 const props = withDefaults(defineProps<{ variant?: "dashboard" | "home" }>(), {
     variant: "dashboard",
@@ -36,7 +40,8 @@ const theme = computed(() =>
               unreadDot: "h-1.5 w-1.5 rounded-full bg-sf-gold shrink-0 mt-1.5",
               emptyIcon: "size-8 text-sf-muted/40",
               emptyText: "text-sm text-sf-muted",
-              viewAll: "text-xs text-sf-muted transition-colors hover:text-sf-text",
+              viewAll:
+                  "text-xs text-sf-muted transition-colors hover:text-sf-text",
           }
         : {
               trigger:
@@ -54,7 +59,8 @@ const theme = computed(() =>
               unreadDot: "h-1.5 w-1.5 rounded-full bg-primary shrink-0 mt-1.5",
               emptyIcon: "size-8 text-muted-foreground/40",
               emptyText: "text-sm text-muted-foreground",
-              viewAll: "text-xs text-muted-foreground transition-colors hover:text-foreground",
+              viewAll:
+                  "text-xs text-muted-foreground transition-colors hover:text-foreground",
           },
 );
 
@@ -69,7 +75,9 @@ const allNotifications = computed(() => page.props.all_notifications);
 const unreadCount = computed(() => page.props.unread_notifications_count);
 
 const activeNotifications = computed(() =>
-    activeTab.value === "unread" ? unreadNotifications.value : allNotifications.value,
+    activeTab.value === "unread"
+        ? unreadNotifications.value
+        : allNotifications.value,
 );
 
 function markAsRead(notification: NotificationResource): void {
@@ -114,7 +122,11 @@ function markAllAsRead(): void {
                     <button
                         type="button"
                         class="pb-2.5 text-sm font-medium transition-colors"
-                        :class="activeTab === 'all' ? theme.tabActive : theme.tabInactive"
+                        :class="
+                            activeTab === 'all'
+                                ? theme.tabActive
+                                : theme.tabInactive
+                        "
                         @click="activeTab = 'all'"
                     >
                         All
@@ -122,7 +134,11 @@ function markAllAsRead(): void {
                     <button
                         type="button"
                         class="pb-2.5 text-sm font-medium transition-colors"
-                        :class="activeTab === 'unread' ? theme.tabActive : theme.tabInactive"
+                        :class="
+                            activeTab === 'unread'
+                                ? theme.tabActive
+                                : theme.tabInactive
+                        "
                         @click="activeTab = 'unread'"
                     >
                         Unread
@@ -158,7 +174,10 @@ function markAllAsRead(): void {
                     v-for="notification in activeNotifications"
                     :key="notification.id"
                     type="button"
-                    :class="[theme.item, notification.read_at ? theme.itemRead : '']"
+                    :class="[
+                        theme.item,
+                        notification.read_at ? theme.itemRead : '',
+                    ]"
                     @click="markAsRead(notification)"
                 >
                     <div class="flex items-start gap-2">
@@ -186,12 +205,13 @@ function markAllAsRead(): void {
                 </button>
             </div>
 
-            <div
-                class="border-t px-4 py-2.5"
-                :class="theme.headerBorder"
-            >
+            <div class="border-t px-4 py-2.5" :class="theme.headerBorder">
                 <Link
-                    :href="variant === 'dashboard' ? dashboardNotificationsIndex().url : notificationsIndex().url"
+                    :href="
+                        variant === 'dashboard'
+                            ? dashboardNotificationsIndex().url
+                            : notificationsIndex().url
+                    "
                     :class="theme.viewAll"
                 >
                     View all notifications →

@@ -20,16 +20,25 @@ final class BrowseEventController extends Controller
         private readonly ResponseFactory $inertiaResponse,
     ) {}
 
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        $search = $request->string('search')->toString() ?: null;
+        $upcoming = $request->boolean('upcoming');
+
         $events = Event::query()
             ->published()
-            ->orderBy('starts_at', 'desc')
+            ->search($search)
+            ->when($upcoming, fn ($query) => $query->upcoming())
+            ->orderBy('starts_at', 'asc')
             ->with('coverImage')
             ->paginate(12);
 
         return $this->inertiaResponse->render('Events/Index', [
             'events' => $this->inertiaResponse->scroll(EventResource::collection($events)),
+            'filters' => [
+                'search' => $search ?? '',
+                'upcoming' => $upcoming,
+            ],
         ]);
     }
 
