@@ -22,6 +22,7 @@ use App\Http\Controllers\Dashboard\CancelOrderController as DashboardCancelOrder
 use App\Http\Controllers\Dashboard\CheckInController;
 use App\Http\Controllers\Dashboard\EventController;
 use App\Http\Controllers\Dashboard\EventMediaController;
+use App\Http\Controllers\Dashboard\NotificationsController as DashboardNotificationsController;
 use App\Http\Controllers\Dashboard\OrderController as DashboardOrderController;
 use App\Http\Controllers\Dashboard\OrganizationController;
 use App\Http\Controllers\Dashboard\PublishEventController;
@@ -38,6 +39,7 @@ use App\Http\Controllers\IndexController;
 use App\Http\Controllers\MarkAllNotificationsReadController;
 use App\Http\Controllers\MarkNotificationReadController;
 use App\Http\Controllers\MyOrderController;
+use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\ProcessPaymentController;
 use App\Http\Controllers\ReserveTicketsController;
 use App\Http\Controllers\TicketQrCodeController;
@@ -79,6 +81,7 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
 });
 
 Route::middleware('auth')->group(function (): void {
+    Route::get('notifications', NotificationsController::class)->name('notifications.index');
     Route::patch('notifications/{notificationId}/read', MarkNotificationReadController::class)->name('notifications.read');
     Route::delete('notifications', MarkAllNotificationsReadController::class)->name('notifications.read-all');
 
@@ -90,6 +93,7 @@ Route::middleware('auth')->group(function (): void {
     });
     Route::middleware(['can:access-dashboard', 'verified:auth.verification.notice'])->prefix('dashboard')->as('dashboard.')->group(function (): void {
         Route::get('/', DashboardController::class)->name('index');
+        Route::get('notifications', DashboardNotificationsController::class)->name('notifications.index');
         Route::resource('users', UserController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
         Route::resource('roles', RoleController::class);
         Route::resource('organizations', OrganizationController::class)->only(['index', 'show', 'store', 'update', 'destroy']);

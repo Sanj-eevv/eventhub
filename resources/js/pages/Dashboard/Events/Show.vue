@@ -2,6 +2,7 @@
 import { Head, Link } from "@inertiajs/vue3";
 import { ArrowLeftIcon, ScanLine } from "lucide-vue-next";
 import { computed, ref } from "vue";
+import CancelEventDialog from "@/components/Dashboard/Events/CancelEventDialog.vue";
 import EventStatusBadge from "@/components/Dashboard/Events/EventStatusBadge.vue";
 import ImageLightbox from "@/components/ImageLightbox.vue";
 import { Button } from "@/components/ui/button";
@@ -27,6 +28,7 @@ import { show as orgsShow } from "@/wayfinder/routes/dashboard/organizations";
 import { show as usersShow } from "@/wayfinder/routes/dashboard/users";
 
 const canCheckIn = usePermission("event")("checkIn");
+const canCancel = usePermission("event")("cancel");
 
 const props = defineProps<{
     event: EventResource;
@@ -47,6 +49,7 @@ const galleryImages = computed<MediaResource[]>(
 
 const lightboxOpen = ref(false);
 const lightboxIndex = ref(0);
+const cancelDialogOpen = ref(false);
 
 function openLightbox(index: number): void {
     lightboxIndex.value = index;
@@ -66,11 +69,13 @@ function openLightbox(index: number): void {
                         Back
                     </Link>
                 </Button>
-                <h1 class="flex-1 min-w-0 text-2xl font-bold truncate">
-                    {{ event.title }}
-                </h1>
+                <div class="flex-1 min-w-0 flex items-center gap-2.5">
+                    <h1 class="text-2xl font-bold truncate">
+                        {{ event.title }}
+                    </h1>
+                    <EventStatusBadge :status="event.status" class="shrink-0" />
+                </div>
                 <div class="flex items-center gap-2 shrink-0">
-                    <EventStatusBadge :status="event.status" />
                     <Button
                         v-if="canCheckIn"
                         variant="outline"
@@ -81,6 +86,17 @@ function openLightbox(index: number): void {
                             <ScanLine class="size-4" />
                             Check In
                         </Link>
+                    </Button>
+                    <Button
+                        v-if="
+                            canCancel &&
+                            event.status.value !== 'cancelled'
+                        "
+                        variant="destructive"
+                        size="sm"
+                        @click="cancelDialogOpen = true"
+                    >
+                        Cancel Event
                     </Button>
                     <Button variant="outline" size="sm" as-child>
                         <Link :href="eventsEdit({ event: event.uuid }).url"
@@ -284,6 +300,12 @@ function openLightbox(index: number): void {
             v-model:open="lightboxOpen"
             :images="galleryImages"
             :initial-index="lightboxIndex"
+        />
+
+        <CancelEventDialog
+            v-if="canCancel"
+            v-model:open="cancelDialogOpen"
+            :event="event"
         />
     </DashboardLayout>
 </template>

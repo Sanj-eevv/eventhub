@@ -9,10 +9,9 @@ use App\Enums\PreservedRoleList;
 use App\Events\EventCancelled;
 use App\Events\OrganizationApproved;
 use App\Events\OrganizationRejected;
-use App\Listeners\NotifyEventTicketHolders;
+use App\Listeners\HandleEventCancelled;
 use App\Listeners\SendOrganizationApprovedMail;
 use App\Listeners\SendOrganizationRejectedMail;
-use App\Listeners\VoidEventTickets;
 use App\Models\Event as EventModel;
 use App\Models\User;
 use App\Services\SettingsService;
@@ -81,8 +80,7 @@ final class AppServiceProvider extends ServiceProvider
         Event::listen(OrganizationApproved::class, SendOrganizationApprovedMail::class);
         Event::listen(OrganizationRejected::class, SendOrganizationRejectedMail::class);
 
-        Event::listen(EventCancelled::class, VoidEventTickets::class);
-        Event::listen(EventCancelled::class, NotifyEventTicketHolders::class);
+        Event::listen(EventCancelled::class, HandleEventCancelled::class);
     }
 
     private function configureDatabase(): void

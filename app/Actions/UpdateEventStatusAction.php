@@ -9,9 +9,12 @@ use App\Events\EventCancelled;
 use App\Exceptions\InvalidStatusTransitionException;
 use App\Exceptions\MissingEventCoverImageException;
 use App\Models\Event;
+use Illuminate\Events\Dispatcher;
 
 final class UpdateEventStatusAction
 {
+    public function __construct(private readonly Dispatcher $dispatcher) {}
+
     public function execute(Event $event, EventStatus $status): Event
     {
         if ( ! $event->status->canTransitionTo($status)) {
@@ -25,7 +28,7 @@ final class UpdateEventStatusAction
         $event->update(['status' => $status]);
 
         if (EventStatus::Cancelled === $status) {
-            EventCancelled::dispatch($event);
+            $this->dispatcher->dispatch(new EventCancelled($event));
         }
 
         return $event;

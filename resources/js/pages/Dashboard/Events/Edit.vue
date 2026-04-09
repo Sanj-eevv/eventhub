@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { router } from "@inertiajs/vue3";
-import { onMounted, shallowRef } from "vue";
+import { onMounted, ref, shallowRef } from "vue";
+import CancelEventDialog from "@/components/Dashboard/Events/CancelEventDialog.vue";
 import EventForm from "@/components/Dashboard/Events/EventForm.vue";
 import EventStatusBadge from "@/components/Dashboard/Events/EventStatusBadge.vue";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
+import { usePermission } from "@/composables/usePermission";
 import DashboardLayout from "@/layouts/DashboardLayout.vue";
 import type { BreadcrumbItem } from "@/types";
 import type { EventResource } from "@/types/event";
@@ -32,7 +34,9 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: props.event.title, href: eventsEdit(props.event.uuid).url },
 ];
 
+const canCancel = usePermission("event")("cancel");
 const isPublishing = shallowRef(false);
+const cancelDialogOpen = ref(false);
 const eventForm = shallowRef<InstanceType<typeof EventForm> | null>(null);
 
 onMounted(() => {
@@ -88,6 +92,18 @@ const handleStatusChange = (action: StatusAction) => {
 
                     <div class="flex shrink-0 gap-2">
                         <Button
+                            v-if="
+                                canCancel &&
+                                event.status.value !== 'cancelled'
+                            "
+                            type="button"
+                            variant="destructive"
+                            size="sm"
+                            @click="cancelDialogOpen = true"
+                        >
+                            Cancel Event
+                        </Button>
+                        <Button
                             v-if="event.status.value === 'draft'"
                             type="button"
                             size="sm"
@@ -111,6 +127,12 @@ const handleStatusChange = (action: StatusAction) => {
                     </div>
                 </div>
             </div>
+
+            <CancelEventDialog
+                v-if="canCancel"
+                v-model:open="cancelDialogOpen"
+                :event="event"
+            />
 
             <div class="flex min-h-0 flex-1 flex-col">
                 <EventForm

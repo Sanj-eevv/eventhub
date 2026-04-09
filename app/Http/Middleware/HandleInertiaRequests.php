@@ -41,9 +41,14 @@ final class HandleInertiaRequests extends Middleware
                 'toast_error' => fn () => $request->session()->get('toast_error'),
             ],
             'can' => fn () => $request->user() ? SharedPermissionResource::make($request->user())->toArray() : null,
-            'notifications' => fn () => $request->user()
+            'unread_notifications' => fn () => $request->user()
                 ? NotificationResource::collection(
                     $request->user()->unreadNotifications()->latest()->limit(10)->get()
+                )
+                : [],
+            'all_notifications' => fn () => $request->user()
+                ? NotificationResource::collection(
+                    $request->user()->notifications()->latest()->limit(15)->get()
                 )
                 : [],
             'unread_notifications_count' => fn () => $request->user()?->unreadNotifications()->count() ?? 0,
