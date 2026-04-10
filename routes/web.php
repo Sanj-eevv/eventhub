@@ -25,7 +25,7 @@ Route::get('/', IndexController::class)->name('home');
 Route::get('events', [BrowseEventController::class, 'index'])->name('events.index');
 Route::get('events/{event:slug}', [BrowseEventController::class, 'show'])->name('events.show');
 
-Route::middleware(['auth', 'verified'])->group(function (): void {
+Route::middleware(['auth', 'verified:auth.verification.notice'])->group(function (): void {
     Route::post('events/{event:slug}/reserve', ReserveTicketsController::class)->name('tickets.reserve');
     Route::get('checkout/{order:uuid}', [CheckoutController::class, 'show'])->name('checkout.show');
     Route::delete('checkout/{order:uuid}', CancelReservedOrderController::class)->name('checkout.cancel');

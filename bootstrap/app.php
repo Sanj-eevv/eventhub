@@ -23,6 +23,8 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->redirectGuestsTo(fn () => route('auth.login'));
+
         $middleware->validateCsrfTokens(except: [
             'webhooks/stripe',
         ]);

@@ -114,7 +114,7 @@ final class EventRequest extends FormRequest
                 price: (int) round($type['price'] * 100),
                 capacity: (int) $type['capacity'],
                 sort_order: $index,
-                uuid: $type['uuid'],
+                uuid: $type['uuid'] ?? '',
                 max_per_user: isset($type['max_per_user']) ? (int) $type['max_per_user'] : null,
                 sale_starts_at: isset($type['sale_starts_at']) ? CarbonImmutable::parse($type['sale_starts_at'], $timezone)->utc() : null,
                 sale_ends_at: isset($type['sale_ends_at']) ? CarbonImmutable::parse($type['sale_ends_at'], $timezone)->utc() : null,

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Requests\Auth;
 
 use App\DataTransferObjects\UserData;
-use App\Models\Role;
+use App\Enums\PreservedRoleList;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Password;
 
@@ -28,7 +28,7 @@ final class RegisterRequest extends FormRequest
             name: $validated['name'],
             email: $validated['email'],
             password: $validated['password'],
-            role_id: Role::userRole()->id,
+            role_slug: PreservedRoleList::User->value,
         );
     }
 }

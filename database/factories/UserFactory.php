@@ -22,6 +22,7 @@ final class UserFactory extends Factory
     {
         return [
             'role_id' => Role::factory(),
+            'organization_id' => null,
             'name' => $this->faker->name,
             'email' => $this->faker->unique()->safeEmail,
             'email_verified_at' => now(),

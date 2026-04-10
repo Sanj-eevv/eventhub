@@ -29,13 +29,13 @@ final class RolePolicy extends BasePolicy
         return $user->hasPermission(RolePermissions::Create);
     }
 
-    public function update(User $user, Role $role): bool
+    public function update(User $user, ?Role $role = null): bool
     {
-        return $user->hasPermission(RolePermissions::Update) && ! $role->preserved;
+        return $user->hasPermission(RolePermissions::Update) && (null === $role || ! $role->preserved);
     }
 
-    public function delete(User $user, Role $role): bool
+    public function delete(User $user, ?Role $role = null): bool
     {
-        return $user->hasPermission(RolePermissions::Delete) && ! $role->preserved;
+        return $user->hasPermission(RolePermissions::Delete) && (null === $role || ! $role->preserved);
     }
 }

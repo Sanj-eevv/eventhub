@@ -38,65 +38,65 @@ final class EventPolicy extends BasePolicy
         return $user->hasPermission(EventPermissions::Create);
     }
 
-    public function update(User $user, Event $event): bool
+    public function update(User $user, ?Event $event = null): bool
     {
         if ( ! $user->hasPermission(EventPermissions::Update)) {
             return false;
         }
 
-        if ($user->hasAnyRole(PreservedRoleList::Admin)) {
+        if (null === $event || $user->hasAnyRole(PreservedRoleList::Admin)) {
             return true;
         }
 
         return $this->withinOrganization($user, $event);
     }
 
-    public function publish(User $user, Event $event): bool
+    public function publish(User $user, ?Event $event = null): bool
     {
         if ( ! $user->hasPermission(EventPermissions::Publish)) {
             return false;
         }
 
-        if ($user->hasAnyRole(PreservedRoleList::Admin)) {
+        if (null === $event || $user->hasAnyRole(PreservedRoleList::Admin)) {
             return true;
         }
 
         return $this->withinOrganization($user, $event);
     }
 
-    public function unpublish(User $user, Event $event): bool
+    public function unpublish(User $user, ?Event $event = null): bool
     {
         if ( ! $user->hasPermission(EventPermissions::Unpublish)) {
             return false;
         }
 
-        if ($user->hasAnyRole(PreservedRoleList::Admin)) {
+        if (null === $event || $user->hasAnyRole(PreservedRoleList::Admin)) {
             return true;
         }
 
         return $this->withinOrganization($user, $event);
     }
 
-    public function cancel(User $user, Event $event): bool
+    public function cancel(User $user, ?Event $event = null): bool
     {
         if ( ! $user->hasPermission(EventPermissions::Cancel)) {
             return false;
         }
 
-        if ($user->hasAnyRole(PreservedRoleList::Admin)) {
+        if (null === $event || $user->hasAnyRole(PreservedRoleList::Admin)) {
             return true;
         }
 
         return $this->withinOrganization($user, $event);
     }
 
-    public function delete(User $user, Event $event): bool
+    public function delete(User $user, ?Event $event = null): bool
     {
         if ( ! $user->hasPermission(EventPermissions::Delete)) {
             return false;
         }
 
-        if ($user->hasAnyRole(PreservedRoleList::Admin)) {
+        if (null === $event || $user->hasAnyRole(PreservedRoleList::Admin)) {
             return true;
         }
 
@@ -108,13 +108,13 @@ final class EventPolicy extends BasePolicy
         return EventStatus::Published === $event->status;
     }
 
-    public function checkIn(User $user, Event $event): bool
+    public function checkIn(User $user, ?Event $event = null): bool
     {
         if ( ! $user->hasPermission(EventPermissions::CheckIn)) {
             return false;
         }
 
-        if ($user->hasAnyRole(PreservedRoleList::Admin)) {
+        if (null === $event || $user->hasAnyRole(PreservedRoleList::Admin)) {
             return true;
         }
 
