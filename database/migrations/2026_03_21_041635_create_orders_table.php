@@ -17,6 +17,7 @@ return new class() extends Migration
             $table->foreignId('user_id')->constrained()->restrictOnDelete();
             $table->foreignId('event_id')->constrained()->restrictOnDelete();
             $table->string('status')->default('reserved');
+            $table->index(['event_id', 'status']);
             $table->char('currency', 3)->default('USD');
             $table->unsignedBigInteger('subtotal');
             $table->unsignedBigInteger('total');
@@ -27,7 +28,7 @@ return new class() extends Migration
             $table->timestamp('refunded_at')->nullable();
             $table->timestamp('reserved_at')->nullable();
             $table->timestamp('expires_at')->nullable()->index();
-            $table->timestamp('paid_at')->nullable();
+            $table->timestamp('paid_at')->nullable()->index();
             $table->timestamp('cancelled_at')->nullable();
             $table->timestamps();
         });

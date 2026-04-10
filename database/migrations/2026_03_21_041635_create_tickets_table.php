@@ -21,6 +21,7 @@ return new class() extends Migration
             $table->string('attendee_name');
             $table->string('attendee_email');
             $table->string('status')->default('pending');
+            $table->index(['event_id', 'status']);
             $table->string('qr_code_path')->nullable();
             $table->timestamp('checked_in_at')->nullable();
             $table->foreignId('checked_in_by')->nullable()->constrained('users')->nullOnDelete();

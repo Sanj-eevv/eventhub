@@ -7,6 +7,7 @@ namespace App\Actions;
 use App\Models\Order;
 use App\Models\Ticket;
 use Illuminate\Filesystem\FilesystemManager;
+use RuntimeException;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 final class GenerateTicketQrCodesAction
@@ -21,7 +22,9 @@ final class GenerateTicketQrCodesAction
             $svg = QrCode::format('svg')->generate($ticket->booking_reference);
             $path = "tickets/{$order->uuid}/{$ticket->uuid}.svg";
 
-            $this->filesystemManager->disk('local')->put($path, $svg);
+            if ( ! $this->filesystemManager->disk('local')->put($path, $svg)) {
+                throw new RuntimeException("Failed to write QR code to disk for ticket [{$ticket->uuid}].");
+            }
 
             $ticket->update(['qr_code_path' => $path]);
         });

@@ -9,20 +9,22 @@ use App\DataTransferObjects\TicketTypeData;
 use App\Enums\TicketStatus;
 use App\Models\Event;
 use App\Models\TicketType;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\DatabaseManager;
 
 final class UpdateEventAction
 {
+    public function __construct(
+        private readonly DatabaseManager $databaseManager,
+    ) {}
+
     public function execute(Event $event, EventData $data): Event
     {
-        return DB::transaction(function () use ($event, $data): Event {
+        return $this->databaseManager->transaction(function () use ($event, $data): Event {
             $event->update([
-                'user_id' => $data->user_id,
-                'organization_id' => $data->organization_id,
                 'title' => $data->title,
                 'description' => $data->description,
-                'starts_at' => $data->starts_at,
-                'ends_at' => $data->ends_at,
+                'starts_at' => $data->period->start,
+                'ends_at' => $data->period->end,
                 'timezone' => $data->timezone,
                 'venue_name' => $data->venue_name,
                 'address' => $data->address,

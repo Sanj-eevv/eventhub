@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Notifications;
 
 use App\Models\Order;
+use App\ValueObjects\Money;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -26,7 +27,7 @@ final class RefundCompletedNotification extends Notification implements ShouldQu
 
     public function toMail(object $notifiable): MailMessage
     {
-        $formatted = number_format($this->refundAmount / 100, 2).' '.mb_strtoupper($this->order->currency);
+        $formatted = Money::fromCents($this->refundAmount, $this->order->currency)->format();
 
         return (new MailMessage())
             ->subject("Refund Processed — {$this->order->event->title}")

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions;
 
+use App\Enums\ActivityEvent;
 use App\Enums\EventStatus;
 use App\Enums\TicketStatus;
 use App\Exceptions\InvalidStatusTransitionException;
@@ -14,8 +15,12 @@ use RuntimeException;
 
 final class CheckInTicketAction
 {
+    public function __construct(private readonly RecordActivityAction $recordActivityAction) {}
+
     public function execute(Ticket $ticket, User $scanner): Ticket
     {
+        $ticket->loadMissing('event');
+
         if (EventStatus::Published !== $ticket->event->status) {
             throw new RuntimeException('Check-in is only available for published events.');
         }
@@ -29,6 +34,8 @@ final class CheckInTicketAction
             'checked_in_at' => CarbonImmutable::now(),
             'checked_in_by' => $scanner->id,
         ]);
+
+        $this->recordActivityAction->execute(ActivityEvent::TicketCheckedIn, $ticket, $scanner);
 
         return $ticket;
     }

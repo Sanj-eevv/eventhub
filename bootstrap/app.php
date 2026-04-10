@@ -6,7 +6,10 @@ use App\Exceptions\ActiveReservationExistsException;
 use App\Exceptions\InsufficientTicketCapacityException;
 use App\Exceptions\InvalidStatusTransitionException;
 use App\Exceptions\MediaLimitExceededException;
+use App\Exceptions\MissingEventCoverImageException;
 use App\Exceptions\TicketLimitExceededException;
+use App\Exceptions\TicketSaleClosedException;
+use App\Exceptions\TicketSaleNotOpenException;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\LoadPermissionsMiddleware;
 use Illuminate\Foundation\Application;
@@ -35,4 +38,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(fn (InsufficientTicketCapacityException $exception) => back()->with('toast_error', $exception->getMessage()));
         $exceptions->render(fn (TicketLimitExceededException $exception) => back()->with('toast_error', $exception->getMessage()));
         $exceptions->render(fn (MediaLimitExceededException $exception) => back()->with('toast_error', $exception->getMessage()));
+        $exceptions->render(fn (MissingEventCoverImageException $exception) => back()->with('toast_error', $exception->getMessage()));
+        $exceptions->render(fn (TicketSaleNotOpenException $exception) => back()->with('toast_error', $exception->getMessage()));
+        $exceptions->render(fn (TicketSaleClosedException $exception) => back()->with('toast_error', $exception->getMessage()));
     })->create();

@@ -15,6 +15,7 @@ use App\Listeners\SendOrganizationRejectedMail;
 use App\Models\Event as EventModel;
 use App\Models\Order;
 use App\Models\Organization;
+use App\Models\Ticket;
 use App\Models\User;
 use App\Services\SettingsService;
 use Carbon\CarbonImmutable;
@@ -105,6 +106,7 @@ final class AppServiceProvider extends ServiceProvider
             'event' => EventModel::class,
             'order' => Order::class,
             'organization' => Organization::class,
+            'ticket' => Ticket::class,
             'user' => User::class,
         ]);
     }

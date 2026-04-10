@@ -6,11 +6,11 @@ namespace App\Notifications;
 
 use App\Models\Order;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-final class OrderConfirmedNotification extends Notification implements ShouldQueueAfterCommit
+final class PaymentFailedNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -24,18 +24,18 @@ final class OrderConfirmedNotification extends Notification implements ShouldQue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage())
-            ->subject("Order Confirmed — {$this->order->event->title}")
+            ->subject("Payment Failed — {$this->order->event->title}")
             ->greeting("Hi {$notifiable->name},")
-            ->line("Your order for **{$this->order->event->title}** has been confirmed.")
-            ->line('Booking references: '.$this->order->tickets->pluck('booking_reference')->implode(', '))
+            ->line("Your payment for **{$this->order->event->title}** could not be processed.")
+            ->line('Please try again with a different payment method.')
             ->action('View Order', route('orders.show', $this->order));
     }
 
     public function toArray(object $notifiable): array
     {
         return [
-            'title' => 'Order Confirmed',
-            'body' => "Your order for {$this->order->event->title} has been confirmed.",
+            'title' => 'Payment Failed',
+            'body' => "Your payment for {$this->order->event->title} could not be processed.",
             'url' => route('orders.show', $this->order),
         ];
     }

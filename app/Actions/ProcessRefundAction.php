@@ -23,7 +23,7 @@ final class ProcessRefundAction
 
     public function execute(Order $order, ?User $causer = null, ?int $refundAmount = null): void
     {
-        $refundAmount ??= (int) round($order->total * $this->settingsService->get()->refundPercentage / 100);
+        $refundAmount ??= $this->settingsService->get()->refundPercentage->applyTo($order->total);
 
         $refundId = $this->paymentGateway->refundPaymentIntent(
             $order->stripe_payment_intent_id,

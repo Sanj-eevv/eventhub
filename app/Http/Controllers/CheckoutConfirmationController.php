@@ -21,7 +21,7 @@ final class CheckoutConfirmationController extends Controller
     {
         $this->authorize('view', $order);
 
-        if (OrderStatus::Paid !== $order->status) {
+        if ( ! in_array($order->status, [OrderStatus::Reserved, OrderStatus::Paid], true)) {
             throw new NotFoundHttpException();
         }
 

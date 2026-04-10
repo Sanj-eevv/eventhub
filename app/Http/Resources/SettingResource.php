@@ -16,7 +16,7 @@ final class SettingResource extends JsonResource
         return [
             'ticket_reservation_minutes' => $this->ticketReservationMinutes,
             'cancellation_cutoff_hours' => $this->cancellationCutoffHours,
-            'refund_percentage' => $this->refundPercentage,
+            'refund_percentage' => $this->refundPercentage->value,
         ];
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Policies;
 
 use App\Enums\EventPermissions;
+use App\Enums\EventStatus;
 use App\Enums\PreservedRoleList;
 use App\Models\Event;
 use App\Models\User;
@@ -19,9 +20,17 @@ final class EventPolicy extends BasePolicy
         return $user->hasPermission(EventPermissions::View);
     }
 
-    public function view(User $user): bool
+    public function view(User $user, Event $event): bool
     {
-        return $user->hasPermission(EventPermissions::View);
+        if ( ! $user->hasPermission(EventPermissions::View)) {
+            return false;
+        }
+
+        if ($user->hasAnyRole(PreservedRoleList::Admin)) {
+            return true;
+        }
+
+        return $this->withinOrganization($user, $event);
     }
 
     public function create(User $user): bool
@@ -29,29 +38,74 @@ final class EventPolicy extends BasePolicy
         return $user->hasPermission(EventPermissions::Create);
     }
 
-    public function update(User $user): bool
+    public function update(User $user, Event $event): bool
     {
-        return $user->hasPermission(EventPermissions::Update);
+        if ( ! $user->hasPermission(EventPermissions::Update)) {
+            return false;
+        }
+
+        if ($user->hasAnyRole(PreservedRoleList::Admin)) {
+            return true;
+        }
+
+        return $this->withinOrganization($user, $event);
     }
 
-    public function publish(User $user): bool
+    public function publish(User $user, Event $event): bool
     {
-        return $user->hasPermission(EventPermissions::Publish);
+        if ( ! $user->hasPermission(EventPermissions::Publish)) {
+            return false;
+        }
+
+        if ($user->hasAnyRole(PreservedRoleList::Admin)) {
+            return true;
+        }
+
+        return $this->withinOrganization($user, $event);
     }
 
-    public function unpublish(User $user): bool
+    public function unpublish(User $user, Event $event): bool
     {
-        return $user->hasPermission(EventPermissions::Publish);
+        if ( ! $user->hasPermission(EventPermissions::Unpublish)) {
+            return false;
+        }
+
+        if ($user->hasAnyRole(PreservedRoleList::Admin)) {
+            return true;
+        }
+
+        return $this->withinOrganization($user, $event);
     }
 
-    public function cancel(User $user): bool
+    public function cancel(User $user, Event $event): bool
     {
-        return $user->hasPermission(EventPermissions::Cancel);
+        if ( ! $user->hasPermission(EventPermissions::Cancel)) {
+            return false;
+        }
+
+        if ($user->hasAnyRole(PreservedRoleList::Admin)) {
+            return true;
+        }
+
+        return $this->withinOrganization($user, $event);
     }
 
-    public function delete(User $user): bool
+    public function delete(User $user, Event $event): bool
     {
-        return $user->hasPermission(EventPermissions::Delete);
+        if ( ! $user->hasPermission(EventPermissions::Delete)) {
+            return false;
+        }
+
+        if ($user->hasAnyRole(PreservedRoleList::Admin)) {
+            return true;
+        }
+
+        return $this->withinOrganization($user, $event);
+    }
+
+    public function reserve(User $user, Event $event): bool
+    {
+        return EventStatus::Published === $event->status;
     }
 
     public function checkIn(User $user, Event $event): bool

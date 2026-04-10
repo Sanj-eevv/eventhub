@@ -21,6 +21,8 @@ final class ReserveTicketsController extends Controller
 
     public function __invoke(ReserveTicketsRequest $request, Event $event): RedirectResponse
     {
+        $this->authorize('reserve', $event);
+
         $order = $this->reserveTicketsAction->execute($request->user(), $event, $request->toDto());
         $this->createPaymentIntentAction->execute($order);
 

@@ -12,6 +12,7 @@ use App\Models\Organization;
 use App\Models\TicketType;
 use App\Rules\EndsOnDifferentCalendarDay;
 use App\Support\DateFormat;
+use App\ValueObjects\DateRange;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Validator;
@@ -125,8 +126,10 @@ final class EventRequest extends FormRequest
             organization_id: $organizationId,
             title: $this->validated('title'),
             description: $this->validated('description'),
-            starts_at: CarbonImmutable::parse($this->validated('starts_at'), $timezone)->utc(),
-            ends_at: CarbonImmutable::parse($this->validated('ends_at'), $timezone)->utc(),
+            period: new DateRange(
+                start: CarbonImmutable::parse($this->validated('starts_at'), $timezone)->utc(),
+                end: CarbonImmutable::parse($this->validated('ends_at'), $timezone)->utc(),
+            ),
             timezone: $timezone,
             venue_name: $this->validated('venue_name'),
             address: $this->validated('address'),

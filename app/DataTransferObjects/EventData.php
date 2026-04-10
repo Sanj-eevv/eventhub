@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\DataTransferObjects;
 
-use Carbon\CarbonImmutable;
+use App\ValueObjects\DateRange;
 
 final readonly class EventData
 {
@@ -13,8 +13,7 @@ final readonly class EventData
         public int $organization_id,
         public string $title,
         public string $description,
-        public CarbonImmutable $starts_at,
-        public CarbonImmutable $ends_at,
+        public DateRange $period,
         public string $timezone,
         public string $venue_name,
         public string $address,
