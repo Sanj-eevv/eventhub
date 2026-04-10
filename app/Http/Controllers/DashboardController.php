@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Actions\GetDashboardStatsAction;
-use Illuminate\Http\Request;
+use Illuminate\Auth\AuthManager;
 use Inertia\Inertia;
 use Inertia\Response;
 use Inertia\ResponseFactory;
@@ -13,15 +13,16 @@ use Inertia\ResponseFactory;
 final class DashboardController extends Controller
 {
     public function __construct(
+        private readonly AuthManager $authManager,
         private readonly GetDashboardStatsAction $getDashboardStatsAction,
         private readonly ResponseFactory $inertiaResponse,
     ) {}
 
-    public function __invoke(Request $request): Response
+    public function __invoke(): Response
     {
         $this->authorize('access-dashboard');
 
-        $user = $request->user();
+        $user = $this->authManager->user();
 
         return $this->inertiaResponse->render('Dashboard/Index', [
             'pendingOrganizationsCount' => fn () => $this->getDashboardStatsAction->pendingOrganizationsCount($user),

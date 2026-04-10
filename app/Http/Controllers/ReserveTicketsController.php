@@ -8,22 +8,24 @@ use App\Actions\CreatePaymentIntentAction;
 use App\Actions\ReserveTicketsAction;
 use App\Http\Requests\ReserveTicketsRequest;
 use App\Models\Event;
+use Illuminate\Auth\AuthManager;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Redirector;
 
 final class ReserveTicketsController extends Controller
 {
     public function __construct(
-        private readonly ReserveTicketsAction $reserveTicketsAction,
+        private readonly AuthManager $authManager,
         private readonly CreatePaymentIntentAction $createPaymentIntentAction,
         private readonly Redirector $redirector,
+        private readonly ReserveTicketsAction $reserveTicketsAction,
     ) {}
 
     public function __invoke(ReserveTicketsRequest $request, Event $event): RedirectResponse
     {
         $this->authorize('reserve', $event);
 
-        $order = $this->reserveTicketsAction->execute($request->user(), $event, $request->toDto());
+        $order = $this->reserveTicketsAction->execute($this->authManager->user(), $event, $request->toDto());
         $this->createPaymentIntentAction->execute($order);
 
         return $this->redirector->route('checkout.show', ['order' => $order->uuid]);

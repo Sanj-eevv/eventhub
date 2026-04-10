@@ -9,6 +9,7 @@ use App\Http\Resources\OrderResource;
 use App\Models\Order;
 use App\Services\SettingsService;
 use Carbon\CarbonImmutable;
+use Illuminate\Auth\AuthManager;
 use Illuminate\Http\Request;
 use Inertia\Response;
 use Inertia\ResponseFactory;
@@ -16,6 +17,7 @@ use Inertia\ResponseFactory;
 final class MyOrderController extends Controller
 {
     public function __construct(
+        private readonly AuthManager $authManager,
         private readonly ResponseFactory $inertiaResponse,
         private readonly SettingsService $settingsService,
     ) {}
@@ -23,7 +25,7 @@ final class MyOrderController extends Controller
     public function index(Request $request): Response
     {
         $orders = Order::query()
-            ->forUser($request->user())
+            ->forUser($this->authManager->user())
             ->with(['event', 'tickets.ticketType'])
             ->latest()
             ->paginate(perPage: 10, page: $request->integer('page', 1));

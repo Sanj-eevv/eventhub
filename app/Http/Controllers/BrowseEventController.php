@@ -10,7 +10,7 @@ use App\Http\Requests\BrowseEventsRequest;
 use App\Http\Resources\EventResource;
 use App\Models\Event;
 use App\Models\Order;
-use Illuminate\Http\Request;
+use Illuminate\Auth\AuthManager;
 use Inertia\Response;
 use Inertia\ResponseFactory;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -18,6 +18,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 final class BrowseEventController extends Controller
 {
     public function __construct(
+        private readonly AuthManager $authManager,
         private readonly ResponseFactory $inertiaResponse,
     ) {}
 
@@ -43,13 +44,13 @@ final class BrowseEventController extends Controller
         ]);
     }
 
-    public function show(Request $request, Event $event): Response
+    public function show(Event $event): Response
     {
         if (EventStatus::Published !== $event->status) {
             throw new NotFoundHttpException();
         }
 
-        $user = $request->user();
+        $user = $this->authManager->user();
 
         $event->load([
             'ticketTypes' => fn ($query) => $query
@@ -64,9 +65,9 @@ final class BrowseEventController extends Controller
             'coverImage',
         ]);
 
-        $activeOrder = $request->user()
+        $activeOrder = $user
             ? Order::query()
-                ->forUser($request->user())
+                ->forUser($user)
                 ->forEvent($event)
                 ->activeReservation()
                 ->first()

@@ -17,6 +17,7 @@ use App\Http\Resources\Organization\PickerResource as OrganizationPickerResource
 use App\Models\Event;
 use App\Models\Organization;
 use DateTimeZone;
+use Illuminate\Auth\AuthManager;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
@@ -26,6 +27,7 @@ use Inertia\ResponseFactory;
 final class EventController extends Controller
 {
     public function __construct(
+        private readonly AuthManager $authManager,
         private readonly CreateEventAction $createEventAction,
         private readonly UpdateEventAction $updateEventAction,
         private readonly DeleteEventAction $deleteEventAction,
@@ -41,7 +43,7 @@ final class EventController extends Controller
         $status = $request->input('status');
         $sortBy = $request->array('sort_by');
 
-        $user = $request->user();
+        $user = $this->authManager->user();
 
         $events = Event::query()
             ->forIndex()

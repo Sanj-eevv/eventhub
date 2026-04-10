@@ -10,6 +10,7 @@ use App\Http\Requests\Dashboard\ScanTicketRequest;
 use App\Http\Resources\TicketResource;
 use App\Models\Event;
 use App\Models\Ticket;
+use Illuminate\Auth\AuthManager;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
@@ -18,6 +19,7 @@ use RuntimeException;
 final class ScanTicketController extends Controller
 {
     public function __construct(
+        private readonly AuthManager $authManager,
         private readonly CheckInTicketAction $checkInTicketAction,
         private readonly ResponseFactory $responseFactory,
     ) {}
@@ -37,7 +39,7 @@ final class ScanTicketController extends Controller
         }
 
         try {
-            $ticket = $this->checkInTicketAction->execute($ticket, $request->user());
+            $ticket = $this->checkInTicketAction->execute($ticket, $this->authManager->user());
         } catch (RuntimeException) {
             return $this->responseFactory->json(['error' => 'This ticket cannot be checked in.'], Response::HTTP_UNPROCESSABLE_ENTITY);
         }

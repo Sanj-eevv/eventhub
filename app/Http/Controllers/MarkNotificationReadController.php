@@ -4,17 +4,20 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use Illuminate\Auth\AuthManager;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 
 final class MarkNotificationReadController extends Controller
 {
-    public function __construct(private readonly Redirector $redirector) {}
+    public function __construct(
+        private readonly AuthManager $authManager,
+        private readonly Redirector $redirector,
+    ) {}
 
-    public function __invoke(Request $request, string $notificationId): RedirectResponse
+    public function __invoke(string $notificationId): RedirectResponse
     {
-        $request->user()
+        $this->authManager->user()
             ->notifications()
             ->findOrFail($notificationId)
             ->markAsRead();

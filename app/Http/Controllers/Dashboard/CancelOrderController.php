@@ -8,24 +8,25 @@ use App\Actions\CancelPaidOrderAction;
 use App\Http\Controllers\Controller;
 use App\Jobs\ProcessRefundJob;
 use App\Models\Order;
+use Illuminate\Auth\AuthManager;
 use Illuminate\Bus\Dispatcher;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 
 final class CancelOrderController extends Controller
 {
     public function __construct(
+        private readonly AuthManager $authManager,
         private readonly CancelPaidOrderAction $cancelPaidOrderAction,
         private readonly Dispatcher $dispatcher,
         private readonly Redirector $redirector,
     ) {}
 
-    public function __invoke(Order $order, Request $request): RedirectResponse
+    public function __invoke(Order $order): RedirectResponse
     {
         $this->authorize('cancel', $order);
 
-        $this->cancelPaidOrderAction->execute($order, $request->user());
+        $this->cancelPaidOrderAction->execute($order, $this->authManager->user());
 
         $this->dispatcher->dispatch(new ProcessRefundJob($order));
 

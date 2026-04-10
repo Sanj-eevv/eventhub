@@ -9,22 +9,23 @@ use App\Jobs\ProcessRefundJob;
 use App\Models\Order;
 use App\Services\SettingsService;
 use Carbon\CarbonImmutable;
+use Illuminate\Auth\AuthManager;
 use Illuminate\Bus\Dispatcher;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 final class CancelPaidOrderController extends Controller
 {
     public function __construct(
+        private readonly AuthManager $authManager,
         private readonly CancelPaidOrderAction $cancelPaidOrderAction,
         private readonly Dispatcher $dispatcher,
         private readonly Redirector $redirector,
         private readonly SettingsService $settingsService,
     ) {}
 
-    public function __invoke(Order $order, Request $request): RedirectResponse
+    public function __invoke(Order $order): RedirectResponse
     {
         $this->authorize('cancel', $order);
 
@@ -32,7 +33,7 @@ final class CancelPaidOrderController extends Controller
             throw new HttpException(422, 'The cancellation window for this order has passed.');
         }
 
-        $this->cancelPaidOrderAction->execute($order, $request->user());
+        $this->cancelPaidOrderAction->execute($order, $this->authManager->user());
 
         $this->dispatcher->dispatch(new ProcessRefundJob($order));
 
