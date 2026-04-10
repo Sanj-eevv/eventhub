@@ -7,9 +7,9 @@ namespace App\Http\Controllers\Dashboard;
 use App\Actions\ConfirmOrganizationStatusAction;
 use App\Enums\OrganizationStatus;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Dashboard\ConfirmOrganizationStatusRequest;
 use App\Models\Organization;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 
 final class ApproveOrganizationController extends Controller
@@ -19,7 +19,7 @@ final class ApproveOrganizationController extends Controller
         private readonly Redirector $redirector,
     ) {}
 
-    public function __invoke(Request $request, Organization $organization): RedirectResponse
+    public function __invoke(ConfirmOrganizationStatusRequest $request, Organization $organization): RedirectResponse
     {
         $this->authorize('approve', $organization);
 

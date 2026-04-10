@@ -36,6 +36,7 @@ export type PaginatedResponseMeta = {
 export type StatusLabel<T extends string> = {
     value: T;
     label: string;
+    color: string;
 };
 
 export type PaginatedResponse<T> = {

@@ -33,7 +33,7 @@ final class RefundCompletedNotification extends Notification implements ShouldQu
             ->greeting("Hi {$notifiable->name},")
             ->line("Your refund for **{$this->order->event->title}** has been processed.")
             ->line("Refund amount: {$formatted}")
-            ->action('View Order', url("/my/orders/{$this->order->uuid}"));
+            ->action('View Order', route('orders.show', $this->order));
     }
 
     public function toArray(object $notifiable): array
@@ -41,7 +41,7 @@ final class RefundCompletedNotification extends Notification implements ShouldQu
         return [
             'title' => 'Refund Processed',
             'body' => "Your refund for {$this->order->event->title} has been processed.",
-            'url' => "/my/orders/{$this->order->uuid}",
+            'url' => route('orders.show', $this->order),
         ];
     }
 }

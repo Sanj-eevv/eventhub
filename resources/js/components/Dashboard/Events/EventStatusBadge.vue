@@ -1,31 +1,24 @@
 <script setup lang="ts">
-import type { VariantProps } from "class-variance-authority";
 import { Badge } from "@/components/ui/badge";
-import type { badgeVariants } from "@/components/ui/badge";
-import type { EventStatus, EventStatusData } from "@/types/event";
+import type { EventStatusData } from "@/types/event";
 
 defineProps<{
     status: EventStatusData;
 }>();
 
-type BadgeVariants = VariantProps<typeof badgeVariants>;
-const statusConfig: Record<
-    EventStatus,
-    { variant: BadgeVariants["variant"]; class: string }
-> = {
-    draft: { variant: "default", class: "bg-blue-600 text-white" },
-    published: {
-        variant: "default",
-        class: "bg-green-600 text-white hover:bg-green-600/90",
-    },
-    cancelled: { variant: "destructive", class: "" },
+const colorClass: Record<string, string> = {
+    green: "bg-green-600 text-white hover:bg-green-600/90",
+    blue: "bg-blue-600 text-white hover:bg-blue-600/90",
+    yellow: "bg-yellow-500 text-white hover:bg-yellow-500/90",
+    red: "",
+    gray: "bg-gray-500 text-white hover:bg-gray-500/90",
 };
 </script>
 
 <template>
     <Badge
-        :variant="statusConfig[status.value].variant"
-        :class="statusConfig[status.value].class"
+        :variant="status.color === 'red' ? 'destructive' : 'default'"
+        :class="colorClass[status.color]"
     >
         {{ status.label }}
     </Badge>

@@ -21,6 +21,21 @@ enum TicketStatus: string
         };
     }
 
+    public function color(): string
+    {
+        return match ($this) {
+            self::Pending => 'blue',
+            self::Active => 'green',
+            self::Used => 'gray',
+            self::Cancelled => 'red',
+        };
+    }
+
+    public function isFinal(): bool
+    {
+        return in_array($this, [self::Used, self::Cancelled], true);
+    }
+
     public function canTransitionTo(self $status): bool
     {
         return match ($this) {

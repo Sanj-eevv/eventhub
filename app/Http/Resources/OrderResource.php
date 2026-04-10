@@ -13,7 +13,7 @@ final class OrderResource extends JsonResource
     {
         return [
             'uuid' => $this->uuid,
-            'status' => ['value' => $this->status->value, 'label' => $this->status->label()],
+            'status' => ['value' => $this->status->value, 'label' => $this->status->label(), 'color' => $this->status->color()],
             'currency' => $this->currency,
             'total' => $this->total,
             'refund_status' => $this->refund_status?->value,

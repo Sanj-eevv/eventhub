@@ -25,7 +25,7 @@ final class EventResource extends JsonResource
             'address' => $this->address,
             'zip' => $this->zip,
             'map_url' => $this->map_url,
-            'status' => ['value' => $this->status->value, 'label' => $this->status->label()],
+            'status' => ['value' => $this->status->value, 'label' => $this->status->label(), 'color' => $this->status->color()],
             'created_at' => $this->created_at->toISOString(),
             'updated_at' => $this->updated_at->toISOString(),
             'organization' => OrganizationResource::make($this->whenLoaded('organization')),

@@ -17,7 +17,7 @@ final class OrganizationResource extends JsonResource
             'description' => $this->description,
             'contact_address' => $this->contact_address,
             'contact_email' => $this->contact_email,
-            'status' => ['value' => $this->status->value, 'label' => $this->status->label()],
+            'status' => ['value' => $this->status->value, 'label' => $this->status->label(), 'color' => $this->status->color()],
             'created_at' => $this->created_at->toISOString(),
         ];
     }

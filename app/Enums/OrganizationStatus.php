@@ -21,6 +21,21 @@ enum OrganizationStatus: string
         };
     }
 
+    public function color(): string
+    {
+        return match ($this) {
+            self::Pending => 'blue',
+            self::Approved => 'green',
+            self::Rejected => 'yellow',
+            self::Suspended => 'red',
+        };
+    }
+
+    public function isFinal(): bool
+    {
+        return in_array($this, [self::Rejected, self::Suspended], true);
+    }
+
     public function canTransitionTo(self $status): bool
     {
         return match ($this) {

@@ -8,6 +8,7 @@ use App\Http\Controllers\CancelReservedOrderController;
 use App\Http\Controllers\CheckoutConfirmationController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\DownloadOrderTicketsPdfController;
+use App\Http\Controllers\HandleStripeWebhookController;
 use App\Http\Controllers\IndexController;
 use App\Http\Controllers\MarkAllNotificationsReadController;
 use App\Http\Controllers\MarkNotificationReadController;
@@ -17,6 +18,8 @@ use App\Http\Controllers\ProcessPaymentController;
 use App\Http\Controllers\ReserveTicketsController;
 use App\Http\Controllers\TicketQrCodeController;
 use Illuminate\Support\Facades\Route;
+
+Route::post('webhooks/stripe', HandleStripeWebhookController::class)->name('webhooks.stripe');
 
 Route::get('/', IndexController::class)->name('home');
 Route::get('events', [BrowseEventController::class, 'index'])->name('events.index');

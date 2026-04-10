@@ -19,6 +19,20 @@ enum EventStatus: string
         };
     }
 
+    public function color(): string
+    {
+        return match ($this) {
+            self::Draft => 'blue',
+            self::Published => 'green',
+            self::Cancelled => 'red',
+        };
+    }
+
+    public function isFinal(): bool
+    {
+        return self::Cancelled === $this;
+    }
+
     public function canTransitionTo(self $status): bool
     {
         return match ($this) {

@@ -13,7 +13,7 @@ final class IndexResource extends JsonResource
     {
         return [
             'uuid' => $this->uuid,
-            'status' => ['value' => $this->status->value, 'label' => $this->status->label()],
+            'status' => ['value' => $this->status->value, 'label' => $this->status->label(), 'color' => $this->status->color()],
             'total' => $this->total,
             'currency' => $this->currency,
             'paid_at' => $this->paid_at?->toISOString(),

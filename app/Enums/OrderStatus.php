@@ -19,6 +19,20 @@ enum OrderStatus: string
         };
     }
 
+    public function color(): string
+    {
+        return match ($this) {
+            self::Reserved => 'blue',
+            self::Paid => 'green',
+            self::Cancelled => 'red',
+        };
+    }
+
+    public function isFinal(): bool
+    {
+        return self::Cancelled === $this;
+    }
+
     public function canTransitionTo(self $status): bool
     {
         return match ($this) {

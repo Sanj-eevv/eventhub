@@ -37,7 +37,7 @@ final class CompleteOrderAction
                 ->update(['status' => TicketStatus::Active]);
         });
 
-        $order->loadMissing('user');
+        $order->loadMissing(['user', 'event', 'tickets']);
         $order->user->notify(new OrderConfirmedNotification($order));
         $this->busDispatcher->dispatch(new GenerateTicketQrCodesJob($order));
 

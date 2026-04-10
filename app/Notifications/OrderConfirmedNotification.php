@@ -28,7 +28,7 @@ final class OrderConfirmedNotification extends Notification implements ShouldQue
             ->greeting("Hi {$notifiable->name},")
             ->line("Your order for **{$this->order->event->title}** has been confirmed.")
             ->line('Booking references: '.$this->order->tickets->pluck('booking_reference')->implode(', '))
-            ->action('View Order', url("/my/orders/{$this->order->uuid}"));
+            ->action('View Order', route('orders.show', $this->order));
     }
 
     public function toArray(object $notifiable): array
@@ -36,7 +36,7 @@ final class OrderConfirmedNotification extends Notification implements ShouldQue
         return [
             'title' => 'Order Confirmed',
             'body' => "Your order for {$this->order->event->title} has been confirmed.",
-            'url' => "/my/orders/{$this->order->uuid}",
+            'url' => route('orders.show', $this->order),
         ];
     }
 }

@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\EventStatus;
 use App\Enums\TicketStatus;
+use App\Http\Requests\BrowseEventsRequest;
 use App\Http\Resources\EventResource;
 use App\Models\Event;
 use App\Models\Order;
@@ -20,7 +21,7 @@ final class BrowseEventController extends Controller
         private readonly ResponseFactory $inertiaResponse,
     ) {}
 
-    public function index(Request $request): Response
+    public function index(BrowseEventsRequest $request): Response
     {
         $search = $request->string('search')->toString() ?: null;
         $upcoming = $request->boolean('upcoming');
