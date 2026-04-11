@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Builders;
 
 use App\Enums\OrderStatus;
+use App\Enums\PreservedRoleList;
 use App\Models\Event;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
@@ -62,5 +63,13 @@ final class OrderBuilder extends AppBuilder
     public function forOrganization(int $organizationId): self
     {
         return $this->whereHas('event', fn (Builder $query) => $query->where('organization_id', $organizationId));
+    }
+
+    public function forUserContext(User $user): self
+    {
+        return $this->when(
+            $user->organization_id && ! $user->hasAnyRole(PreservedRoleList::Admin),
+            fn (self $query) => $query->forOrganization($user->organization_id),
+        );
     }
 }

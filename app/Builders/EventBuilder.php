@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Builders;
 
 use App\Enums\EventStatus;
+use App\Enums\PreservedRoleList;
+use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\JoinClause;
@@ -75,5 +77,13 @@ final class EventBuilder extends AppBuilder
     public function forOrganization(int $organizationId): self
     {
         return $this->where('events.organization_id', $organizationId);
+    }
+
+    public function forUserContext(User $user): self
+    {
+        return $this->when(
+            $user->organization_id && ! $user->hasAnyRole(PreservedRoleList::Admin),
+            fn (self $query) => $query->forOrganization($user->organization_id),
+        );
     }
 }

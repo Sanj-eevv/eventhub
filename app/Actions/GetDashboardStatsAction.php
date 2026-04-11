@@ -13,6 +13,7 @@ use App\Models\Organization;
 use App\Models\Ticket;
 use App\Models\User;
 use Carbon\CarbonImmutable;
+use Illuminate\Database\Eloquent\Builder;
 
 final class GetDashboardStatsAction
 {
@@ -27,31 +28,23 @@ final class GetDashboardStatsAction
 
     public function cancelledOrdersCount(User $user): int
     {
-        $query = Order::query()
-            ->cancelled()
-            ->where('cancelled_at', '>=', CarbonImmutable::now()->subDays(7));
-
-        if ($user->hasAnyRole(PreservedRoleList::OrganizationAdmin)) {
-            $query->forOrganization($user->organization_id);
-        }
-
-        return $query->count();
+        return $this->scopeForUser(
+            Order::query()->cancelled()->where('cancelled_at', '>=', CarbonImmutable::now()->subDays(7)),
+            $user,
+        )->count();
     }
 
     public function recentCancelledOrders(User $user): array
     {
-        $query = Order::query()
-            ->with(['user', 'event'])
-            ->cancelled()
-            ->where('cancelled_at', '>=', CarbonImmutable::now()->subDays(7))
-            ->orderByDesc('cancelled_at')
-            ->limit(5);
-
-        if ($user->hasAnyRole(PreservedRoleList::OrganizationAdmin)) {
-            $query->forOrganization($user->organization_id);
-        }
-
-        return $query->get()
+        return $this->scopeForUser(
+            Order::query()
+                ->with(['user', 'event'])
+                ->cancelled()
+                ->where('cancelled_at', '>=', CarbonImmutable::now()->subDays(7))
+                ->orderByDesc('cancelled_at')
+                ->limit(5),
+            $user,
+        )->get()
             ->map(fn (Order $order) => [
                 'uuid' => $order->uuid,
                 'customer_name' => $order->user->name,
@@ -66,20 +59,17 @@ final class GetDashboardStatsAction
 
     public function eventsCheckInRates(User $user): array
     {
-        $query = Event::query()
-            ->withCount([
-                'tickets',
-                'tickets as checked_in_count' => fn (TicketBuilder $subQuery) => $subQuery->used(),
-            ])
-            ->published()
-            ->where('ends_at', '>=', CarbonImmutable::now())
-            ->orderBy('starts_at');
-
-        if ($user->hasAnyRole(PreservedRoleList::OrganizationAdmin)) {
-            $query->forOrganization($user->organization_id);
-        }
-
-        return $query->get()
+        return $this->scopeForUser(
+            Event::query()
+                ->withCount([
+                    'tickets',
+                    'tickets as checked_in_count' => fn (TicketBuilder $subQuery) => $subQuery->used(),
+                ])
+                ->published()
+                ->where('ends_at', '>=', CarbonImmutable::now())
+                ->orderBy('starts_at'),
+            $user,
+        )->get()
             ->map(fn (Event $event) => [
                 'uuid' => $event->uuid,
                 'title' => $event->title,
@@ -92,20 +82,15 @@ final class GetDashboardStatsAction
 
     public function revenueThisMonth(User $user): array
     {
-        $query = Order::query()
-            ->paid()
-            ->whereBetween('paid_at', [
-                CarbonImmutable::now()->startOfMonth(),
-                CarbonImmutable::now()->endOfMonth(),
-            ]);
-
-        if ($user->hasAnyRole(PreservedRoleList::OrganizationAdmin)) {
-            $query->forOrganization($user->organization_id);
-        }
-
-        $stats = $query
-            ->selectRaw('COALESCE(SUM(total), 0) as revenue, MAX(currency) as currency')
-            ->first();
+        $stats = $this->scopeForUser(
+            Order::query()
+                ->paid()
+                ->whereBetween('paid_at', [
+                    CarbonImmutable::now()->startOfMonth(),
+                    CarbonImmutable::now()->endOfMonth(),
+                ]),
+            $user,
+        )->selectRaw('COALESCE(SUM(total), 0) as revenue, MAX(currency) as currency')->first();
 
         return [
             'amount' => (int) ($stats?->revenue ?? 0),
@@ -115,35 +100,29 @@ final class GetDashboardStatsAction
 
     public function ticketsSoldThisMonth(User $user): int
     {
-        $query = Ticket::query()
-            ->sold()
-            ->whereBetween('created_at', [
-                CarbonImmutable::now()->startOfMonth(),
-                CarbonImmutable::now()->endOfMonth(),
-            ]);
-
-        if ($user->hasAnyRole(PreservedRoleList::OrganizationAdmin)) {
-            $query->forOrganization($user->organization_id);
-        }
-
-        return $query->count();
+        return $this->scopeForUser(
+            Ticket::query()
+                ->sold()
+                ->whereBetween('created_at', [
+                    CarbonImmutable::now()->startOfMonth(),
+                    CarbonImmutable::now()->endOfMonth(),
+                ]),
+            $user,
+        )->count();
     }
 
     public function draftEventsNearStartDate(User $user): array
     {
-        $query = Event::query()
-            ->draft()
-            ->whereBetween('starts_at', [
-                CarbonImmutable::now(),
-                CarbonImmutable::now()->addDays(7),
-            ])
-            ->orderBy('starts_at');
-
-        if ($user->hasAnyRole(PreservedRoleList::OrganizationAdmin)) {
-            $query->forOrganization($user->organization_id);
-        }
-
-        return $query->get()
+        return $this->scopeForUser(
+            Event::query()
+                ->draft()
+                ->whereBetween('starts_at', [
+                    CarbonImmutable::now(),
+                    CarbonImmutable::now()->addDays(7),
+                ])
+                ->orderBy('starts_at'),
+            $user,
+        )->get()
             ->map(fn (Event $event) => [
                 'uuid' => $event->uuid,
                 'title' => $event->title,
@@ -192,5 +171,14 @@ final class GetDashboardStatsAction
             'published' => $base()->published()->count(),
             'cancelled' => $base()->cancelled()->count(),
         ];
+    }
+
+    private function scopeForUser(Builder $query, User $user): Builder
+    {
+        if ($user->hasAnyRole(PreservedRoleList::OrganizationAdmin)) {
+            $query->forOrganization($user->organization_id);
+        }
+
+        return $query;
     }
 }

@@ -39,6 +39,7 @@ final class UpdateEventAction
     }
 
     /** @param TicketTypeData[] $ticketTypes */
+    /** @param TicketTypeData[] $ticketTypes */
     private function syncTicketTypes(Event $event, array $ticketTypes): void
     {
         $existingUuids = $event->ticketTypes()->pluck('uuid');
@@ -59,28 +60,24 @@ final class UpdateEventAction
             if ($existingUuids->contains($ticketType->uuid)) {
                 $event->ticketTypes()
                     ->where('uuid', $ticketType->uuid)
-                    ->update([
-                        'name' => $ticketType->name,
-                        'description' => $ticketType->description,
-                        'price' => $ticketType->price,
-                        'capacity' => $ticketType->capacity,
-                        'max_per_user' => $ticketType->max_per_user,
-                        'sort_order' => $ticketType->sort_order,
-                        'sale_starts_at' => $ticketType->sale_starts_at,
-                        'sale_ends_at' => $ticketType->sale_ends_at,
-                    ]);
+                    ->update($this->ticketTypeAttributes($ticketType));
             } else {
-                $event->ticketTypes()->create([
-                    'name' => $ticketType->name,
-                    'description' => $ticketType->description,
-                    'price' => $ticketType->price,
-                    'capacity' => $ticketType->capacity,
-                    'max_per_user' => $ticketType->max_per_user,
-                    'sort_order' => $ticketType->sort_order,
-                    'sale_starts_at' => $ticketType->sale_starts_at,
-                    'sale_ends_at' => $ticketType->sale_ends_at,
-                ]);
+                $event->ticketTypes()->create($this->ticketTypeAttributes($ticketType));
             }
         }
+    }
+
+    private function ticketTypeAttributes(TicketTypeData $ticketType): array
+    {
+        return [
+            'name' => $ticketType->name,
+            'description' => $ticketType->description,
+            'price' => $ticketType->price,
+            'capacity' => $ticketType->capacity,
+            'max_per_user' => $ticketType->max_per_user,
+            'sort_order' => $ticketType->sort_order,
+            'sale_starts_at' => $ticketType->sale_starts_at,
+            'sale_ends_at' => $ticketType->sale_ends_at,
+        ];
     }
 }

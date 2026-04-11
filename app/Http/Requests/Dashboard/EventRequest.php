@@ -9,7 +9,6 @@ use App\DataTransferObjects\TicketTypeData;
 use App\Enums\TicketStatus;
 use App\Models\Event;
 use App\Models\Organization;
-use App\Models\TicketType;
 use App\Rules\EndsOnDifferentCalendarDay;
 use App\Support\DateFormat;
 use App\ValueObjects\DateRange;
@@ -68,13 +67,12 @@ final class EventRequest extends FormRequest
 
             $event->ticketTypes()
                 ->whereNotIn('uuid', $submittedUuids)
+                ->whereHas('tickets', fn ($query) => $query->where('status', TicketStatus::Active))
                 ->each(function (TicketType $ticketType) use ($validator): void {
-                    if ($ticketType->tickets()->where('status', TicketStatus::Active)->exists()) {
-                        $validator->errors()->add(
-                            'ticket_types',
-                            "The \"{$ticketType->name}\" ticket type has paid tickets and cannot be removed."
-                        );
-                    }
+                    $validator->errors()->add(
+                        'ticket_types',
+                        "The \"{$ticketType->name}\" ticket type has paid tickets and cannot be removed."
+                    );
                 });
         });
     }

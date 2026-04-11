@@ -7,10 +7,10 @@
         "dev": "vite"
     },
     "devDependencies": {
+        "@inertiajs/vite": "^3.0.3",
         "@laravel/vite-plugin-wayfinder": "^0.1.7",
         "@tailwindcss/vite": "^4.0.0",
         "@vitejs/plugin-vue": "^6.0.4",
-        "axios": "^1.11.0",
         "concurrently": "^9.0.1",
         "eslint": "^9.39.2",
         "eslint-import-resolver-typescript": "^4.4.4",
@@ -21,7 +21,7 @@
         "vite": "^7.0.7"
     },
     "dependencies": {
-        "@inertiajs/vue3": "^2.3.14",
+        "@inertiajs/vue3": "^3.0.3",
         "@stripe/stripe-js": "^9.0.1",
         "@tanstack/vue-table": "^8.21.3",
         "@vue/eslint-config-typescript": "^14.6.0",

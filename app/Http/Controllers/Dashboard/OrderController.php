@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Dashboard;
 
-use App\Enums\PreservedRoleList;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Order\IndexResource;
 use App\Http\Resources\OrderResource;
@@ -32,10 +31,7 @@ final class OrderController extends Controller
 
         $orders = Order::query()
             ->forIndex()
-            ->when(
-                $user->organization_id && ! $user->hasAnyRole(PreservedRoleList::Admin),
-                fn ($query) => $query->forOrganization($user->organization_id)
-            )
+            ->forUserContext($user)
             ->search($search)
             ->sortBy($sortBy)
             ->paginate(perPage: $request->integer('per_page', 10), page: $request->integer('page', 1));

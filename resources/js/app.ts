@@ -1,6 +1,4 @@
 import { createInertiaApp, usePage } from "@inertiajs/vue3";
-import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
-import type { DefineComponent } from "vue";
 import { createApp, h, watch } from "vue";
 import "../css/app.css";
 import "vue-sonner/style.css";
@@ -17,11 +15,10 @@ type Flash = {
 const appName = import.meta.env.VITE_APP_NAME || "Laravel";
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
-    resolve: (name) =>
-        resolvePageComponent(
-            `./pages/${name}.vue`,
-            import.meta.glob<DefineComponent>("./pages/**/*.vue"),
-        ),
+    resolve: (name) => {
+        const pages = import.meta.glob("./pages/**/*.vue");
+        return pages[`./pages/${name}.vue`]();
+    },
     setup({ el, App, props, plugin }) {
         createApp({
             setup() {

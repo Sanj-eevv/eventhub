@@ -8,7 +8,6 @@ use App\Actions\CreateEventAction;
 use App\Actions\DeleteEventAction;
 use App\Actions\UpdateEventAction;
 use App\Enums\EventStatus;
-use App\Enums\PreservedRoleList;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Dashboard\EventRequest;
 use App\Http\Resources\Event\IndexResource;
@@ -43,14 +42,12 @@ final class EventController extends Controller
         $status = $request->input('status');
         $sortBy = $request->array('sort_by');
 
+        /** @var User $user */
         $user = $this->authManager->user();
 
         $events = Event::query()
             ->forIndex()
-            ->when(
-                $user->organization_id && ! $user->hasAnyRole(PreservedRoleList::Admin),
-                fn ($query) => $query->forOrganization($user->organization_id)
-            )
+            ->forUserContext($user)
             ->search($search)
             ->filterByStatus($status)
             ->sortBy($sortBy)
