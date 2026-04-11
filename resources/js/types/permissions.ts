@@ -9,6 +9,7 @@ export interface Can {
         delete: boolean
         publish: boolean
         cancel: boolean
+        reserve: boolean
     }
     order: { viewAny: boolean; cancel: boolean }
     setting: { update: boolean }

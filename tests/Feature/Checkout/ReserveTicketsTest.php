@@ -14,6 +14,33 @@ use Tests\Traits\CreatesUsers;
 
 uses(CreatesUsers::class, CreatesEvents::class, CreatesOrders::class);
 
+it('prevents super admin from reserving tickets', function (): void {
+    $user = $this->createSuperAdmin();
+    [$event, $ticketType] = $this->createPublishedEventWithTicketType();
+
+    $this->actingAs($user)->post(route('tickets.reserve', ['event' => $event->slug]), [
+        'items' => [['ticket_type_uuid' => $ticketType->uuid, 'quantity' => 1]],
+    ])->assertForbidden();
+});
+
+it('prevents admin from reserving tickets', function (): void {
+    $user = $this->createAdmin();
+    [$event, $ticketType] = $this->createPublishedEventWithTicketType();
+
+    $this->actingAs($user)->post(route('tickets.reserve', ['event' => $event->slug]), [
+        'items' => [['ticket_type_uuid' => $ticketType->uuid, 'quantity' => 1]],
+    ])->assertForbidden();
+});
+
+it('prevents organization admin from reserving tickets', function (): void {
+    $user = $this->createOrganizationAdmin();
+    [$event, $ticketType] = $this->createPublishedEventWithTicketType();
+
+    $this->actingAs($user)->post(route('tickets.reserve', ['event' => $event->slug]), [
+        'items' => [['ticket_type_uuid' => $ticketType->uuid, 'quantity' => 1]],
+    ])->assertForbidden();
+});
+
 it('redirects guests to login', function (): void {
     [$event] = $this->createPublishedEventWithTicketType();
 

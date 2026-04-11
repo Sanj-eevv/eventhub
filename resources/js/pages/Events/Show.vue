@@ -8,16 +8,23 @@ import EventHero from "@/components/Events/EventHero.vue";
 import EventVenue from "@/components/Events/EventVenue.vue";
 import TicketSelector from "@/components/Events/TicketSelector.vue";
 import PageContainer from "@/components/PageContainer.vue";
+import { usePermission } from "@/composables/usePermission";
 import HomeLayout from "@/layouts/HomeLayout.vue";
 import type { ActiveOrderResource, EventResource } from "@/types/event";
 import { login as loginCreate } from "@/wayfinder/routes/auth";
 
-defineProps<{
+const props = defineProps<{
     event: EventResource;
     activeOrder: ActiveOrderResource | null;
 }>();
 
-const isAuthenticated = computed(() => !!usePage().props.auth.user);
+const page = usePage();
+const isAuthenticated = computed(() => !!page.props.auth.user);
+const canEvent = usePermission("event");
+const canReserve = computed(() => canEvent("reserve"));
+const showRightColumn = computed(
+    () => !!props.activeOrder || canReserve.value || !isAuthenticated.value,
+);
 </script>
 
 <template>
@@ -27,24 +34,24 @@ const isAuthenticated = computed(() => !!usePage().props.auth.user);
             <EventHero :event="event" />
 
             <div class="grid lg:grid-cols-3 gap-10 lg:gap-14 pt-10">
-                <div class="lg:col-span-2 space-y-10">
+                <div :class="showRightColumn ? 'lg:col-span-2' : 'lg:col-span-3'" class="space-y-10">
                     <EventAbout :description="event.description ?? ''" />
                     <EventGallery :media="event.media" />
                     <EventVenue :event="event" />
                 </div>
-                <div class="lg:col-span-1">
+                <div v-if="showRightColumn" class="lg:col-span-1">
                     <ActiveReservationPanel
                         v-if="activeOrder"
                         :active-order="activeOrder"
                     />
                     <TicketSelector
-                        v-else-if="isAuthenticated"
+                        v-else-if="isAuthenticated && canReserve"
                         :ticket-types="event.ticket_types"
                         :event-slug="event.slug"
                         :event-timezone="event.timezone"
                     />
                     <div
-                        v-else
+                        v-else-if="!isAuthenticated"
                         class="sticky top-24 bg-sf-surface border border-sf-border-subtle rounded-xl p-8 text-center space-y-5"
                     >
                         <div

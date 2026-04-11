@@ -103,9 +103,13 @@ final class EventPolicy extends BasePolicy
         return $this->withinOrganization($user, $event);
     }
 
-    public function reserve(User $user, Event $event): bool
+    public function reserve(User $user, ?Event $event = null): bool
     {
-        return EventStatus::Published === $event->status;
+        if ($user->hasAnyRole(PreservedRoleList::SuperAdmin, PreservedRoleList::Admin, PreservedRoleList::OrganizationAdmin)) {
+            return false;
+        }
+
+        return null === $event || EventStatus::Published === $event->status;
     }
 
     public function checkIn(User $user, ?Event $event = null): bool
@@ -119,5 +123,10 @@ final class EventPolicy extends BasePolicy
         }
 
         return $this->withinOrganization($user, $event);
+    }
+
+    protected function attendeeAbilities(): array
+    {
+        return ['reserve'];
     }
 }

@@ -23,6 +23,9 @@ const user = computed(
 const canDashboard = usePermission("dashboard");
 const canAccessDashboard = computed(() => canDashboard("access"));
 
+const canEvent = usePermission("event");
+const canReserve = computed(() => canEvent("reserve"));
+
 const mobileOpen = ref(false);
 
 const { isDark, toggle } = useTheme();
@@ -57,6 +60,7 @@ const handleLogout = (): void => {
                     </Link>
                     <template v-if="user">
                         <Link
+                            v-if="canReserve"
                             :href="ordersIndex()"
                             class="text-sm tracking-wide text-sf-muted hover:text-sf-text transition-colors duration-200"
                         >
@@ -232,6 +236,7 @@ const handleLogout = (): void => {
             >
             <template v-if="user">
                 <Link
+                    v-if="canReserve"
                     :href="ordersIndex()"
                     class="block py-3 text-sm text-sf-muted hover:text-sf-text border-b border-sf-border-subtle transition-colors"
                     >My Orders</Link
