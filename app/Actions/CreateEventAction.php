@@ -7,13 +7,15 @@ namespace App\Actions;
 use App\DataTransferObjects\EventData;
 use App\Enums\EventStatus;
 use App\Models\Event;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\DatabaseManager;
 
 final class CreateEventAction
 {
+    public function __construct(private readonly DatabaseManager $databaseManager) {}
+
     public function execute(EventData $data): Event
     {
-        return DB::transaction(function () use ($data): Event {
+        return $this->databaseManager->transaction(function () use ($data): Event {
             $event = Event::query()->create([
                 'user_id' => $data->user_id,
                 'organization_id' => $data->organization_id,
