@@ -12,6 +12,8 @@ final class FakePaymentGateway implements PaymentGateway
 {
     private bool $shouldFail = false;
 
+    private string $retrieveStatus = 'succeeded';
+
     /** @var array<int, array<string, mixed>> */
     private array $createdIntents = [];
 
@@ -21,6 +23,13 @@ final class FakePaymentGateway implements PaymentGateway
     public function failOnNextCall(): self
     {
         $this->shouldFail = true;
+
+        return $this;
+    }
+
+    public function withRetrieveStatus(string $status): self
+    {
+        $this->retrieveStatus = $status;
 
         return $this;
     }
@@ -41,7 +50,7 @@ final class FakePaymentGateway implements PaymentGateway
         return new PaymentIntentResult(
             payment_intent_id: $paymentIntentId,
             client_secret: 'pi_fake_secret',
-            status: 'succeeded',
+            status: $this->retrieveStatus,
         );
     }
 

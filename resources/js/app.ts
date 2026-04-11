@@ -20,7 +20,7 @@ createInertiaApp({
         return pages[`./pages/${name}.vue`]();
     },
     setup({ el, App, props, plugin }) {
-        createApp({
+        const app = createApp({
             setup() {
                 const page = usePage();
                 watch(
@@ -37,8 +37,10 @@ createInertiaApp({
                 );
                 return () => [h(Toaster), h(App, props)];
             },
-        })
-            .use(plugin)
-            .mount(el);
+        }).use(plugin);
+
+        if (el) app.mount(el);
+
+        return app;
     },
 });
