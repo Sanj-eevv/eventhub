@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Events;
 
-use App\Models\Event;
 use App\Models\Ticket;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
@@ -20,12 +19,11 @@ final class DuplicateScanAttempted implements ShouldBroadcast
 
     public function __construct(
         public readonly Ticket $ticket,
-        public readonly Event $event,
     ) {}
 
     public function broadcastOn(): array
     {
-        return [new PrivateChannel('checkin.'.$this->event->uuid)];
+        return [new PrivateChannel('checkin.'.$this->ticket->event->uuid)];
     }
 
     public function broadcastWith(): array

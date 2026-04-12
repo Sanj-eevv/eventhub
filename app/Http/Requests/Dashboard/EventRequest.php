@@ -51,7 +51,7 @@ final class EventRequest extends FormRequest
             foreach ($this->input('ticket_types', []) as $index => $ticketType) {
                 if (filled($ticketType['sale_ends_at'] ?? null) && blank($ticketType['sale_starts_at'] ?? null)) {
                     $validator->errors()->add(
-                        "ticket_types.{$index}.sale_ends_at",
+                        sprintf('ticket_types.%s.sale_ends_at', $index),
                         'A sale end date requires a sale start date.'
                     );
                 }
@@ -71,7 +71,7 @@ final class EventRequest extends FormRequest
                 ->each(function (TicketType $ticketType) use ($validator): void {
                     $validator->errors()->add(
                         'ticket_types',
-                        "The \"{$ticketType->name}\" ticket type has paid tickets and cannot be removed."
+                        sprintf('The "%s" ticket type has paid tickets and cannot be removed.', $ticketType->name)
                     );
                 });
         });
@@ -104,9 +104,9 @@ final class EventRequest extends FormRequest
     public function toDto(): EventData
     {
         $timezone = $this->validated('timezone');
-        $organizationId = Organization::where('uuid', $this->validated('organization_uuid'))->value('id');
+        $organizationId = Organization::query()->where('uuid', $this->validated('organization_uuid'))->value('id');
         $ticketTypes = collect($this->validated('ticket_types'))
-            ->map(fn (array $type, int $index) => new TicketTypeData(
+            ->map(fn (array $type, int $index): TicketTypeData => new TicketTypeData(
                 name: $type['name'],
                 description: $type['description'],
                 price: (int) round($type['price'] * 100),

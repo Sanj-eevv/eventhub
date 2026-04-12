@@ -17,13 +17,13 @@ use Illuminate\Bus\Dispatcher as BusDispatcher;
 use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 use Illuminate\Database\DatabaseManager;
 
-final class CompleteOrderAction
+final readonly class CompleteOrderAction
 {
     public function __construct(
-        private readonly DatabaseManager $databaseManager,
-        private readonly BusDispatcher $busDispatcher,
-        private readonly EventDispatcher $eventDispatcher,
-        private readonly RecordActivityAction $recordActivityAction,
+        private DatabaseManager $databaseManager,
+        private BusDispatcher $busDispatcher,
+        private EventDispatcher $eventDispatcher,
+        private RecordActivityAction $recordActivityAction,
     ) {}
 
     public function execute(Order $order): Order
@@ -46,10 +46,11 @@ final class CompleteOrderAction
 
             $order->loadMissing(['user', 'event', 'tickets']);
             $order->user->notify(new OrderConfirmedNotification($order));
+
             $this->busDispatcher->dispatch(new GenerateTicketQrCodesJob($order));
         });
 
-        $this->eventDispatcher->dispatch(new OrderCompleted($order, $order->event));
+        $this->eventDispatcher->dispatch(new OrderCompleted($order));
         $this->eventDispatcher->dispatch(new OrderStatusChanged($order));
 
         return $order;

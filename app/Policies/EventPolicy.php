@@ -44,7 +44,7 @@ final class EventPolicy extends BasePolicy
             return false;
         }
 
-        if (null === $event || $user->hasAnyRole(PreservedRoleList::Admin)) {
+        if ( ! $event instanceof Event || $user->hasAnyRole(PreservedRoleList::Admin)) {
             return true;
         }
 
@@ -57,7 +57,7 @@ final class EventPolicy extends BasePolicy
             return false;
         }
 
-        if (null === $event || $user->hasAnyRole(PreservedRoleList::Admin)) {
+        if ( ! $event instanceof Event || $user->hasAnyRole(PreservedRoleList::Admin)) {
             return true;
         }
 
@@ -70,7 +70,7 @@ final class EventPolicy extends BasePolicy
             return false;
         }
 
-        if (null === $event || $user->hasAnyRole(PreservedRoleList::Admin)) {
+        if ( ! $event instanceof Event || $user->hasAnyRole(PreservedRoleList::Admin)) {
             return true;
         }
 
@@ -83,7 +83,7 @@ final class EventPolicy extends BasePolicy
             return false;
         }
 
-        if (null === $event || $user->hasAnyRole(PreservedRoleList::Admin)) {
+        if ( ! $event instanceof Event || $user->hasAnyRole(PreservedRoleList::Admin)) {
             return true;
         }
 
@@ -96,7 +96,7 @@ final class EventPolicy extends BasePolicy
             return false;
         }
 
-        if (null === $event || $user->hasAnyRole(PreservedRoleList::Admin)) {
+        if ( ! $event instanceof Event || $user->hasAnyRole(PreservedRoleList::Admin)) {
             return true;
         }
 
@@ -109,7 +109,7 @@ final class EventPolicy extends BasePolicy
             return false;
         }
 
-        return null === $event || EventStatus::Published === $event->status;
+        return ! $event instanceof Event || EventStatus::Published === $event->status;
     }
 
     public function checkIn(User $user, ?Event $event = null): bool
@@ -118,7 +118,7 @@ final class EventPolicy extends BasePolicy
             return false;
         }
 
-        if (null === $event || $user->hasAnyRole(PreservedRoleList::Admin)) {
+        if ( ! $event instanceof Event || $user->hasAnyRole(PreservedRoleList::Admin)) {
             return true;
         }
 

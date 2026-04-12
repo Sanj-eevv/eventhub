@@ -16,15 +16,15 @@ use Illuminate\Support\Str;
  */
 final class UserFactory extends Factory
 {
-    protected static ?string $password;
+    private static ?string $password;
 
     public function definition(): array
     {
         return [
             'role_id' => Role::factory(),
             'organization_id' => null,
-            'name' => $this->faker->name,
-            'email' => $this->faker->unique()->safeEmail,
+            'name' => $this->faker->name(),
+            'email' => $this->faker->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => self::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
@@ -33,14 +33,14 @@ final class UserFactory extends Factory
 
     public function unverified(): static
     {
-        return $this->state(fn () => [
+        return $this->state(fn (): array => [
             'email_verified_at' => null,
         ]);
     }
 
     public function organizationAdmin(): static
     {
-        return $this->state(fn () => [
+        return $this->state(fn (): array => [
             'role_id' => Role::organizationAdminRole()->id,
             'organization_id' => Organization::factory()->approved(),
         ]);

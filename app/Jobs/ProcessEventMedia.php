@@ -8,15 +8,15 @@ use App\Models\Media;
 use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
 use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Queue\Attributes\Timeout;
+use Illuminate\Queue\Attributes\Tries;
 use Intervention\Image\ImageManager;
 
+#[Timeout(60)]
+#[Tries(3)]
 final class ProcessEventMedia implements ShouldQueueAfterCommit
 {
     use Queueable;
-
-    public int $tries = 3;
-
-    public int $timeout = 60;
 
     public function __construct(private readonly Media $media) {}
 

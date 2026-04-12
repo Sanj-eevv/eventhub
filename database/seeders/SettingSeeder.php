@@ -29,6 +29,6 @@ final class SettingSeeder extends Seeder
             ],
         ];
 
-        Setting::upsert($defaults, ['key'], ['description']);
+        Setting::query()->upsert($defaults, ['key'], ['description']);
     }
 }

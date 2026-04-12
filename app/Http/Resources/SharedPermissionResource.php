@@ -12,9 +12,9 @@ use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
 
-final class SharedPermissionResource
+final readonly class SharedPermissionResource
 {
-    public function __construct(private readonly User $user) {}
+    public function __construct(private User $user) {}
 
     public static function make(User $user): self
     {
@@ -49,7 +49,7 @@ final class SharedPermissionResource
     private function checksFor(string $model, array $abilities): array
     {
         return collect($abilities)
-            ->mapWithKeys(fn (string $ability) => [
+            ->mapWithKeys(fn (string $ability): array => [
                 $ability => Gate::forUser($this->user)->allows($ability, $model),
             ])
             ->all();

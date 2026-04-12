@@ -8,9 +8,9 @@ use App\Models\User;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Contracts\Events\Dispatcher;
 
-final class VerifyEmailAction
+final readonly class VerifyEmailAction
 {
-    public function __construct(private readonly Dispatcher $dispatcher) {}
+    public function __construct(private Dispatcher $dispatcher) {}
 
     public function execute(User $user): void
     {

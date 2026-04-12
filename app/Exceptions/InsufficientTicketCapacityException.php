@@ -11,6 +11,6 @@ final class InsufficientTicketCapacityException extends RuntimeException
 {
     public function __construct(TicketType $ticketType)
     {
-        parent::__construct("Not enough capacity available for ticket type [{$ticketType->name}].");
+        parent::__construct(sprintf('Not enough capacity available for ticket type [%s].', $ticketType->name));
     }
 }

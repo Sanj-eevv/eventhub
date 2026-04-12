@@ -12,10 +12,12 @@ use App\Traits\HasAppUuid;
 use BackedEnum;
 use Carbon\CarbonImmutable;
 use Database\Factories\UserFactory;
-use Eloquent;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Attributes\UseEloquentBuilder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -42,7 +44,7 @@ use Illuminate\Support\Collection;
  * @property-read int|null $notifications_count
  * @property-read Organization|null $organization
  * @property-read Role $role
- * @property-read Collection<int, Event> $events
+ * @property-read Collection<int, \Illuminate\Support\Facades\Event> $events
  * @property-read int|null $events_count
  *
  * @method static UserFactory factory( $count = null, $state = [] )
@@ -65,9 +67,20 @@ use Illuminate\Support\Collection;
  * @method static Builder<static>|User withTrashed( bool $withTrashed = true )
  * @method static Builder<static>|User withoutTrashed()
  *
- * @mixin Eloquent
+ * @mixin Model
  */
 #[UseEloquentBuilder(UserBuilder::class)]
+#[Fillable([
+    'role_id',
+    'organization_id',
+    'name',
+    'email',
+    'password',
+])]
+#[Hidden([
+    'password',
+    'remember_token',
+])]
 final class User extends Authenticatable implements Authorizable, MustVerifyEmail
 {
     use HasAppUuid;
@@ -77,19 +90,6 @@ final class User extends Authenticatable implements Authorizable, MustVerifyEmai
 
     use Notifiable;
     use SoftDeletes;
-
-    protected $fillable = [
-        'role_id',
-        'organization_id',
-        'name',
-        'email',
-        'password',
-    ];
-
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
 
     public function sendEmailVerificationNotification(): void
     {
@@ -124,14 +124,14 @@ final class User extends Authenticatable implements Authorizable, MustVerifyEmai
 
     public function hasAllPermissions(BackedEnum ...$permissions): bool
     {
-        $normalised = collect($permissions)->map(fn (BackedEnum $permission) => $permission->value);
+        $normalised = collect($permissions)->map(fn (BackedEnum $permission): int|string => $permission->value);
 
         return $normalised->diff($this->getAllPermissions())->isEmpty();
     }
 
     public function hasAnyPermission(BackedEnum ...$permissions): bool
     {
-        $normalised = collect($permissions)->map(fn (BackedEnum $permission) => $permission->value);
+        $normalised = collect($permissions)->map(fn (BackedEnum $permission): int|string => $permission->value);
 
         return $this->getAllPermissions()->intersect($normalised)->isNotEmpty();
     }

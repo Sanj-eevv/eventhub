@@ -1,7 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
+use App\Providers\AppServiceProvider;
+use App\Providers\HorizonServiceProvider;
+use App\Providers\PaymentServiceProvider;
+
 return [
-    App\Providers\AppServiceProvider::class,
-    App\Providers\HorizonServiceProvider::class,
-    App\Providers\PaymentServiceProvider::class,
+    AppServiceProvider::class,
+    HorizonServiceProvider::class,
+    PaymentServiceProvider::class,
 ];

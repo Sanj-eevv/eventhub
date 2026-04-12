@@ -43,10 +43,10 @@ final class EventBuilder extends AppBuilder
     public function search(?string $search): self
     {
         return $this->when($search, fn (self $query) => $query->where(fn (Builder $query) => $query
-            ->where('events.title', 'like', "%{$search}%")
-            ->orWhere('events.description', 'like', "%{$search}%")
-            ->orWhere('events.venue_name', 'like', "%{$search}%")
-            ->orWhere('events.address', 'like', "%{$search}%")));
+            ->where('events.title', 'like', sprintf('%%%s%%', $search))
+            ->orWhere('events.description', 'like', sprintf('%%%s%%', $search))
+            ->orWhere('events.venue_name', 'like', sprintf('%%%s%%', $search))
+            ->orWhere('events.address', 'like', sprintf('%%%s%%', $search))));
     }
 
     public function upcoming(): self
@@ -83,7 +83,7 @@ final class EventBuilder extends AppBuilder
     {
         return $this->when(
             $user->organization_id && ! $user->hasAnyRole(PreservedRoleList::Admin),
-            fn (self $query) => $query->forOrganization($user->organization_id),
+            fn (self $query): EventBuilder => $query->forOrganization($user->organization_id),
         );
     }
 }

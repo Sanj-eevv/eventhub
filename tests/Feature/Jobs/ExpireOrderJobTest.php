@@ -17,7 +17,7 @@ it('deletes a reserved order and its tickets when handled', function (): void {
     [$event, $ticketType] = $this->createPublishedEventWithTicketType();
     $order = $this->createReservedOrder($user, $event, $ticketType);
 
-    (new ExpireOrderJob($order))->handle(app(ExpireOrderAction::class));
+    (new ExpireOrderJob($order))->handle(resolve(ExpireOrderAction::class));
 
     $this->assertDatabaseMissing('orders', ['id' => $order->id]);
     $this->assertDatabaseMissing('tickets', ['order_id' => $order->id]);
@@ -28,7 +28,7 @@ it('does nothing when the order is already paid', function (): void {
     [$event, $ticketType] = $this->createPublishedEventWithTicketType();
     $order = $this->createPaidOrder($user, $event, $ticketType);
 
-    (new ExpireOrderJob($order))->handle(app(ExpireOrderAction::class));
+    (new ExpireOrderJob($order))->handle(resolve(ExpireOrderAction::class));
 
     $this->assertDatabaseHas('orders', ['id' => $order->id]);
 });
@@ -39,7 +39,7 @@ it('does nothing when the order is already cancelled', function (): void {
     $order = $this->createPaidOrder($user, $event, $ticketType);
     $order->update(['status' => OrderStatus::Cancelled]);
 
-    (new ExpireOrderJob($order))->handle(app(ExpireOrderAction::class));
+    (new ExpireOrderJob($order))->handle(resolve(ExpireOrderAction::class));
 
     $this->assertDatabaseHas('orders', ['id' => $order->id]);
 });

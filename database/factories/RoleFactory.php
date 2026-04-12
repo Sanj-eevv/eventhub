@@ -15,13 +15,13 @@ final class RoleFactory extends Factory
 {
     public function definition(): array
     {
-        $name = $this->faker->unique()->name;
+        $name = $this->faker->unique()->name();
         $slug = Str::slug($name);
 
         return [
             'name' => $name,
             'slug' => $slug,
-            'description' => $this->faker->sentence,
+            'description' => $this->faker->sentence(),
             'preserved' => false,
         ];
     }

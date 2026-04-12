@@ -24,9 +24,9 @@ final class EventCancelledNotification extends Notification implements ShouldQue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage())
-            ->subject("Event Cancelled — {$this->event->title}")
-            ->greeting("Hi {$notifiable->name},")
-            ->line("We're sorry to let you know that **{$this->event->title}** has been cancelled.")
+            ->subject('Event Cancelled — '.$this->event->title)
+            ->greeting(sprintf('Hi %s,', $notifiable->name))
+            ->line(sprintf("We're sorry to let you know that **%s** has been cancelled.", $this->event->title))
             ->line('If you purchased tickets, your order has been voided. Please contact support regarding any refund questions.');
     }
 
@@ -34,7 +34,7 @@ final class EventCancelledNotification extends Notification implements ShouldQue
     {
         return [
             'title' => 'Event Cancelled',
-            'body' => "{$this->event->title} has been cancelled.",
+            'body' => $this->event->title.' has been cancelled.',
             'url' => null,
         ];
     }

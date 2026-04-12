@@ -10,17 +10,17 @@ use App\Enums\ActivityEvent;
 use App\Models\Order;
 use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Queue\Attributes\Backoff;
+use Illuminate\Queue\Attributes\Tries;
 use Throwable;
 
+#[Backoff(30)]
+#[Tries(3)]
 final class GenerateTicketQrCodesJob implements ShouldQueueAfterCommit
 {
     use Queueable;
 
     public bool $deleteWhenMissingModels = true;
-
-    public int $tries = 3;
-
-    public int $backoff = 30;
 
     public function __construct(public readonly Order $order) {}
 

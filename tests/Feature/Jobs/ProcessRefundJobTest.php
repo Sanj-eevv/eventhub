@@ -22,10 +22,10 @@ it('calls the payment gateway to refund the payment intent', function (): void {
     [$event, $ticketType] = $this->createPublishedEventWithTicketType();
     $order = $this->createPaidOrder($user, $event, $ticketType);
 
-    (new ProcessRefundJob($order))->handle(app(ProcessRefundAction::class));
+    (new ProcessRefundJob($order))->handle(resolve(ProcessRefundAction::class));
 
     /** @var FakePaymentGateway $gateway */
-    $gateway = app(PaymentGateway::class);
+    $gateway = resolve(PaymentGateway::class);
     $gateway->assertRefunded($order->stripe_payment_intent_id);
 });
 
@@ -36,7 +36,7 @@ it('sets the refund_status to Refunded after processing', function (): void {
     [$event, $ticketType] = $this->createPublishedEventWithTicketType();
     $order = $this->createPaidOrder($user, $event, $ticketType);
 
-    (new ProcessRefundJob($order))->handle(app(ProcessRefundAction::class));
+    (new ProcessRefundJob($order))->handle(resolve(ProcessRefundAction::class));
 
     expect($order->fresh()->refund_status)->toBe(RefundStatus::Refunded);
 });
@@ -48,7 +48,7 @@ it('stores the stripe refund id on the order', function (): void {
     [$event, $ticketType] = $this->createPublishedEventWithTicketType();
     $order = $this->createPaidOrder($user, $event, $ticketType);
 
-    (new ProcessRefundJob($order))->handle(app(ProcessRefundAction::class));
+    (new ProcessRefundJob($order))->handle(resolve(ProcessRefundAction::class));
 
     expect($order->fresh()->stripe_refund_id)->toStartWith('re_fake_');
 });
@@ -60,7 +60,7 @@ it('sends a RefundCompletedNotification to the order owner', function (): void {
     [$event, $ticketType] = $this->createPublishedEventWithTicketType();
     $order = $this->createPaidOrder($user, $event, $ticketType);
 
-    (new ProcessRefundJob($order))->handle(app(ProcessRefundAction::class));
+    (new ProcessRefundJob($order))->handle(resolve(ProcessRefundAction::class));
 
     Notification::assertSentTo($user, RefundCompletedNotification::class);
 });
@@ -72,7 +72,7 @@ it('logs a RefundProcessed activity', function (): void {
     [$event, $ticketType] = $this->createPublishedEventWithTicketType();
     $order = $this->createPaidOrder($user, $event, $ticketType);
 
-    (new ProcessRefundJob($order))->handle(app(ProcessRefundAction::class));
+    (new ProcessRefundJob($order))->handle(resolve(ProcessRefundAction::class));
 
     $this->assertDatabaseHas('activity_logs', ['event' => 'refund.processed']);
 });
@@ -84,10 +84,10 @@ it('uses the settings refund percentage when no explicit amount is given', funct
     [$event, $ticketType] = $this->createPublishedEventWithTicketType();
     $order = $this->createPaidOrder($user, $event, $ticketType);
 
-    (new ProcessRefundJob($order))->handle(app(ProcessRefundAction::class));
+    (new ProcessRefundJob($order))->handle(resolve(ProcessRefundAction::class));
 
     /** @var FakePaymentGateway $gateway */
-    $gateway = app(PaymentGateway::class);
+    $gateway = resolve(PaymentGateway::class);
 
     expect($gateway->getLastRefundAmount())->toBe($order->total);
 });
@@ -99,10 +99,10 @@ it('uses an explicit refund amount when provided', function (): void {
     [$event, $ticketType] = $this->createPublishedEventWithTicketType();
     $order = $this->createPaidOrder($user, $event, $ticketType);
 
-    (new ProcessRefundJob($order, 500))->handle(app(ProcessRefundAction::class));
+    (new ProcessRefundJob($order, 500))->handle(resolve(ProcessRefundAction::class));
 
     /** @var FakePaymentGateway $gateway */
-    $gateway = app(PaymentGateway::class);
+    $gateway = resolve(PaymentGateway::class);
 
     expect($gateway->getLastRefundAmount())->toBe(500);
 });

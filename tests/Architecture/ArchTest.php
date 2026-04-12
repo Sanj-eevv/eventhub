@@ -2,9 +2,16 @@
 
 declare(strict_types=1);
 
+use App\Enums\PreservedRoleList;
 use App\Http\Controllers\Controller;
+use App\Models\Permission;
+use App\Models\Role;
+use App\Models\Setting;
 use App\Policies\BasePolicy;
 use App\Traits\HasAppUuid;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 
 arch('action classes are final')
     ->expect('App\Actions')
@@ -34,9 +41,9 @@ arch('models use HasAppUuid')
     ->expect('App\Models')
     ->toUse(HasAppUuid::class)
     ->ignoring([
-        'App\Models\Role',
-        'App\Models\Permission',
-        'App\Models\Setting',
+        Role::class,
+        Permission::class,
+        Setting::class,
     ]);
 
 arch('policies extend BasePolicy')
@@ -46,18 +53,18 @@ arch('policies extend BasePolicy')
 
 arch('no DB facade used in application code')
     ->expect('App')
-    ->not->toUse('Illuminate\Support\Facades\DB');
+    ->not->toUse(DB::class);
 
 arch('actions and controllers do not dispatch events via static calls or Event facade')
     ->expect(['App\Actions', 'App\Http\Controllers'])
     ->not->toUse([
-        'Illuminate\Support\Facades\Event',
-        'Illuminate\Foundation\Events\Dispatchable',
+        Event::class,
+        Dispatchable::class,
     ]);
 
 arch('enums are backed enums')
     ->expect('App\Enums')
     ->toBeStringBackedEnum()
     ->ignoring([
-        'App\Enums\PreservedRoleList',
+        PreservedRoleList::class,
     ]);

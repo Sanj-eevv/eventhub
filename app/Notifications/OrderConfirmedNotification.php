@@ -24,9 +24,9 @@ final class OrderConfirmedNotification extends Notification implements ShouldQue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage())
-            ->subject("Order Confirmed — {$this->order->event->title}")
-            ->greeting("Hi {$notifiable->name},")
-            ->line("Your order for **{$this->order->event->title}** has been confirmed.")
+            ->subject('Order Confirmed — '.$this->order->event->title)
+            ->greeting(sprintf('Hi %s,', $notifiable->name))
+            ->line(sprintf('Your order for **%s** has been confirmed.', $this->order->event->title))
             ->line('Booking references: '.$this->order->tickets->pluck('booking_reference')->implode(', '))
             ->action('View Order', route('orders.show', $this->order));
     }
@@ -35,7 +35,7 @@ final class OrderConfirmedNotification extends Notification implements ShouldQue
     {
         return [
             'title' => 'Order Confirmed',
-            'body' => "Your order for {$this->order->event->title} has been confirmed.",
+            'body' => sprintf('Your order for %s has been confirmed.', $this->order->event->title),
             'url' => route('orders.show', $this->order),
         ];
     }

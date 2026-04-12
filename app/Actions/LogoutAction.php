@@ -6,9 +6,9 @@ namespace App\Actions;
 
 use Illuminate\Auth\AuthManager;
 
-final class LogoutAction
+final readonly class LogoutAction
 {
-    public function __construct(private readonly AuthManager $authManager) {}
+    public function __construct(private AuthManager $authManager) {}
 
     public function execute(): void
     {

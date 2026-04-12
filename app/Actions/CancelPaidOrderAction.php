@@ -17,13 +17,13 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Filesystem\FilesystemManager;
 
-final class CancelPaidOrderAction
+final readonly class CancelPaidOrderAction
 {
     public function __construct(
-        private readonly DatabaseManager $databaseManager,
-        private readonly Dispatcher $dispatcher,
-        private readonly FilesystemManager $filesystemManager,
-        private readonly RecordActivityAction $recordActivityAction,
+        private DatabaseManager $databaseManager,
+        private Dispatcher $dispatcher,
+        private FilesystemManager $filesystemManager,
+        private RecordActivityAction $recordActivityAction,
     ) {}
 
     public function execute(Order $order, ?User $causer = null): void
@@ -44,11 +44,11 @@ final class CancelPaidOrderAction
                 ->update(['status' => TicketStatus::Cancelled, 'qr_code_path' => null]);
         });
 
-        $this->filesystemManager->disk('local')->deleteDirectory("tickets/{$order->uuid}");
+        $this->filesystemManager->disk('local')->deleteDirectory('tickets/'.$order->uuid);
 
         $this->recordActivityAction->execute(ActivityEvent::OrderCancelled, $order, $causer);
 
         $order->loadMissing('event');
-        $this->dispatcher->dispatch(new OrderCancelled($order, $order->event));
+        $this->dispatcher->dispatch(new OrderCancelled($order));
     }
 }

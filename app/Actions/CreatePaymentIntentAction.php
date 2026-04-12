@@ -9,9 +9,9 @@ use App\DataTransferObjects\PaymentIntentData;
 use App\DataTransferObjects\PaymentIntentResult;
 use App\Models\Order;
 
-final class CreatePaymentIntentAction
+final readonly class CreatePaymentIntentAction
 {
-    public function __construct(private readonly PaymentGateway $paymentGateway) {}
+    public function __construct(private PaymentGateway $paymentGateway) {}
 
     public function execute(Order $order): PaymentIntentResult
     {

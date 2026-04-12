@@ -6,9 +6,9 @@ namespace App\Actions;
 
 use Illuminate\Contracts\Auth\PasswordBroker;
 
-final class SendPasswordResetEmailAction
+final readonly class SendPasswordResetEmailAction
 {
-    public function __construct(private readonly PasswordBroker $passwordBroker) {}
+    public function __construct(private PasswordBroker $passwordBroker) {}
 
     public function execute(string $email): void
     {

@@ -114,13 +114,13 @@ it('deletes the QR code directory when a paid order is cancelled', function (): 
     $event->update(['starts_at' => now()->addMonths(6)]);
 
     $order = $this->createPaidOrder($user, $event);
-    Storage::disk('local')->makeDirectory("tickets/{$order->uuid}");
-    Storage::disk('local')->put("tickets/{$order->uuid}/ticket.svg", 'fake-qr-content');
+    Storage::disk('local')->makeDirectory('tickets/'.$order->uuid);
+    Storage::disk('local')->put(sprintf('tickets/%s/ticket.svg', $order->uuid), 'fake-qr-content');
 
     $this->actingAs($user)
         ->delete(route('orders.cancel', ['order' => $order->uuid]));
 
-    Storage::disk('local')->assertMissing("tickets/{$order->uuid}/ticket.svg");
+    Storage::disk('local')->assertMissing(sprintf('tickets/%s/ticket.svg', $order->uuid));
 });
 
 it('broadcasts OrderCancelled when a paid order is cancelled', function (): void {

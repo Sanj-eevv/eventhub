@@ -38,7 +38,7 @@ it('restricts organization admins to their organization orders', function (): vo
         ->assertSuccessful()
         ->assertInertia(
             fn ($page) => $page
-                ->where('orders.data', fn ($data) => collect($data)->pluck('uuid')->contains($ownOrder->uuid)
+                ->where('orders.data', fn ($data): bool => collect($data)->pluck('uuid')->contains($ownOrder->uuid)
                     && collect($data)->pluck('uuid')->doesntContain($otherOrder->uuid))
         );
 });

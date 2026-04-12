@@ -29,13 +29,13 @@ use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Collection;
 
-final class ReserveTicketsAction
+final readonly class ReserveTicketsAction
 {
     public function __construct(
-        private readonly DatabaseManager $databaseManager,
-        private readonly Dispatcher $dispatcher,
-        private readonly EventDispatcher $eventDispatcher,
-        private readonly SettingsService $settingsService,
+        private DatabaseManager $databaseManager,
+        private Dispatcher $dispatcher,
+        private EventDispatcher $eventDispatcher,
+        private SettingsService $settingsService,
     ) {}
 
     /**
@@ -43,13 +43,9 @@ final class ReserveTicketsAction
      */
     public function execute(User $user, Event $event, array $items): Order
     {
-        if (EventStatus::Published !== $event->status) {
-            throw new EventNotAvailableException();
-        }
+        throw_if(EventStatus::Published !== $event->status, EventNotAvailableException::class);
 
-        if (Order::query()->forUser($user)->forEvent($event)->activeReservation()->exists()) {
-            throw new ActiveReservationExistsException();
-        }
+        throw_if(Order::query()->forUser($user)->forEvent($event)->activeReservation()->exists(), ActiveReservationExistsException::class);
 
         $attempts = 0;
 
@@ -68,30 +64,22 @@ final class ReserveTicketsAction
 
                         $saleEndsAt = $ticketType->sale_ends_at ?? $event->ends_at;
 
-                        if ($ticketType->sale_starts_at && $now->isBefore($ticketType->sale_starts_at)) {
-                            throw new TicketSaleNotOpenException($ticketType);
-                        }
+                        throw_if($ticketType->sale_starts_at && $now->isBefore($ticketType->sale_starts_at), TicketSaleNotOpenException::class, $ticketType);
 
-                        if ($now->isAfter($saleEndsAt)) {
-                            throw new TicketSaleClosedException($ticketType);
-                        }
+                        throw_if($now->isAfter($saleEndsAt), TicketSaleClosedException::class, $ticketType);
 
                         $soldCount = $ticketType->tickets()
                             ->whereIn('status', [TicketStatus::Pending, TicketStatus::Active])
                             ->count();
 
-                        if ($soldCount + $item->quantity > $ticketType->capacity) {
-                            throw new InsufficientTicketCapacityException($ticketType);
-                        }
+                        throw_if($soldCount + $item->quantity > $ticketType->capacity, InsufficientTicketCapacityException::class, $ticketType);
 
                         $userCount = $ticketType->tickets()
                             ->where('user_id', $user->id)
                             ->whereIn('status', [TicketStatus::Pending, TicketStatus::Active])
                             ->count();
 
-                        if (null !== $ticketType->max_per_user && $userCount + $item->quantity > $ticketType->max_per_user) {
-                            throw new TicketLimitExceededException($ticketType);
-                        }
+                        throw_if(null !== $ticketType->max_per_user && $userCount + $item->quantity > $ticketType->max_per_user, TicketLimitExceededException::class, $ticketType);
 
                         return ['ticketType' => $ticketType, 'quantity' => $item->quantity];
                     });
@@ -126,13 +114,11 @@ final class ReserveTicketsAction
                     return $order;
                 });
 
-                $this->eventDispatcher->dispatch(new OrderReserved($order, $event));
+                $this->eventDispatcher->dispatch(new OrderReserved($order));
 
                 return $order;
             } catch (UniqueConstraintViolationException $exception) {
-                if (++$attempts >= 3) {
-                    throw $exception;
-                }
+                throw_if(++$attempts >= 3, $exception);
             }
         }
     }

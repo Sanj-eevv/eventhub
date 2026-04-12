@@ -11,6 +11,6 @@ final class InvalidStatusTransitionException extends RuntimeException
 {
     public function __construct(UnitEnum $from, UnitEnum $to)
     {
-        parent::__construct("Cannot transition from [{$from->value}] to [{$to->value}].");
+        parent::__construct(sprintf('Cannot transition from [%s] to [%s].', $from->value, $to->value));
     }
 }

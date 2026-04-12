@@ -45,7 +45,7 @@ final class GetDashboardStatsAction
                 ->limit(5),
             $user,
         )->get()
-            ->map(fn (Order $order) => [
+            ->map(fn (Order $order): array => [
                 'uuid' => $order->uuid,
                 'customer_name' => $order->user->name,
                 'customer_email' => $order->user->email,
@@ -63,14 +63,14 @@ final class GetDashboardStatsAction
             Event::query()
                 ->withCount([
                     'tickets',
-                    'tickets as checked_in_count' => fn (TicketBuilder $subQuery) => $subQuery->used(),
+                    'tickets as checked_in_count' => fn (TicketBuilder $subQuery): TicketBuilder => $subQuery->used(),
                 ])
                 ->published()
                 ->where('ends_at', '>=', CarbonImmutable::now())
                 ->orderBy('starts_at'),
             $user,
         )->get()
-            ->map(fn (Event $event) => [
+            ->map(fn (Event $event): array => [
                 'uuid' => $event->uuid,
                 'title' => $event->title,
                 'starts_at' => $event->starts_at->toISOString(),
@@ -123,7 +123,7 @@ final class GetDashboardStatsAction
                 ->orderBy('starts_at'),
             $user,
         )->get()
-            ->map(fn (Event $event) => [
+            ->map(fn (Event $event): array => [
                 'uuid' => $event->uuid,
                 'title' => $event->title,
                 'starts_at' => $event->starts_at->toISOString(),
@@ -142,7 +142,7 @@ final class GetDashboardStatsAction
             ->latest('created_at')
             ->limit(10)
             ->get()
-            ->map(fn (ActivityLog $log) => [
+            ->map(fn (ActivityLog $log): array => [
                 'uuid' => $log->uuid,
                 'event' => ['value' => $log->event->value, 'label' => $log->event->label()],
                 'causer_name' => $log->causer?->name,

@@ -10,11 +10,11 @@ use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Support\Str;
 use SensitiveParameter;
 
-final class ResetPasswordAction
+final readonly class ResetPasswordAction
 {
     public function __construct(
-        private readonly PasswordBroker $passwordBroker,
-        private readonly Hasher $hasher,
+        private PasswordBroker $passwordBroker,
+        private Hasher $hasher,
     ) {}
 
     public function execute(array $data): string

@@ -13,11 +13,11 @@ use App\Models\Event;
 use App\Models\User;
 use Illuminate\Events\Dispatcher;
 
-final class UpdateEventStatusAction
+final readonly class UpdateEventStatusAction
 {
     public function __construct(
-        private readonly Dispatcher $dispatcher,
-        private readonly RecordActivityAction $recordActivityAction,
+        private Dispatcher $dispatcher,
+        private RecordActivityAction $recordActivityAction,
     ) {}
 
     public function execute(Event $event, EventStatus $status, ?User $causer = null): Event
@@ -26,9 +26,7 @@ final class UpdateEventStatusAction
             throw new InvalidStatusTransitionException($event->status, $status);
         }
 
-        if (EventStatus::Published === $status && ! $event->coverImage()->exists()) {
-            throw new MissingEventCoverImageException();
-        }
+        throw_if(EventStatus::Published === $status && ! $event->coverImage()->exists(), MissingEventCoverImageException::class);
 
         $event->update(['status' => $status]);
 

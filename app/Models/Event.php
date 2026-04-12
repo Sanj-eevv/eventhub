@@ -10,7 +10,7 @@ use App\Traits\HasAppUuid;
 use App\Traits\HasSlug;
 use Carbon\CarbonImmutable;
 use Database\Factories\EventFactory;
-use Eloquent;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\UseEloquentBuilder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -49,52 +49,51 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read Media|null $coverImage
  *
  * @method static EventFactory factory($count = null, $state = [])
- * @method static Builder<static>|Event newModelQuery()
- * @method static Builder<static>|Event newQuery()
- * @method static Builder<static>|Event onlyTrashed()
- * @method static Builder<static>|Event query()
- * @method static Builder<static>|Event whereCreatedAt($value)
- * @method static Builder<static>|Event whereDeletedAt($value)
- * @method static Builder<static>|Event whereDescription($value)
- * @method static Builder<static>|Event whereEndsAt($value)
- * @method static Builder<static>|Event whereId($value)
- * @method static Builder<static>|Event whereOrganizationId($value)
- * @method static Builder<static>|Event whereSlug($value)
- * @method static Builder<static>|Event whereStartsAt($value)
- * @method static Builder<static>|Event whereStatus($value)
- * @method static Builder<static>|Event whereTimezone($value)
- * @method static Builder<static>|Event whereTitle($value)
- * @method static Builder<static>|Event whereUpdatedAt($value)
- * @method static Builder<static>|Event whereUserId($value)
- * @method static Builder<static>|Event whereUuid($value)
- * @method static Builder<static>|Event withTrashed(bool $withTrashed = true)
- * @method static Builder<static>|Event withoutTrashed()
+ * @method static Builder<static>|\Illuminate\Support\Facades\Event newModelQuery()
+ * @method static Builder<static>|\Illuminate\Support\Facades\Event newQuery()
+ * @method static Builder<static>|\Illuminate\Support\Facades\Event onlyTrashed()
+ * @method static Builder<static>|\Illuminate\Support\Facades\Event query()
+ * @method static Builder<static>|\Illuminate\Support\Facades\Event whereCreatedAt($value)
+ * @method static Builder<static>|\Illuminate\Support\Facades\Event whereDeletedAt($value)
+ * @method static Builder<static>|\Illuminate\Support\Facades\Event whereDescription($value)
+ * @method static Builder<static>|\Illuminate\Support\Facades\Event whereEndsAt($value)
+ * @method static Builder<static>|\Illuminate\Support\Facades\Event whereId($value)
+ * @method static Builder<static>|\Illuminate\Support\Facades\Event whereOrganizationId($value)
+ * @method static Builder<static>|\Illuminate\Support\Facades\Event whereSlug($value)
+ * @method static Builder<static>|\Illuminate\Support\Facades\Event whereStartsAt($value)
+ * @method static Builder<static>|\Illuminate\Support\Facades\Event whereStatus($value)
+ * @method static Builder<static>|\Illuminate\Support\Facades\Event whereTimezone($value)
+ * @method static Builder<static>|\Illuminate\Support\Facades\Event whereTitle($value)
+ * @method static Builder<static>|\Illuminate\Support\Facades\Event whereUpdatedAt($value)
+ * @method static Builder<static>|\Illuminate\Support\Facades\Event whereUserId($value)
+ * @method static Builder<static>|\Illuminate\Support\Facades\Event whereUuid($value)
+ * @method static Builder<static>|\Illuminate\Support\Facades\Event withTrashed(bool $withTrashed = true)
+ * @method static Builder<static>|\Illuminate\Support\Facades\Event withoutTrashed()
  *
- * @mixin Eloquent
+ * @mixin Model
  */
 #[UseEloquentBuilder(EventBuilder::class)]
+#[Fillable([
+    'user_id',
+    'organization_id',
+    'title',
+    'slug',
+    'description',
+    'starts_at',
+    'ends_at',
+    'status',
+    'timezone',
+    'venue_name',
+    'address',
+    'zip',
+    'map_url',
+])]
 final class Event extends Model
 {
     use HasAppUuid;
     use HasFactory;
     use HasSlug;
     use SoftDeletes;
-
-    protected $fillable = [
-        'user_id',
-        'organization_id',
-        'title',
-        'slug',
-        'description',
-        'starts_at',
-        'ends_at',
-        'status',
-        'timezone',
-        'venue_name',
-        'address',
-        'zip',
-        'map_url',
-    ];
 
     public function ticketTypes(): HasMany
     {

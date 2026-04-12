@@ -8,9 +8,9 @@ use App\Enums\OrderStatus;
 use App\Models\Order;
 use Illuminate\Database\DatabaseManager;
 
-final class ExpireOrderAction
+final readonly class ExpireOrderAction
 {
-    public function __construct(private readonly DatabaseManager $databaseManager) {}
+    public function __construct(private DatabaseManager $databaseManager) {}
 
     public function execute(Order $order): void
     {

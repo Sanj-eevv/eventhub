@@ -8,9 +8,9 @@ use App\Models\Event;
 use App\Models\Media;
 use Illuminate\Database\DatabaseManager;
 
-final class SetCoverMediaAction
+final readonly class SetCoverMediaAction
 {
-    public function __construct(private readonly DatabaseManager $databaseManager) {}
+    public function __construct(private DatabaseManager $databaseManager) {}
 
     public function execute(Event $event, Media $media): void
     {

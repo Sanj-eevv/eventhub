@@ -11,6 +11,6 @@ final class TicketSaleNotOpenException extends RuntimeException
 {
     public function __construct(TicketType $ticketType)
     {
-        parent::__construct("Ticket sales for [{$ticketType->name}] have not opened yet.");
+        parent::__construct(sprintf('Ticket sales for [%s] have not opened yet.', $ticketType->name));
     }
 }

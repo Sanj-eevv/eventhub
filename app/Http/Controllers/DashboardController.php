@@ -25,15 +25,15 @@ final class DashboardController extends Controller
         $user = $this->authManager->user();
 
         return $this->inertiaResponse->render('Dashboard/Index', [
-            'pendingOrganizationsCount' => fn () => $this->getDashboardStatsAction->pendingOrganizationsCount($user),
-            'cancelledOrdersCount' => fn () => $this->getDashboardStatsAction->cancelledOrdersCount($user),
-            'revenueThisMonth' => fn () => $this->getDashboardStatsAction->revenueThisMonth($user),
-            'ticketsSoldThisMonth' => fn () => $this->getDashboardStatsAction->ticketsSoldThisMonth($user),
-            'eventsByStatus' => fn () => $this->getDashboardStatsAction->eventsByStatus($user),
-            'draftEventsNearStartDate' => fn () => $this->getDashboardStatsAction->draftEventsNearStartDate($user),
-            'recentCancelledOrders' => Inertia::defer(fn () => $this->getDashboardStatsAction->recentCancelledOrders($user)),
-            'eventsCheckInRates' => Inertia::defer(fn () => $this->getDashboardStatsAction->eventsCheckInRates($user)),
-            'recentActivity' => Inertia::defer(fn () => $this->getDashboardStatsAction->recentActivity($user)),
+            'pendingOrganizationsCount' => fn (): int => $this->getDashboardStatsAction->pendingOrganizationsCount($user),
+            'cancelledOrdersCount' => fn (): int => $this->getDashboardStatsAction->cancelledOrdersCount($user),
+            'revenueThisMonth' => fn (): array => $this->getDashboardStatsAction->revenueThisMonth($user),
+            'ticketsSoldThisMonth' => fn (): int => $this->getDashboardStatsAction->ticketsSoldThisMonth($user),
+            'eventsByStatus' => fn (): array => $this->getDashboardStatsAction->eventsByStatus($user),
+            'draftEventsNearStartDate' => fn (): array => $this->getDashboardStatsAction->draftEventsNearStartDate($user),
+            'recentCancelledOrders' => Inertia::defer(fn (): array => $this->getDashboardStatsAction->recentCancelledOrders($user)),
+            'eventsCheckInRates' => Inertia::defer(fn (): array => $this->getDashboardStatsAction->eventsCheckInRates($user)),
+            'recentActivity' => Inertia::defer(fn (): array => $this->getDashboardStatsAction->recentActivity($user)),
         ]);
     }
 }

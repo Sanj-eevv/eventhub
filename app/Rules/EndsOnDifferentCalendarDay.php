@@ -26,6 +26,7 @@ final class EndsOnDifferentCalendarDay implements DataAwareRule, ValidationRule
         if ( ! $startsAt) {
             return;
         }
+
         $startDate = CarbonImmutable::parse($startsAt)->toDateString();
         $endDate = CarbonImmutable::parse($value)->toDateString();
         if ($endDate <= $startDate) {

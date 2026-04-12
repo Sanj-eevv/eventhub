@@ -7,17 +7,20 @@ namespace App\Models;
 use App\Builders\RoleBuilder;
 use App\Enums\PreservedRoleList;
 use App\Traits\HasSlug;
-use Carbon\CarbonImmutable;
-use Database\Factories\RoleFactory;
-use Eloquent;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\UseEloquentBuilder;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[UseEloquentBuilder(RoleBuilder::class)]
+#[Fillable([
+    'name',
+    'slug',
+    'description',
+    'preserved',
+])]
 /**
  * @property int $id
  * @property string $name
@@ -52,13 +55,6 @@ final class Role extends Model
 {
     use HasFactory;
     use HasSlug;
-
-    protected $fillable = [
-        'name',
-        'slug',
-        'description',
-        'preserved',
-    ];
 
     public static function superAdminRole(): self
     {

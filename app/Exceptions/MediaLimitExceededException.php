@@ -10,6 +10,6 @@ final class MediaLimitExceededException extends RuntimeException
 {
     public function __construct(int $limit)
     {
-        parent::__construct("Media limit of {$limit} files per event has been reached.");
+        parent::__construct(sprintf('Media limit of %d files per event has been reached.', $limit));
     }
 }

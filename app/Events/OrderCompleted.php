@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Events;
 
-use App\Models\Event;
 use App\Models\Order;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
@@ -20,12 +19,11 @@ final class OrderCompleted implements ShouldBroadcast
 
     public function __construct(
         public readonly Order $order,
-        public readonly Event $event,
     ) {}
 
     public function broadcastOn(): array
     {
-        return [new PrivateChannel('event.'.$this->event->uuid)];
+        return [new PrivateChannel('event.'.$this->order->event->uuid)];
     }
 
     public function broadcastWith(): array
@@ -33,8 +31,8 @@ final class OrderCompleted implements ShouldBroadcast
         return [
             'order_uuid' => $this->order->uuid,
             'amount' => $this->order->total,
-            'paid_count' => $this->event->orders()->paid()->count(),
-            'total_revenue' => $this->event->orders()->paid()->sum('total'),
+            'paid_count' => $this->order->event->orders()->paid()->count(),
+            'total_revenue' => $this->order->event->orders()->paid()->sum('total'),
         ];
     }
 

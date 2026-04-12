@@ -10,6 +10,7 @@ use App\Enums\RefundStatus;
 use App\Traits\HasAppUuid;
 use Carbon\CarbonImmutable;
 use Database\Factories\OrderFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\UseEloquentBuilder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -38,34 +39,33 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property CarbonImmutable|null $created_at
  * @property CarbonImmutable|null $updated_at
  * @property-read User $user
- * @property-read Event $event
+ * @property-read \Illuminate\Support\Facades\Event $event
  * @property-read Collection<int, Ticket> $tickets
  *
  * @method static OrderFactory factory($count = null, $state = [])
  */
 #[UseEloquentBuilder(OrderBuilder::class)]
+#[Fillable([
+    'user_id',
+    'event_id',
+    'status',
+    'currency',
+    'subtotal',
+    'total',
+    'stripe_payment_intent_id',
+    'stripe_client_secret',
+    'stripe_refund_id',
+    'refund_status',
+    'reserved_at',
+    'expires_at',
+    'paid_at',
+    'cancelled_at',
+    'refunded_at',
+])]
 final class Order extends Model
 {
     use HasAppUuid;
     use HasFactory;
-
-    protected $fillable = [
-        'user_id',
-        'event_id',
-        'status',
-        'currency',
-        'subtotal',
-        'total',
-        'stripe_payment_intent_id',
-        'stripe_client_secret',
-        'stripe_refund_id',
-        'refund_status',
-        'reserved_at',
-        'expires_at',
-        'paid_at',
-        'cancelled_at',
-        'refunded_at',
-    ];
 
     public function user(): BelongsTo
     {

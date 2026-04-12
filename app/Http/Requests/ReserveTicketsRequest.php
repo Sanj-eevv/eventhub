@@ -22,7 +22,7 @@ final class ReserveTicketsRequest extends FormRequest
     public function toDto(): array
     {
         return collect($this->validated('items'))
-            ->map(fn (array $item) => new TicketItemData(
+            ->map(fn (array $item): TicketItemData => new TicketItemData(
                 ticketTypeUuid: $item['ticket_type_uuid'],
                 quantity: $item['quantity'],
             ))

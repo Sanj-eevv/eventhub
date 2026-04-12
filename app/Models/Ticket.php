@@ -9,6 +9,7 @@ use App\Enums\TicketStatus;
 use App\Traits\HasAppUuid;
 use Carbon\CarbonImmutable;
 use Database\Factories\TicketFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\UseEloquentBuilder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -32,31 +33,30 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property CarbonImmutable|null $updated_at
  * @property-read Order $order
  * @property-read TicketType $ticketType
- * @property-read Event $event
+ * @property-read \Illuminate\Support\Facades\Event $event
  * @property-read User $user
  * @property-read User|null $checkedInBy
  *
  * @method static TicketFactory factory($count = null, $state = [])
  */
 #[UseEloquentBuilder(TicketBuilder::class)]
+#[Fillable([
+    'order_id',
+    'ticket_type_id',
+    'event_id',
+    'user_id',
+    'booking_reference',
+    'attendee_name',
+    'attendee_email',
+    'status',
+    'qr_code_path',
+    'checked_in_at',
+    'checked_in_by',
+])]
 final class Ticket extends Model
 {
     use HasAppUuid;
     use HasFactory;
-
-    protected $fillable = [
-        'order_id',
-        'ticket_type_id',
-        'event_id',
-        'user_id',
-        'booking_reference',
-        'attendee_name',
-        'attendee_email',
-        'status',
-        'qr_code_path',
-        'checked_in_at',
-        'checked_in_by',
-    ];
 
     public function order(): BelongsTo
     {

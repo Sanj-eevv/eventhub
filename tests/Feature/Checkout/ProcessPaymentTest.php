@@ -26,7 +26,7 @@ it('completes the order and redirects to confirmation when payment intent succee
         ->assertRedirect(route('checkout.confirmation', ['order' => $order->uuid]));
 
     expect($order->fresh()->status)->toBe(OrderStatus::Paid);
-    expect($order->fresh()->tickets->every(fn ($ticket) => TicketStatus::Active === $ticket->status))->toBeTrue();
+    expect($order->fresh()->tickets->every(fn ($ticket): bool => TicketStatus::Active === $ticket->status))->toBeTrue();
 });
 
 it('does not complete the order when payment intent has not succeeded', function (): void {

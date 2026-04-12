@@ -117,7 +117,7 @@ it('broadcasts TicketCheckedIn event on successful check-in', function (): void 
         ->assertSuccessful();
 
     Event::assertDispatched(TicketCheckedIn::class, fn (TicketCheckedIn $broadcastEvent): bool => $broadcastEvent->ticket->is($ticket)
-            && $broadcastEvent->event->is($event));
+            && $broadcastEvent->ticket->event->is($event));
 });
 
 it('broadcasts DuplicateScanAttempted when ticket already used', function (): void {
@@ -136,5 +136,5 @@ it('broadcasts DuplicateScanAttempted when ticket already used', function (): vo
         ->assertStatus(422);
 
     Event::assertDispatched(DuplicateScanAttempted::class, fn (DuplicateScanAttempted $broadcastEvent): bool => $broadcastEvent->ticket->is($ticket)
-            && $broadcastEvent->event->is($event));
+            && $broadcastEvent->ticket->event->is($event));
 });

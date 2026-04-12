@@ -7,9 +7,9 @@ namespace App\Actions;
 use App\Models\Organization;
 use Illuminate\Database\DatabaseManager;
 
-final class DeleteOrganizationAction
+final readonly class DeleteOrganizationAction
 {
-    public function __construct(private readonly DatabaseManager $databaseManager) {}
+    public function __construct(private DatabaseManager $databaseManager) {}
 
     public function execute(Organization $organization): void
     {

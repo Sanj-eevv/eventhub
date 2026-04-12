@@ -10,8 +10,6 @@ use App\DataTransferObjects\PaymentIntentResult;
 
 final class FakePaymentGateway implements PaymentGateway
 {
-    private bool $shouldFail = false;
-
     private string $retrieveStatus = 'succeeded';
 
     /** @var array<int, array<string, mixed>> */
@@ -22,8 +20,6 @@ final class FakePaymentGateway implements PaymentGateway
 
     public function failOnNextCall(): self
     {
-        $this->shouldFail = true;
-
         return $this;
     }
 
@@ -73,7 +69,7 @@ final class FakePaymentGateway implements PaymentGateway
         $refund = collect($this->refundedIntents)
             ->firstWhere('payment_intent_id', $paymentIntentId);
 
-        expect($refund)->not->toBeNull("Expected refund for {$paymentIntentId} but none was issued.");
+        expect($refund)->not->toBeNull(sprintf('Expected refund for %s but none was issued.', $paymentIntentId));
     }
 
     public function getLastRefundAmount(): int

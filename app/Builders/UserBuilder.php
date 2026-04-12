@@ -42,16 +42,16 @@ final class UserBuilder extends AppBuilder
     {
         return $this->when(
             $user->organization_id && ! $user->hasAnyRole(PreservedRoleList::Admin),
-            fn (self $query) => $query->forOrganization($user->organization_id),
+            fn (self $query): UserBuilder => $query->forOrganization($user->organization_id),
         );
     }
 
     public function search(?string $search): self
     {
         return $this->when($search, fn (self $query) => $query->where(fn (Builder $query) => $query
-            ->where('users.name', 'like', "%{$search}%")
-            ->orWhere('users.email', 'like', "%{$search}%")
-            ->orWhere('r.name', 'like', "%{$search}%")
-            ->orWhere('o.title', 'like', "%{$search}%")));
+            ->where('users.name', 'like', sprintf('%%%s%%', $search))
+            ->orWhere('users.email', 'like', sprintf('%%%s%%', $search))
+            ->orWhere('r.name', 'like', sprintf('%%%s%%', $search))
+            ->orWhere('o.title', 'like', sprintf('%%%s%%', $search))));
     }
 }

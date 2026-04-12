@@ -35,7 +35,7 @@ final class OrderFactory extends Factory
 
     public function paid(): static
     {
-        return $this->state(fn () => [
+        return $this->state(fn (): array => [
             'status' => OrderStatus::Paid,
             'paid_at' => CarbonImmutable::now(),
         ]);
@@ -43,7 +43,7 @@ final class OrderFactory extends Factory
 
     public function expired(): static
     {
-        return $this->state(fn () => [
+        return $this->state(fn (): array => [
             'status' => OrderStatus::Expired,
             'expires_at' => CarbonImmutable::now()->subMinutes(15),
         ]);
@@ -51,7 +51,7 @@ final class OrderFactory extends Factory
 
     public function cancelled(): static
     {
-        return $this->state(fn () => [
+        return $this->state(fn (): array => [
             'status' => OrderStatus::Cancelled,
             'cancelled_at' => CarbonImmutable::now(),
         ]);

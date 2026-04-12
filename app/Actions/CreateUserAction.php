@@ -10,9 +10,9 @@ use App\Models\Role;
 use App\Models\User;
 use Illuminate\Contracts\Hashing\Hasher;
 
-final class CreateUserAction
+final readonly class CreateUserAction
 {
-    public function __construct(private readonly Hasher $hash) {}
+    public function __construct(private Hasher $hash) {}
 
     public function execute(UserData $userData): User
     {

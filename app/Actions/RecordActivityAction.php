@@ -13,7 +13,7 @@ final class RecordActivityAction
 {
     public function execute(ActivityEvent $event, Model $subject, ?User $causer = null, array $properties = []): void
     {
-        ActivityLog::create([
+        ActivityLog::query()->create([
             'event' => $event,
             'subject_type' => $subject->getMorphClass(),
             'subject_id' => $subject->getKey(),

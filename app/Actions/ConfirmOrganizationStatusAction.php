@@ -13,11 +13,11 @@ use App\Models\Organization;
 use App\Models\User;
 use Illuminate\Contracts\Events\Dispatcher;
 
-final class ConfirmOrganizationStatusAction
+final readonly class ConfirmOrganizationStatusAction
 {
     public function __construct(
-        private readonly Dispatcher $dispatcher,
-        private readonly RecordActivityAction $recordActivityAction,
+        private Dispatcher $dispatcher,
+        private RecordActivityAction $recordActivityAction,
     ) {}
 
     public function execute(Organization $organization, OrganizationStatus $status, bool $notify = true, ?User $causer = null): void

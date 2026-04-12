@@ -8,11 +8,11 @@ use App\Contracts\PaymentGateway;
 use App\Enums\OrderStatus;
 use App\Models\Order;
 
-final class VerifyAndCompleteOrderAction
+final readonly class VerifyAndCompleteOrderAction
 {
     public function __construct(
-        private readonly CompleteOrderAction $completeOrderAction,
-        private readonly PaymentGateway $paymentGateway,
+        private CompleteOrderAction $completeOrderAction,
+        private PaymentGateway $paymentGateway,
     ) {}
 
     public function execute(Order $order): Order

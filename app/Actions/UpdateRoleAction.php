@@ -8,9 +8,9 @@ use App\DataTransferObjects\RoleData;
 use App\Models\Role;
 use Illuminate\Database\DatabaseManager;
 
-final class UpdateRoleAction
+final readonly class UpdateRoleAction
 {
-    public function __construct(private readonly DatabaseManager $databaseManager) {}
+    public function __construct(private DatabaseManager $databaseManager) {}
 
     public function execute(Role $role, RoleData $data): Role
     {

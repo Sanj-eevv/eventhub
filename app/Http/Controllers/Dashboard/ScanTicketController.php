@@ -46,7 +46,7 @@ final class ScanTicketController extends Controller
             $ticket = $this->checkInTicketAction->execute($ticket, $this->authManager->user());
         } catch (RuntimeException) {
             if (TicketStatus::Used === $ticket->status) {
-                $this->dispatcher->dispatch(new DuplicateScanAttempted($ticket, $event));
+                $this->dispatcher->dispatch(new DuplicateScanAttempted($ticket));
             }
 
             return $this->responseFactory->json(['error' => 'This ticket cannot be checked in.'], Response::HTTP_UNPROCESSABLE_ENTITY);

@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Carbon\CarbonImmutable;
-use Eloquent;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
@@ -29,11 +30,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @method static Builder<static>|Permission whereName($value)
  * @method static Builder<static>|Permission whereUpdatedAt($value)
  *
- * @mixin Eloquent
+ * @mixin Model
  */
+#[Fillable(['name', 'description'])]
 final class Permission extends Model
 {
-    protected $fillable = ['name', 'description'];
+    use HasFactory;
+    use HasFactory;
 
     public function roles(): BelongsToMany
     {

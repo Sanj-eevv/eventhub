@@ -16,28 +16,28 @@ final class OrganizationFactory extends Factory
 {
     public function definition(): array
     {
-        $title = $this->faker->company;
+        $title = $this->faker->company();
 
         return [
             'title' => $title,
             'slug' => Str::slug($title),
-            'description' => $this->faker->paragraph,
-            'contact_address' => $this->faker->address,
-            'contact_email' => $this->faker->unique()->companyEmail,
+            'description' => $this->faker->paragraph(),
+            'contact_address' => $this->faker->address(),
+            'contact_email' => $this->faker->unique()->companyEmail(),
             'status' => OrganizationStatus::Pending,
         ];
     }
 
     public function approved(): static
     {
-        return $this->state(fn () => [
+        return $this->state(fn (): array => [
             'status' => OrganizationStatus::Approved,
         ]);
     }
 
     public function suspended(): static
     {
-        return $this->state(fn () => [
+        return $this->state(fn (): array => [
             'status' => OrganizationStatus::Suspended,
         ]);
     }

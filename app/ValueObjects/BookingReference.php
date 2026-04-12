@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace App\ValueObjects;
 
 use Illuminate\Support\Str;
+use Stringable;
 
-final readonly class BookingReference
+final readonly class BookingReference implements Stringable
 {
     private function __construct(public string $value) {}
 

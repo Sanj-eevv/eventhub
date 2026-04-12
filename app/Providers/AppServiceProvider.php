@@ -154,18 +154,18 @@ final class AppServiceProvider extends ServiceProvider
 
     private function configureRateLimit(): void
     {
-        $loginRateLimitedResponse = fn (Request $request): RedirectResponse => app(Redirector::class)->back()->withErrors([
+        $loginRateLimitedResponse = fn (Request $request): RedirectResponse => resolve(Redirector::class)->back()->withErrors([
             'email' => ['Too many login attempts. Please try again later.'],
         ])->withInput($request->except('password'));
-        RateLimiter::for('login', fn (Request $request) => [
+        RateLimiter::for('login', fn (Request $request): array => [
             Limit::perMinute(100)->by($request->ip())->response($loginRateLimitedResponse),
             Limit::perMinute(5)->by($request->input('email'))->response($loginRateLimitedResponse),
         ]);
-        RateLimiter::for('password-reset-request', fn (Request $request) => [
+        RateLimiter::for('password-reset-request', fn (Request $request): array => [
             Limit::perHour(10)->by($request->ip()),
             Limit::perMinute(3)->by($request->input('email')),
         ]);
-        RateLimiter::for('password-reset', fn (Request $request) => [
+        RateLimiter::for('password-reset', fn (Request $request): array => [
             Limit::perHour(5)->by($request->ip()),
             Limit::perHour(3)->by($request->input('email')),
         ]);

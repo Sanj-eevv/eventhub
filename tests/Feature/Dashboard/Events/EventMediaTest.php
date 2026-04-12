@@ -32,8 +32,8 @@ it('blocks upload when the event already has 10 media files', function (): void 
     for ($i = 0; $i < 10; $i++) {
         $event->media()->create([
             'disk' => 'local',
-            'path' => "events/file_{$i}.jpg",
-            'filename' => "file_{$i}.jpg",
+            'path' => sprintf('events/file_%d.jpg', $i),
+            'filename' => sprintf('file_%d.jpg', $i),
             'mime_type' => 'image/jpeg',
             'size' => 1024,
             'is_cover' => false,

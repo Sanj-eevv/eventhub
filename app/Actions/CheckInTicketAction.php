@@ -15,20 +15,18 @@ use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Events\Dispatcher;
 use RuntimeException;
 
-final class CheckInTicketAction
+final readonly class CheckInTicketAction
 {
     public function __construct(
-        private readonly Dispatcher $dispatcher,
-        private readonly RecordActivityAction $recordActivityAction,
+        private Dispatcher $dispatcher,
+        private RecordActivityAction $recordActivityAction,
     ) {}
 
     public function execute(Ticket $ticket, User $scanner): Ticket
     {
         $ticket->loadMissing('event');
 
-        if (EventStatus::Published !== $ticket->event->status) {
-            throw new RuntimeException('Check-in is only available for published events.');
-        }
+        throw_if(EventStatus::Published !== $ticket->event->status, RuntimeException::class, 'Check-in is only available for published events.');
 
         if ( ! $ticket->status->canTransitionTo(TicketStatus::Used)) {
             throw new InvalidStatusTransitionException($ticket->status, TicketStatus::Used);
@@ -42,7 +40,7 @@ final class CheckInTicketAction
 
         $this->recordActivityAction->execute(ActivityEvent::TicketCheckedIn, $ticket, $scanner);
 
-        $this->dispatcher->dispatch(new TicketCheckedIn($ticket, $ticket->event));
+        $this->dispatcher->dispatch(new TicketCheckedIn($ticket));
 
         return $ticket;
     }

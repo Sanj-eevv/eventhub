@@ -6,7 +6,7 @@ use App\ValueObjects\DateRange;
 use Carbon\CarbonImmutable;
 
 it('throws when end date is before start date', function (): void {
-    expect(fn () => new DateRange(
+    expect(fn (): DateRange => new DateRange(
         CarbonImmutable::parse('2025-06-01'),
         CarbonImmutable::parse('2025-05-01'),
     ))->toThrow(InvalidArgumentException::class);
@@ -25,7 +25,7 @@ it('constructs successfully when end is after start', function (): void {
 it('constructs successfully when end equals start', function (): void {
     $date = CarbonImmutable::parse('2025-05-01');
 
-    expect(fn () => new DateRange($date, $date))->not->toThrow(InvalidArgumentException::class);
+    expect(fn (): DateRange => new DateRange($date, $date))->not->toThrow(InvalidArgumentException::class);
 });
 
 it('contains a date within the range', function (): void {

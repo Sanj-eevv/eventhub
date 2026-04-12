@@ -9,6 +9,7 @@ use App\Models\Scopes\SortByOrderScope;
 use App\Traits\HasAppUuid;
 use App\Traits\HasSlug;
 use Carbon\CarbonImmutable;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Attributes\UseEloquentBuilder;
 use Illuminate\Database\Eloquent\Collection;
@@ -32,29 +33,28 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property CarbonImmutable|null $sale_ends_at
  * @property CarbonImmutable|null $created_at
  * @property CarbonImmutable|null $updated_at
- * @property-read Event $event
+ * @property-read \Illuminate\Support\Facades\Event $event
  * @property-read Collection<int, Ticket> $tickets
  */
 #[ScopedBy(SortByOrderScope::class)]
 #[UseEloquentBuilder(TicketTypeBuilder::class)]
+#[Fillable([
+    'event_id',
+    'name',
+    'slug',
+    'price',
+    'description',
+    'capacity',
+    'max_per_user',
+    'sort_order',
+    'sale_starts_at',
+    'sale_ends_at',
+])]
 final class TicketType extends Model
 {
     use HasAppUuid;
     use HasFactory;
     use HasSlug;
-
-    protected $fillable = [
-        'event_id',
-        'name',
-        'slug',
-        'price',
-        'description',
-        'capacity',
-        'max_per_user',
-        'sort_order',
-        'sale_starts_at',
-        'sale_ends_at',
-    ];
 
     public static function getSluggableColumn(): string
     {

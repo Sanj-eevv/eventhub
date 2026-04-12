@@ -9,9 +9,9 @@ use App\Exceptions\InvalidStatusTransitionException;
 use App\Models\Order;
 use Illuminate\Database\DatabaseManager;
 
-final class CancelReservedOrderAction
+final readonly class CancelReservedOrderAction
 {
-    public function __construct(private readonly DatabaseManager $databaseManager) {}
+    public function __construct(private DatabaseManager $databaseManager) {}
 
     public function execute(Order $order): void
     {

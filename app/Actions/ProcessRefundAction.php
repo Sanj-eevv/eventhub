@@ -13,12 +13,12 @@ use App\Notifications\RefundCompletedNotification;
 use App\Services\SettingsService;
 use Carbon\CarbonImmutable;
 
-final class ProcessRefundAction
+final readonly class ProcessRefundAction
 {
     public function __construct(
-        private readonly PaymentGateway $paymentGateway,
-        private readonly SettingsService $settingsService,
-        private readonly RecordActivityAction $recordActivityAction,
+        private PaymentGateway $paymentGateway,
+        private SettingsService $settingsService,
+        private RecordActivityAction $recordActivityAction,
     ) {}
 
     public function execute(Order $order, ?User $causer = null, ?int $refundAmount = null): void

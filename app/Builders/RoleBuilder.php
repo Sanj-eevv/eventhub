@@ -18,7 +18,7 @@ final class RoleBuilder extends AppBuilder
     public function search(?string $search): self
     {
         return $this->when($search, fn (self $query) => $query->where(fn (Builder $query) => $query
-            ->where('name', 'like', "%{$search}%")
-            ->orWhere('slug', 'like', "%{$search}%")));
+            ->where('name', 'like', sprintf('%%%s%%', $search))
+            ->orWhere('slug', 'like', sprintf('%%%s%%', $search))));
     }
 }

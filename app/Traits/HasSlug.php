@@ -21,6 +21,7 @@ trait HasSlug
                 $iteration++;
                 $slug = sprintf('%s-%d', $initialSlug, $iteration);
             }
+
             $model->setAttribute($slugColumnName, $slug);
         });
 

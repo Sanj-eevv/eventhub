@@ -18,6 +18,6 @@ final class HorizonServiceProvider extends HorizonApplicationServiceProvider
 
     protected function gate(): void
     {
-        Gate::define('viewHorizon', fn (User $user) => $user->hasAnyRole(PreservedRoleList::SuperAdmin));
+        Gate::define('viewHorizon', fn (User $user): bool => $user->hasAnyRole(PreservedRoleList::SuperAdmin));
     }
 }

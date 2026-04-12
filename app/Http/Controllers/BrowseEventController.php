@@ -46,9 +46,7 @@ final class BrowseEventController extends Controller
 
     public function show(Event $event): Response
     {
-        if (EventStatus::Published !== $event->status) {
-            throw new NotFoundHttpException();
-        }
+        throw_if(EventStatus::Published !== $event->status, NotFoundHttpException::class);
 
         $user = $this->authManager->user();
 

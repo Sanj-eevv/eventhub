@@ -10,6 +10,7 @@ use App\Traits\HasAppUuid;
 use App\Traits\HasSlug;
 use Carbon\CarbonImmutable;
 use Database\Factories\OrganizationFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\UseEloquentBuilder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -31,7 +32,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property CarbonImmutable|null $updated_at
  * @property-read Collection<int, User> $users
  * @property-read int|null $users_count
- * @property-read Collection<int, Event> $events
+ * @property-read Collection<int, \Illuminate\Support\Facades\Event> $events
  * @property-read int|null $events_count
  *
  * @method static OrganizationFactory factory($count = null, $state = [])
@@ -53,24 +54,23 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static Builder<static>|Organization withTrashed(bool $withTrashed = true)
  * @method static Builder<static>|Organization withoutTrashed()
  *
- * @mixin \Eloquent
+ * @mixin Model
  */
 #[UseEloquentBuilder(OrganizationBuilder::class)]
+#[Fillable([
+    'title',
+    'slug',
+    'description',
+    'contact_address',
+    'contact_email',
+    'status',
+])]
 final class Organization extends Model
 {
     use HasAppUuid;
     use HasFactory;
     use HasSlug;
     use SoftDeletes;
-
-    protected $fillable = [
-        'title',
-        'slug',
-        'description',
-        'contact_address',
-        'contact_email',
-        'status',
-    ];
 
     public function users(): HasMany
     {

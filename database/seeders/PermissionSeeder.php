@@ -34,21 +34,17 @@ final class PermissionSeeder extends Seeder
                 ...DashboardPermissions::cases(),
             ]);
 
-            Permission::upsert(
-                $allCases->map(fn (BackedEnum $case) => ['name' => $case->value, 'description' => ''])->all(),
-                ['name'],
-                ['updated_at'],
-            );
+            Permission::query()->upsert($allCases->map(fn (BackedEnum $case): array => ['name' => $case->value, 'description' => ''])->all(), ['name'], ['updated_at']);
 
             $permissions = Permission::query()->pluck('id', 'name');
 
             $idsFor = fn (array $cases): array => $permissions
-                ->only(collect($cases)->map(fn (BackedEnum $case) => $case->value)->all())
+                ->only(collect($cases)->map(fn (BackedEnum $case): int|string => $case->value)->all())
                 ->values()
                 ->all();
 
             $adminCases = $allCases
-                ->reject(fn (BackedEnum $case) => SettingPermissions::Manage === $case)
+                ->reject(fn (BackedEnum $case): bool => SettingPermissions::Manage === $case)
                 ->all();
 
             $orgAdminCases = [

@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 use Carbon\CarbonInterface;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Date;
 
 if ( ! function_exists('userTime')) {
     function userTime(DateTimeInterface|string $dateTime, ?string $timezone = null): CarbonInterface
     {
         if (is_string($dateTime)) {
-            $dateTime = Carbon::parse($dateTime);
+            $dateTime = Date::parse($dateTime);
         }
+
         $tz = $timezone ? auth()->user()?->timezone : config('app.timezone');
 
         return $dateTime->timezone($tz);

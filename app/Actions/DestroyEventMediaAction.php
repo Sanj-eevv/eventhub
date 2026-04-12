@@ -9,11 +9,11 @@ use App\Models\Media;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Filesystem\FilesystemManager;
 
-final class DestroyEventMediaAction
+final readonly class DestroyEventMediaAction
 {
     public function __construct(
-        private readonly FilesystemManager $filesystemManager,
-        private readonly DatabaseManager $databaseManager,
+        private FilesystemManager $filesystemManager,
+        private DatabaseManager $databaseManager,
     ) {}
 
     public function execute(Event $event, Media $media): void

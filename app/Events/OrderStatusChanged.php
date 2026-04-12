@@ -30,7 +30,7 @@ final class OrderStatusChanged implements ShouldBroadcast
             'status' => $this->order->status->value,
             'paid_at' => $this->order->paid_at?->toISOString(),
             'tickets' => $this->order->relationLoaded('tickets')
-                ? $this->order->tickets->map(fn ($ticket) => [
+                ? $this->order->tickets->map(fn ($ticket): array => [
                     'uuid' => $ticket->uuid,
                     'booking_reference' => $ticket->booking_reference,
                 ])->all()

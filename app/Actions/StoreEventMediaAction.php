@@ -17,16 +17,16 @@ use Illuminate\Support\Str;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
-final class StoreEventMediaAction
+final readonly class StoreEventMediaAction
 {
     private const int MAX_FILES = 10;
 
     public function __construct(
-        private readonly FilesystemManager $filesystem,
-        private readonly DatabaseManager $databaseManager,
-        private readonly Dispatcher $dispatcher,
-        private readonly Config $config,
-        private readonly LoggerInterface $logger,
+        private FilesystemManager $filesystem,
+        private DatabaseManager $databaseManager,
+        private Dispatcher $dispatcher,
+        private Config $config,
+        private LoggerInterface $logger,
     ) {}
 
     public function execute(Event $event, UploadedFile $file): Media
@@ -34,7 +34,7 @@ final class StoreEventMediaAction
         $uuid = Str::uuid()->toString();
         $filename = $file->getClientOriginalName();
         $extension = $file->extension();
-        $originalPath = "media/{$event->uuid}/{$uuid}.{$extension}";
+        $originalPath = sprintf('media/%s/%s.%s', $event->uuid, $uuid, $extension);
 
         $this->filesystem->writeStream($originalPath, fopen($file->getRealPath(), 'r'));
 
@@ -42,9 +42,7 @@ final class StoreEventMediaAction
             $this->databaseManager->beginTransaction();
             $count = $event->media()->lockForUpdate()->count();
 
-            if ($count >= self::MAX_FILES) {
-                throw new MediaLimitExceededException(self::MAX_FILES);
-            }
+            throw_if($count >= self::MAX_FILES, MediaLimitExceededException::class, self::MAX_FILES);
 
             $media = $event->media()->create([
                 'uuid' => $uuid,
@@ -60,7 +58,7 @@ final class StoreEventMediaAction
             $this->databaseManager->commit();
 
             return $media;
-        } catch (Throwable $exception) {
+        } catch (Throwable $throwable) {
             $this->databaseManager->rollBack();
 
             if ( ! $this->filesystem->delete($originalPath)) {
@@ -69,7 +67,7 @@ final class StoreEventMediaAction
                 ]);
             }
 
-            throw $exception;
+            throw $throwable;
         }
     }
 }

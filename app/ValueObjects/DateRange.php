@@ -13,9 +13,7 @@ final readonly class DateRange
         public CarbonImmutable $start,
         public CarbonImmutable $end,
     ) {
-        if ($end->isBefore($start)) {
-            throw new InvalidArgumentException('End date must be after start date.');
-        }
+        throw_if($end->isBefore($start), InvalidArgumentException::class, 'End date must be after start date.');
     }
 
     public function contains(CarbonImmutable $date): bool

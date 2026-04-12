@@ -21,11 +21,11 @@ it('generates a QR code SVG file for each ticket in the order', function (): voi
     [$event, $ticketType] = $this->createPublishedEventWithTicketType();
     $order = $this->createPaidOrder($user, $event, $ticketType);
 
-    (new GenerateTicketQrCodesJob($order))->handle(app(GenerateTicketQrCodesAction::class));
+    (new GenerateTicketQrCodesJob($order))->handle(resolve(GenerateTicketQrCodesAction::class));
 
     $ticket = $order->tickets()->first();
 
-    Storage::disk('local')->assertExists("tickets/{$order->uuid}/{$ticket->uuid}.svg");
+    Storage::disk('local')->assertExists(sprintf('tickets/%s/%s.svg', $order->uuid, $ticket->uuid));
 });
 
 it('updates the qr_code_path on each ticket after generation', function (): void {
@@ -35,7 +35,7 @@ it('updates the qr_code_path on each ticket after generation', function (): void
     [$event, $ticketType] = $this->createPublishedEventWithTicketType();
     $order = $this->createPaidOrder($user, $event, $ticketType);
 
-    (new GenerateTicketQrCodesJob($order))->handle(app(GenerateTicketQrCodesAction::class));
+    (new GenerateTicketQrCodesJob($order))->handle(resolve(GenerateTicketQrCodesAction::class));
 
     $ticket = $order->tickets()->first();
 
@@ -48,7 +48,7 @@ it('records a QrCodeGenerationFailed activity when the job fails', function (): 
     $order = $this->createPaidOrder($user, $event, $ticketType);
 
     $job = new GenerateTicketQrCodesJob($order);
-    $job->failed(new RuntimeException('Disk write error'), app(RecordActivityAction::class));
+    $job->failed(new RuntimeException('Disk write error'), resolve(RecordActivityAction::class));
 
     $this->assertDatabaseHas('activity_logs', ['event' => ActivityEvent::QrCodeGenerationFailed->value]);
 });

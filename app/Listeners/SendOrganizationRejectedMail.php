@@ -9,9 +9,9 @@ use App\Mail\Organizations\StatusRejected;
 use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-final class SendOrganizationRejectedMail implements ShouldQueue
+final readonly class SendOrganizationRejectedMail implements ShouldQueue
 {
-    public function __construct(private readonly Mailer $mailer) {}
+    public function __construct(private Mailer $mailer) {}
 
     public function shouldQueue(OrganizationRejected $event): bool
     {

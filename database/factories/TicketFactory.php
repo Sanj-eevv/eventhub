@@ -25,25 +25,25 @@ final class TicketFactory extends Factory
             'ticket_type_id' => TicketType::factory(),
             'event_id' => Event::factory(),
             'user_id' => User::factory(),
-            'booking_reference' => fn () => (string) BookingReference::generate(),
-            'attendee_name' => $this->faker->name,
-            'attendee_email' => $this->faker->safeEmail,
+            'booking_reference' => fn (): string => (string) BookingReference::generate(),
+            'attendee_name' => $this->faker->name(),
+            'attendee_email' => $this->faker->safeEmail(),
             'status' => TicketStatus::Pending,
         ];
     }
 
     public function active(): static
     {
-        return $this->state(fn () => ['status' => TicketStatus::Active]);
+        return $this->state(fn (): array => ['status' => TicketStatus::Active]);
     }
 
     public function cancelled(): static
     {
-        return $this->state(fn () => ['status' => TicketStatus::Cancelled]);
+        return $this->state(fn (): array => ['status' => TicketStatus::Cancelled]);
     }
 
     public function used(): static
     {
-        return $this->state(fn () => ['status' => TicketStatus::Used]);
+        return $this->state(fn (): array => ['status' => TicketStatus::Used]);
     }
 }

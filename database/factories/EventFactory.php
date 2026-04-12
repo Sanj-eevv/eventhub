@@ -28,21 +28,21 @@ final class EventFactory extends Factory
                 ->state(['organization_id' => $attributes['organization_id']]),
             'title' => $title,
             'slug' => Str::slug($title),
-            'description' => $this->faker->paragraph,
+            'description' => $this->faker->paragraph(),
             'starts_at' => $startsAt,
             'ends_at' => CarbonImmutable::instance($this->faker->dateTimeBetween($startsAt, '+7 months')),
             'status' => EventStatus::Draft,
             'timezone' => 'UTC',
-            'venue_name' => $this->faker->company,
-            'address' => $this->faker->streetAddress,
-            'zip' => $this->faker->postcode,
+            'venue_name' => $this->faker->company(),
+            'address' => $this->faker->streetAddress(),
+            'zip' => $this->faker->postcode(),
             'map_url' => null,
         ];
     }
 
     public function published(): static
     {
-        return $this->state(fn () => [
+        return $this->state(fn (): array => [
             'status' => EventStatus::Published,
         ]);
     }

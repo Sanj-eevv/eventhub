@@ -17,11 +17,19 @@ final class OrderPolicy extends BasePolicy
 
     public function view(User $user, Order $order): bool
     {
-        return $user->hasPermission(OrderPermissions::View) || $order->user_id === $user->id;
+        if ($user->hasPermission(OrderPermissions::View)) {
+            return true;
+        }
+
+        return $order->user_id === $user->id;
     }
 
     public function cancel(User $user, ?Order $order = null): bool
     {
-        return $user->hasPermission(OrderPermissions::Cancel) || (null !== $order && $order->user_id === $user->id);
+        if ($user->hasPermission(OrderPermissions::Cancel)) {
+            return true;
+        }
+
+        return $order instanceof Order && $order->user_id === $user->id;
     }
 }

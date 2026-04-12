@@ -30,10 +30,10 @@ final class RefundCompletedNotification extends Notification implements ShouldQu
         $formatted = Money::fromCents($this->refundAmount, $this->order->currency)->format();
 
         return (new MailMessage())
-            ->subject("Refund Processed — {$this->order->event->title}")
-            ->greeting("Hi {$notifiable->name},")
-            ->line("Your refund for **{$this->order->event->title}** has been processed.")
-            ->line("Refund amount: {$formatted}")
+            ->subject('Refund Processed — '.$this->order->event->title)
+            ->greeting(sprintf('Hi %s,', $notifiable->name))
+            ->line(sprintf('Your refund for **%s** has been processed.', $this->order->event->title))
+            ->line('Refund amount: '.$formatted)
             ->action('View Order', route('orders.show', $this->order));
     }
 
@@ -41,7 +41,7 @@ final class RefundCompletedNotification extends Notification implements ShouldQu
     {
         return [
             'title' => 'Refund Processed',
-            'body' => "Your refund for {$this->order->event->title} has been processed.",
+            'body' => sprintf('Your refund for %s has been processed.', $this->order->event->title),
             'url' => route('orders.show', $this->order),
         ];
     }

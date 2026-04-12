@@ -9,9 +9,9 @@ use App\Enums\EventStatus;
 use App\Models\Event;
 use Illuminate\Database\DatabaseManager;
 
-final class CreateEventAction
+final readonly class CreateEventAction
 {
-    public function __construct(private readonly DatabaseManager $databaseManager) {}
+    public function __construct(private DatabaseManager $databaseManager) {}
 
     public function execute(EventData $data): Event
     {

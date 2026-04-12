@@ -60,7 +60,7 @@ it('restricts organization admins to their organization events', function (): vo
         ->assertSuccessful()
         ->assertInertia(
             fn ($page) => $page
-                ->where('events.data', fn ($data) => collect($data)->pluck('uuid')->contains($ownEvent->uuid)
+                ->where('events.data', fn ($data): bool => collect($data)->pluck('uuid')->contains($ownEvent->uuid)
                     && collect($data)->pluck('uuid')->doesntContain($otherEvent->uuid))
         );
 });

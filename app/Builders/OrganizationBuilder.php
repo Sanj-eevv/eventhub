@@ -29,8 +29,8 @@ final class OrganizationBuilder extends AppBuilder
     public function search(?string $search): self
     {
         return $this->when($search, fn (self $query) => $query->where(fn (Builder $query) => $query
-            ->where('title', 'like', "%{$search}%")
-            ->orWhere('contact_email', 'like', "%{$search}%")));
+            ->where('title', 'like', sprintf('%%%s%%', $search))
+            ->orWhere('contact_email', 'like', sprintf('%%%s%%', $search))));
     }
 
     public function filterByStatus(?string $status): self

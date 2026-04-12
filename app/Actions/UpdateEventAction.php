@@ -11,10 +11,10 @@ use App\Models\Event;
 use App\Models\TicketType;
 use Illuminate\Database\DatabaseManager;
 
-final class UpdateEventAction
+final readonly class UpdateEventAction
 {
     public function __construct(
-        private readonly DatabaseManager $databaseManager,
+        private DatabaseManager $databaseManager,
     ) {}
 
     public function execute(Event $event, EventData $data): Event

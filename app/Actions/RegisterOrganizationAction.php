@@ -10,11 +10,11 @@ use App\Models\Organization;
 use App\Models\User;
 use Illuminate\Database\DatabaseManager;
 
-final class RegisterOrganizationAction
+final readonly class RegisterOrganizationAction
 {
     public function __construct(
-        private readonly CreateUserAction $createUserAction,
-        private readonly DatabaseManager $databaseManager,
+        private CreateUserAction $createUserAction,
+        private DatabaseManager $databaseManager,
     ) {}
 
     public function execute(OrganizationData $organizationData, UserData $userData): User

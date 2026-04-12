@@ -24,7 +24,7 @@ final class UserPolicy extends BasePolicy
             return false;
         }
 
-        return null === $target
+        return ! $target instanceof User
             || null === $user->organization_id
             || $user->organization_id === $target->organization_id;
     }
@@ -40,7 +40,7 @@ final class UserPolicy extends BasePolicy
             return false;
         }
 
-        return null === $target
+        return ! $target instanceof User
             || null === $user->organization_id
             || $user->organization_id === $target->organization_id;
     }
@@ -51,7 +51,7 @@ final class UserPolicy extends BasePolicy
             return false;
         }
 
-        return null === $target
+        return ! $target instanceof User
             || null === $user->organization_id
             || $user->organization_id === $target->organization_id;
     }

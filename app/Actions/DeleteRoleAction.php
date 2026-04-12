@@ -8,9 +8,9 @@ use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\DatabaseManager;
 
-final class DeleteRoleAction
+final readonly class DeleteRoleAction
 {
-    public function __construct(private readonly DatabaseManager $databaseManager) {}
+    public function __construct(private DatabaseManager $databaseManager) {}
 
     public function execute(Role $role): void
     {

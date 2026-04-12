@@ -9,9 +9,9 @@ use App\DataTransferObjects\PaymentIntentData;
 use App\DataTransferObjects\PaymentIntentResult;
 use Stripe\StripeClient;
 
-final class StripePaymentGateway implements PaymentGateway
+final readonly class StripePaymentGateway implements PaymentGateway
 {
-    public function __construct(private readonly StripeClient $stripe) {}
+    public function __construct(private StripeClient $stripe) {}
 
     public function createPaymentIntent(PaymentIntentData $data): PaymentIntentResult
     {

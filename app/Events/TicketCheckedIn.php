@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Events;
 
-use App\Models\Event;
 use App\Models\Ticket;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
@@ -20,12 +19,11 @@ final class TicketCheckedIn implements ShouldBroadcast
 
     public function __construct(
         public readonly Ticket $ticket,
-        public readonly Event $event,
     ) {}
 
     public function broadcastOn(): array
     {
-        return [new PrivateChannel('checkin.'.$this->event->uuid)];
+        return [new PrivateChannel('checkin.'.$this->ticket->event->uuid)];
     }
 
     public function broadcastWith(): array
@@ -35,8 +33,8 @@ final class TicketCheckedIn implements ShouldBroadcast
             'attendee' => $this->ticket->order->user->name,
             'ticket_type' => $this->ticket->ticketType->name,
             'checked_in_at' => $this->ticket->checked_in_at,
-            'total_checked_in' => $this->event->tickets()->used()->count(),
-            'total_tickets' => $this->event->tickets()->count(),
+            'total_checked_in' => $this->ticket->event->tickets()->used()->count(),
+            'total_tickets' => $this->ticket->event->tickets()->count(),
         ];
     }
 

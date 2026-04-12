@@ -9,11 +9,11 @@ use App\Models\Order;
 use App\Notifications\PaymentFailedNotification;
 use Stripe\Event;
 
-final class HandleStripeWebhookAction
+final readonly class HandleStripeWebhookAction
 {
     public function __construct(
-        private readonly CompleteOrderAction $completeOrderAction,
-        private readonly RecordActivityAction $recordActivityAction,
+        private CompleteOrderAction $completeOrderAction,
+        private RecordActivityAction $recordActivityAction,
     ) {}
 
     public function execute(Event $event): void

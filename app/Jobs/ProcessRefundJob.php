@@ -9,17 +9,17 @@ use App\Enums\RefundStatus;
 use App\Models\Order;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Queue\Attributes\Backoff;
+use Illuminate\Queue\Attributes\Tries;
 use Throwable;
 
+#[Backoff(60)]
+#[Tries(3)]
 final class ProcessRefundJob implements ShouldQueue
 {
     use Queueable;
 
     public bool $deleteWhenMissingModels = true;
-
-    public int $tries = 3;
-
-    public int $backoff = 60;
 
     public function __construct(
         public readonly Order $order,

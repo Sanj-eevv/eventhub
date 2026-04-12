@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Notifications\OrderConfirmedNotification;
 use Illuminate\Support\Str;
 use Tests\Traits\CreatesUsers;
 
@@ -24,7 +25,7 @@ it('marks a single notification as read', function (): void {
 
     $notification = $user->notifications()->create([
         'id' => Str::uuid(),
-        'type' => 'App\Notifications\OrderConfirmedNotification',
+        'type' => OrderConfirmedNotification::class,
         'data' => ['title' => 'Test'],
         'read_at' => null,
     ]);

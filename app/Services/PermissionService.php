@@ -12,7 +12,7 @@ final class PermissionService
     /** @return array<string, list<array{id: int, name: string, description: string}>> */
     public function grouped(?Role $role = null): array
     {
-        $permissions = $role
+        $permissions = $role instanceof Role
             ? $role->permissions
             : Permission::query()->select('id', 'name', 'description')->get();
 

@@ -20,9 +20,7 @@ final class DownloadOrderTicketsPdfController extends Controller
     {
         $this->authorize('view', $order);
 
-        if (OrderStatus::Paid !== $order->status) {
-            throw new AccessDeniedHttpException();
-        }
+        throw_if(OrderStatus::Paid !== $order->status, AccessDeniedHttpException::class);
 
         $order->load(['tickets.ticketType', 'event']);
 
@@ -38,6 +36,6 @@ final class DownloadOrderTicketsPdfController extends Controller
         return Pdf::view('pdf.order-tickets', [
             'order' => $order,
             'svgContents' => $svgContents,
-        ])->download("{$order->event->title}.pdf");
+        ])->download($order->event->title.'.pdf');
     }
 }

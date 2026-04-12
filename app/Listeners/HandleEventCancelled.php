@@ -15,11 +15,11 @@ use Illuminate\Bus\Dispatcher;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Collection;
 
-final class HandleEventCancelled implements ShouldQueue
+final readonly class HandleEventCancelled implements ShouldQueue
 {
     public function __construct(
-        private readonly CancelPaidOrderAction $cancelPaidOrderAction,
-        private readonly Dispatcher $dispatcher,
+        private CancelPaidOrderAction $cancelPaidOrderAction,
+        private Dispatcher $dispatcher,
     ) {}
 
     public function handle(EventCancelled $eventCancelled): void

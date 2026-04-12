@@ -13,11 +13,11 @@ it('accepts 100', function (): void {
 });
 
 it('throws for a value below 0', function (): void {
-    expect(fn () => Percentage::fromInt(-1))->toThrow(InvalidArgumentException::class);
+    expect(fn (): Percentage => Percentage::fromInt(-1))->toThrow(InvalidArgumentException::class);
 });
 
 it('throws for a value above 100', function (): void {
-    expect(fn () => Percentage::fromInt(101))->toThrow(InvalidArgumentException::class);
+    expect(fn (): Percentage => Percentage::fromInt(101))->toThrow(InvalidArgumentException::class);
 });
 
 it('applies to an amount correctly', function (): void {

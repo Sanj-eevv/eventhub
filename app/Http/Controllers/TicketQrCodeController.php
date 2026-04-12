@@ -17,9 +17,7 @@ final class TicketQrCodeController extends Controller
     {
         $this->authorize('view', $ticket);
 
-        if ( ! $ticket->qr_code_path) {
-            throw new NotFoundHttpException();
-        }
+        throw_unless($ticket->qr_code_path, NotFoundHttpException::class);
 
         return $this->filesystemManager->disk('local')->response($ticket->qr_code_path, headers: [
             'Content-Type' => 'image/svg+xml',

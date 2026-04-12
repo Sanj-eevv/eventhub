@@ -8,10 +8,10 @@ use App\Models\Event;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-final class EventCancelled
+final readonly class EventCancelled
 {
     use Dispatchable;
     use SerializesModels;
 
-    public function __construct(public readonly Event $event) {}
+    public function __construct(public Event $event) {}
 }

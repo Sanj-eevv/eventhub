@@ -9,15 +9,15 @@ use App\Models\Setting;
 use App\Services\SettingsService;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
 
-final class UpdateSettingsAction
+final readonly class UpdateSettingsAction
 {
-    public function __construct(private readonly CacheRepository $cache) {}
+    public function __construct(private CacheRepository $cache) {}
 
     public function execute(SettingsData $data): void
     {
         Setting::query()->upsert(
             values: collect($data->toArray())
-                ->map(fn (int $value, string $key): array => compact('key', 'value'))
+                ->map(fn (int $value, string $key): array => ['key' => $key, 'value' => $value])
                 ->values()
                 ->all(),
             uniqueBy: ['key'],

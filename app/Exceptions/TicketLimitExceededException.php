@@ -11,6 +11,6 @@ final class TicketLimitExceededException extends RuntimeException
 {
     public function __construct(TicketType $ticketType)
     {
-        parent::__construct("You have reached the maximum of [{$ticketType->max_per_user}] tickets for [{$ticketType->name}].");
+        parent::__construct(sprintf('You have reached the maximum of [%s] tickets for [%s].', $ticketType->max_per_user, $ticketType->name));
     }
 }

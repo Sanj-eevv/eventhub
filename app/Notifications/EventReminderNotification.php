@@ -24,10 +24,10 @@ final class EventReminderNotification extends Notification implements ShouldQueu
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage())
-            ->subject("Reminder: {$this->event->title} is tomorrow")
-            ->greeting("Hi {$notifiable->name},")
-            ->line("This is a reminder that **{$this->event->title}** starts tomorrow.")
-            ->line("Venue: {$this->event->venue_name}, {$this->event->address}")
+            ->subject(sprintf('Reminder: %s is tomorrow', $this->event->title))
+            ->greeting(sprintf('Hi %s,', $notifiable->name))
+            ->line(sprintf('This is a reminder that **%s** starts tomorrow.', $this->event->title))
+            ->line(sprintf('Venue: %s, %s', $this->event->venue_name, $this->event->address))
             ->action('View Order', route('orders.index'));
     }
 
@@ -35,7 +35,7 @@ final class EventReminderNotification extends Notification implements ShouldQueu
     {
         return [
             'title' => 'Event Reminder',
-            'body' => "{$this->event->title} starts tomorrow.",
+            'body' => $this->event->title.' starts tomorrow.',
             'url' => route('orders.index'),
         ];
     }

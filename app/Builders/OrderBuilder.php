@@ -28,8 +28,8 @@ final class OrderBuilder extends AppBuilder
         }
 
         return $this->where(function (Builder $query) use ($search): void {
-            $query->whereHas('user', fn (Builder $userQuery) => $userQuery->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%"))
-                ->orWhereHas('event', fn (Builder $eventQuery) => $eventQuery->where('title', 'like', "%{$search}%"));
+            $query->whereHas('user', fn (Builder $userQuery) => $userQuery->where('name', 'like', sprintf('%%%s%%', $search))->orWhere('email', 'like', sprintf('%%%s%%', $search)))
+                ->orWhereHas('event', fn (Builder $eventQuery) => $eventQuery->where('title', 'like', sprintf('%%%s%%', $search)));
         });
     }
 
@@ -69,7 +69,7 @@ final class OrderBuilder extends AppBuilder
     {
         return $this->when(
             $user->organization_id && ! $user->hasAnyRole(PreservedRoleList::Admin),
-            fn (self $query) => $query->forOrganization($user->organization_id),
+            fn (self $query): OrderBuilder => $query->forOrganization($user->organization_id),
         );
     }
 }
