@@ -36,6 +36,6 @@ Broadcast::channel('order.{orderUuid}', fn (User $user, string $orderUuid): bool
     ->exists());
 
 Broadcast::channel('admin-approvals', fn (User $user): bool => $user->hasAnyRole(
-    PreservedRoleList::ADMIN,
-    PreservedRoleList::SUPER_ADMIN,
+    PreservedRoleList::Admin,
+    PreservedRoleList::SuperAdmin,
 ));
