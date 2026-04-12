@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Builders;
 
+use App\Enums\PreservedRoleList;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\JoinClause;
 
@@ -29,6 +31,19 @@ final class UserBuilder extends AppBuilder
                 $join->on('o.id', '=', 'users.organization_id')
                     ->whereNull('o.deleted_at');
             });
+    }
+
+    public function forOrganization(int $organizationId): self
+    {
+        return $this->where('users.organization_id', $organizationId);
+    }
+
+    public function forUserContext(User $user): self
+    {
+        return $this->when(
+            $user->organization_id && ! $user->hasAnyRole(PreservedRoleList::Admin),
+            fn (self $query) => $query->forOrganization($user->organization_id),
+        );
     }
 
     public function search(?string $search): self

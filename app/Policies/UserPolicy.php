@@ -18,9 +18,15 @@ final class UserPolicy extends BasePolicy
         );
     }
 
-    public function view(User $user): bool
+    public function view(User $user, ?User $target = null): bool
     {
-        return $this->viewAny($user);
+        if ( ! $this->viewAny($user)) {
+            return false;
+        }
+
+        return null === $target
+            || null === $user->organization_id
+            || $user->organization_id === $target->organization_id;
     }
 
     public function create(User $user): bool
@@ -28,13 +34,25 @@ final class UserPolicy extends BasePolicy
         return $user->hasPermission(UserPermissions::Create);
     }
 
-    public function update(User $user): bool
+    public function update(User $user, ?User $target = null): bool
     {
-        return $user->hasPermission(UserPermissions::Update);
+        if ( ! $user->hasPermission(UserPermissions::Update)) {
+            return false;
+        }
+
+        return null === $target
+            || null === $user->organization_id
+            || $user->organization_id === $target->organization_id;
     }
 
-    public function delete(User $user): bool
+    public function delete(User $user, ?User $target = null): bool
     {
-        return $user->hasPermission(UserPermissions::Delete);
+        if ( ! $user->hasPermission(UserPermissions::Delete)) {
+            return false;
+        }
+
+        return null === $target
+            || null === $user->organization_id
+            || $user->organization_id === $target->organization_id;
     }
 }

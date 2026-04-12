@@ -16,6 +16,7 @@ use App\Http\Resources\UserResource;
 use App\Models\Organization;
 use App\Models\Role;
 use App\Models\User;
+use Illuminate\Auth\AuthManager;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
@@ -25,6 +26,7 @@ use Inertia\ResponseFactory;
 final class UserController extends Controller
 {
     public function __construct(
+        private readonly AuthManager $authManager,
         private readonly CreateUserAction $createUserAction,
         private readonly UpdateUserAction $updateUserAction,
         private readonly DeleteUserAction $deleteUserAction,
@@ -38,8 +40,13 @@ final class UserController extends Controller
 
         $search = $request->input('search');
         $sortBy = $request->array('sort_by');
+
+        /** @var User $authUser */
+        $authUser = $this->authManager->user();
+
         $users = User::query()
             ->forIndex()
+            ->forUserContext($authUser)
             ->search($search)
             ->sortBy($sortBy)
             ->paginate(perPage: $request->integer('per_page', 10), page: $request->integer('page', 1));
