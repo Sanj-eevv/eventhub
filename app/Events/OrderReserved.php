@@ -4,39 +4,41 @@ declare(strict_types=1);
 
 namespace App\Events;
 
-use App\Models\Organization;
+use App\Enums\OrderStatus;
+use App\Models\Event;
+use App\Models\Order;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-final class OrganizationRejected implements ShouldBroadcast
+final class OrderReserved implements ShouldBroadcast
 {
     use Dispatchable;
     use InteractsWithSockets;
     use SerializesModels;
 
     public function __construct(
-        public readonly Organization $organization,
-        public readonly bool $notify = true,
+        public readonly Order $order,
+        public readonly Event $event,
     ) {}
 
     public function broadcastOn(): array
     {
-        return [new PrivateChannel('admin-approvals')];
+        return [new PrivateChannel('event.'.$this->event->uuid)];
     }
 
     public function broadcastWith(): array
     {
         return [
-            'organization_uuid' => $this->organization->uuid,
-            'title' => $this->organization->title,
+            'order_uuid' => $this->order->uuid,
+            'reserved_count' => $this->event->orders()->where('status', OrderStatus::Reserved)->count(),
         ];
     }
 
     public function broadcastAs(): string
     {
-        return 'organization.rejected';
+        return 'order.reserved';
     }
 }

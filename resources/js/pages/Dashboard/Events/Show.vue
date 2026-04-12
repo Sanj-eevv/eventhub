@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Head, Link } from "@inertiajs/vue3";
 import { ArrowLeftIcon, ScanLine } from "lucide-vue-next";
-import { computed, ref } from "vue";
+import { computed, onMounted, onUnmounted, ref } from "vue";
 import CancelEventDialog from "@/components/Dashboard/Events/CancelEventDialog.vue";
 import EventStatusBadge from "@/components/Dashboard/Events/EventStatusBadge.vue";
 import ImageLightbox from "@/components/ImageLightbox.vue";
@@ -30,8 +30,29 @@ import { show as usersShow } from "@/wayfinder/routes/dashboard/users";
 const canCheckIn = usePermission("event")("checkIn");
 const canCancel = usePermission("event")("cancel");
 
+type OrderCompletedPayload = {
+    order_uuid: string
+    amount: number
+    paid_count: number
+    total_revenue: number
+}
+
+type OrderReservedPayload = {
+    order_uuid: string
+    reserved_count: number
+}
+
+type OrderCancelledPayload = {
+    order_uuid: string
+    refunded_amount: number
+    total_revenue: number
+}
+
 const props = defineProps<{
-    event: EventResource;
+    event: EventResource
+    initialRevenue: number
+    initialPaidOrders: number
+    initialReservedOrders: number
 }>();
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -51,10 +72,32 @@ const lightboxOpen = ref(false);
 const lightboxIndex = ref(0);
 const cancelDialogOpen = ref(false);
 
+const revenue = ref(props.initialRevenue)
+const paidOrders = ref(props.initialPaidOrders)
+const reservedOrders = ref(props.initialReservedOrders)
+
 function openLightbox(index: number): void {
     lightboxIndex.value = index;
     lightboxOpen.value = true;
 }
+
+onMounted(() => {
+    window.Echo.private(`event.${props.event.uuid}`)
+        .listen('.order.completed', (data: OrderCompletedPayload) => {
+            revenue.value = data.total_revenue
+            paidOrders.value = data.paid_count
+        })
+        .listen('.order.reserved', (data: OrderReservedPayload) => {
+            reservedOrders.value = data.reserved_count
+        })
+        .listen('.order.cancelled', (data: OrderCancelledPayload) => {
+            revenue.value = data.total_revenue
+        })
+})
+
+onUnmounted(() => {
+    window.Echo.leave(`event.${props.event.uuid}`)
+})
 </script>
 
 <template>
@@ -104,6 +147,27 @@ function openLightbox(index: number): void {
                         >
                     </Button>
                 </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-4">
+                <Card>
+                    <CardContent class="pt-6">
+                        <p class="text-xs text-muted-foreground uppercase tracking-wide">Revenue</p>
+                        <p class="text-2xl font-bold tabular-nums mt-1">{{ formatCurrency(revenue) }}</p>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardContent class="pt-6">
+                        <p class="text-xs text-muted-foreground uppercase tracking-wide">Paid Orders</p>
+                        <p class="text-2xl font-bold tabular-nums mt-1">{{ paidOrders }}</p>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardContent class="pt-6">
+                        <p class="text-xs text-muted-foreground uppercase tracking-wide">Reserved</p>
+                        <p class="text-2xl font-bold tabular-nums mt-1">{{ reservedOrders }}</p>
+                    </CardContent>
+                </Card>
             </div>
 
             <div class="grid gap-6 md:grid-cols-2">

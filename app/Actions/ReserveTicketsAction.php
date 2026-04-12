@@ -8,6 +8,7 @@ use App\DataTransferObjects\TicketItemData;
 use App\Enums\EventStatus;
 use App\Enums\OrderStatus;
 use App\Enums\TicketStatus;
+use App\Events\OrderReserved;
 use App\Exceptions\ActiveReservationExistsException;
 use App\Exceptions\EventNotAvailableException;
 use App\Exceptions\InsufficientTicketCapacityException;
@@ -23,6 +24,7 @@ use App\Services\SettingsService;
 use App\ValueObjects\BookingReference;
 use Carbon\CarbonImmutable;
 use Illuminate\Bus\Dispatcher;
+use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Collection;
@@ -32,6 +34,7 @@ final class ReserveTicketsAction
     public function __construct(
         private readonly DatabaseManager $databaseManager,
         private readonly Dispatcher $dispatcher,
+        private readonly EventDispatcher $eventDispatcher,
         private readonly SettingsService $settingsService,
     ) {}
 
@@ -52,7 +55,7 @@ final class ReserveTicketsAction
 
         while (true) {
             try {
-                return $this->databaseManager->transaction(function () use ($user, $event, $items): Order {
+                $order = $this->databaseManager->transaction(function () use ($user, $event, $items): Order {
                     $reservationMinutes = $this->settingsService->get()->ticketReservationMinutes;
                     $now = CarbonImmutable::now();
                     $expiresAt = $now->addMinutes($reservationMinutes);
@@ -122,6 +125,10 @@ final class ReserveTicketsAction
 
                     return $order;
                 });
+
+                $this->eventDispatcher->dispatch(new OrderReserved($order, $event));
+
+                return $order;
             } catch (UniqueConstraintViolationException $exception) {
                 if (++$attempts >= 3) {
                     throw $exception;

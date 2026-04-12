@@ -48,6 +48,13 @@ arch('no DB facade used in application code')
     ->expect('App')
     ->not->toUse('Illuminate\Support\Facades\DB');
 
+arch('actions and controllers do not dispatch events via static calls or Event facade')
+    ->expect(['App\Actions', 'App\Http\Controllers'])
+    ->not->toUse([
+        'Illuminate\Support\Facades\Event',
+        'Illuminate\Foundation\Events\Dispatchable',
+    ]);
+
 arch('enums are backed enums')
     ->expect('App\Enums')
     ->toBeStringBackedEnum()

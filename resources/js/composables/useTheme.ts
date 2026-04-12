@@ -4,7 +4,7 @@ export type ThemePreference = "light" | "dark" | "system";
 
 export function useTheme() {
     const preference = ref<ThemePreference>(
-        (typeof localStorage !== "undefined"
+        (typeof window !== "undefined"
             ? (localStorage.getItem("theme") as ThemePreference)
             : null) ?? "system",
     );

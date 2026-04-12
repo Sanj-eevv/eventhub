@@ -3,7 +3,10 @@
 declare(strict_types=1);
 
 use App\Enums\OrganizationStatus;
+use App\Events\OrganizationApproved;
+use App\Events\OrganizationRejected;
 use App\Models\Organization;
+use Illuminate\Support\Facades\Event;
 use Tests\Traits\CreatesUsers;
 
 uses(CreatesUsers::class);
@@ -137,4 +140,37 @@ it('forbids organization admins from approving organizations', function (): void
     $this->actingAs($this->createOrganizationAdmin())
         ->post(route('dashboard.organizations.approve', $organization))
         ->assertForbidden();
+});
+
+it('broadcasts OrganizationApproved on admin-approvals and org admin user channels', function (): void {
+    Event::fake();
+
+    $organization = Organization::factory()->create(['status' => OrganizationStatus::Pending]);
+    $orgAdmin = $this->createOrganizationAdmin($organization);
+
+    $this->actingAs($this->createAdmin())
+        ->post(route('dashboard.organizations.approve', $organization));
+
+    Event::assertDispatched(OrganizationApproved::class, function (OrganizationApproved $event) use ($organization): bool {
+        $channels = collect($event->broadcastOn())->map(fn ($channel) => $channel->name);
+
+        return $event->organization->is($organization)
+            && $channels->contains('private-admin-approvals');
+    });
+});
+
+it('broadcasts OrganizationRejected on admin-approvals channel', function (): void {
+    Event::fake();
+
+    $organization = Organization::factory()->create(['status' => OrganizationStatus::Pending]);
+
+    $this->actingAs($this->createAdmin())
+        ->post(route('dashboard.organizations.reject', $organization));
+
+    Event::assertDispatched(OrganizationRejected::class, function (OrganizationRejected $event) use ($organization): bool {
+        $channels = collect($event->broadcastOn())->map(fn ($channel) => $channel->name);
+
+        return $event->organization->is($organization)
+            && $channels->contains('private-admin-approvals');
+    });
 });

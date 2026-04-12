@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head, router } from "@inertiajs/vue3";
-import { ref, watch } from "vue";
+import { onMounted, onUnmounted, ref, watch } from "vue";
 import CheckoutCountdown from "@/components/Checkout/CheckoutCountdown.vue";
 import CheckoutOrderSummary from "@/components/Checkout/CheckoutOrderSummary.vue";
 import CheckoutPaymentForm from "@/components/Checkout/CheckoutPaymentForm.vue";
@@ -19,7 +19,7 @@ import { useReservationCountdown } from "@/composables/checkout/useReservationCo
 import HomeLayout from "@/layouts/HomeLayout.vue";
 import { formatCurrency } from "@/lib/utils";
 import type { OrderResource } from "@/types/order";
-import { cancel, pay } from "@/wayfinder/routes/checkout";
+import { cancel, confirmation, pay } from "@/wayfinder/routes/checkout";
 import { show as eventShow } from "@/wayfinder/routes/events";
 
 const props = defineProps<{
@@ -49,6 +49,24 @@ function confirmCancel(): void {
         onFinish: () => (cancelling.value = false),
     });
 }
+
+type OrderStatusChangedPayload = {
+    status: string
+    paid_at: string | null
+}
+
+onMounted(() => {
+    window.Echo.private(`order.${props.order.uuid}`)
+        .listen('.order.status-changed', (data: OrderStatusChangedPayload) => {
+            if (data.status === 'paid') {
+                router.visit(confirmation({ order: props.order.uuid }).url)
+            }
+        })
+})
+
+onUnmounted(() => {
+    window.Echo.leave(`order.${props.order.uuid}`)
+})
 </script>
 
 <template>

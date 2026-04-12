@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 use App\Enums\OrderStatus;
 use App\Enums\TicketStatus;
+use App\Events\OrderCancelled;
 use App\Jobs\ProcessRefundJob;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use Tests\Traits\CreatesEvents;
@@ -119,4 +121,18 @@ it('deletes the QR code directory when a paid order is cancelled', function (): 
         ->delete(route('orders.cancel', ['order' => $order->uuid]));
 
     Storage::disk('local')->assertMissing("tickets/{$order->uuid}/ticket.svg");
+});
+
+it('broadcasts OrderCancelled when a paid order is cancelled', function (): void {
+    Event::fake();
+
+    $user = $this->createUser();
+    [$event] = $this->createPublishedEventWithTicketType();
+    $event->update(['starts_at' => now()->addMonths(6)]);
+    $order = $this->createPaidOrder($user, $event);
+
+    $this->actingAs($user)
+        ->delete(route('orders.cancel', ['order' => $order->uuid]));
+
+    Event::assertDispatched(OrderCancelled::class, fn (OrderCancelled $e): bool => $e->order->is($order));
 });

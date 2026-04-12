@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { Head } from "@inertiajs/vue3";
+import { Head, router } from "@inertiajs/vue3";
+import { onMounted, onUnmounted } from "vue";
 import { XIcon } from "lucide-vue-next";
 import OrganizationConfirmDialog from "@/components/Dashboard/Organizations/OrganizationConfirmDialog.vue";
 import OrganizationDeleteDialog from "@/components/Dashboard/Organizations/OrganizationDeleteDialog.vue";
@@ -51,6 +52,16 @@ const {
     rejectDialog,
     deleteDialog,
 } = useOrganizationTable(props.organizations.meta, props.organizations.filters);
+
+onMounted(() => {
+    window.Echo.private('admin-approvals')
+        .listen('.organization.approved', () => router.reload())
+        .listen('.organization.rejected', () => router.reload());
+});
+
+onUnmounted(() => {
+    window.Echo.leave('admin-approvals');
+});
 </script>
 
 <template>

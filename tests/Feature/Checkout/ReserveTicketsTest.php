@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 use App\Enums\OrderStatus;
 use App\Enums\TicketStatus;
+use App\Events\OrderReserved;
 use App\Jobs\ExpireOrderJob;
 use App\Models\Order;
 use App\Models\TicketType;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
 use Tests\Traits\CreatesEvents;
 use Tests\Traits\CreatesOrders;
@@ -191,4 +193,17 @@ it('fails validation when quantity is less than 1', function (): void {
     $this->actingAs($user)->post(route('tickets.reserve', ['event' => $event->slug]), [
         'items' => [['ticket_type_uuid' => $ticketType->uuid, 'quantity' => 0]],
     ])->assertSessionHasErrors('items.0.quantity');
+});
+
+it('broadcasts OrderReserved after tickets are reserved', function (): void {
+    Event::fake();
+
+    $user = $this->createUser();
+    [$event, $ticketType] = $this->createPublishedEventWithTicketType();
+
+    $this->actingAs($user)->post(route('tickets.reserve', ['event' => $event->slug]), [
+        'items' => [['ticket_type_uuid' => $ticketType->uuid, 'quantity' => 1]],
+    ])->assertRedirect();
+
+    Event::assertDispatched(OrderReserved::class, fn (OrderReserved $e): bool => $e->event->is($event));
 });

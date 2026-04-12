@@ -89,6 +89,9 @@ final class EventController extends Controller
 
         return $this->inertiaResponse->render('Dashboard/Events/Show', [
             'event' => EventResource::make($event->load(['organization', 'user', 'ticketTypes', 'media', 'coverImage'])),
+            'initialRevenue' => $event->orders()->paid()->sum('total'),
+            'initialPaidOrders' => $event->orders()->paid()->count(),
+            'initialReservedOrders' => $event->orders()->activeReservation()->count(),
         ]);
     }
 

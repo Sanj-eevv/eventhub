@@ -11,7 +11,7 @@ use App\Events\OrganizationRejected;
 use App\Exceptions\InvalidStatusTransitionException;
 use App\Models\Organization;
 use App\Models\User;
-use Illuminate\Events\Dispatcher;
+use Illuminate\Contracts\Events\Dispatcher;
 
 final class ConfirmOrganizationStatusAction
 {
@@ -28,16 +28,18 @@ final class ConfirmOrganizationStatusAction
 
         $organization->update(['status' => $status]);
 
-        $event = OrganizationStatus::Approved === $status
-            ? new OrganizationApproved($organization, $notify)
-            : new OrganizationRejected($organization, $notify);
+        [$broadcastEvent, $activityEvent] = match ($status) {
+            OrganizationStatus::Approved => [
+                new OrganizationApproved($organization, $notify),
+                ActivityEvent::OrganizationApproved,
+            ],
+            OrganizationStatus::Rejected => [
+                new OrganizationRejected($organization, $notify),
+                ActivityEvent::OrganizationRejected,
+            ],
+        };
 
-        $this->dispatcher->dispatch($event);
-
-        $activityEvent = OrganizationStatus::Approved === $status
-            ? ActivityEvent::OrganizationApproved
-            : ActivityEvent::OrganizationRejected;
-
+        $this->dispatcher->dispatch($broadcastEvent);
         $this->recordActivityAction->execute($activityEvent, $organization, $causer);
     }
 }

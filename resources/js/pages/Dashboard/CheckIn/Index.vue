@@ -7,7 +7,8 @@ import {
     UserCheck,
     XCircle,
 } from "lucide-vue-next";
-import { useTemplateRef } from "vue";
+import { onMounted, onUnmounted, ref, useTemplateRef } from "vue";
+import { toast } from "vue-sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,9 +22,32 @@ import {
     show as eventsShow,
 } from "@/wayfinder/routes/dashboard/events";
 
+type CheckInFeedEntry = {
+    attendee: string
+    ticketType: string
+    checkedInAt: string
+}
+
+type TicketCheckedInPayload = {
+    ticket_uuid: string
+    attendee: string
+    ticket_type: string
+    checked_in_at: string
+    total_checked_in: number
+    total_tickets: number
+}
+
+type DuplicateScanPayload = {
+    ticket_uuid: string
+    attendee: string
+    ticket_type: string
+}
+
 const props = defineProps<{
-    event: EventResource;
-}>();
+    event: EventResource
+    initialCheckedIn: number
+    totalTickets: number
+}>()
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: "Dashboard", href: dashboardIndex().url },
@@ -33,9 +57,9 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: eventsShow({ event: props.event.uuid }).url,
     },
     { title: "Check-In" },
-];
+]
 
-const videoRef = useTemplateRef<HTMLVideoElement>("videoRef");
+const videoRef = useTemplateRef<HTMLVideoElement>("videoRef")
 
 const {
     bookingReference,
@@ -46,15 +70,39 @@ const {
     submitScan,
     startCamera,
     stopCamera,
-} = useCheckIn(props.event.uuid);
+} = useCheckIn(props.event.uuid)
+
+const checkedInCount = ref(props.initialCheckedIn)
+const totalTicketsCount = ref(props.totalTickets)
+const liveFeed = ref<CheckInFeedEntry[]>([])
 
 function toggleCamera(): void {
     if (isCameraActive.value) {
-        stopCamera();
+        stopCamera()
     } else {
-        startCamera(videoRef);
+        startCamera(videoRef)
     }
 }
+
+onMounted(() => {
+    window.Echo.private(`checkin.${props.event.uuid}`)
+        .listen('.ticket.checked-in', (data: TicketCheckedInPayload) => {
+            checkedInCount.value = data.total_checked_in
+            totalTicketsCount.value = data.total_tickets
+            liveFeed.value.unshift({
+                attendee: data.attendee,
+                ticketType: data.ticket_type,
+                checkedInAt: data.checked_in_at,
+            })
+        })
+        .listen('.ticket.duplicate-scan', (data: DuplicateScanPayload) => {
+            toast.warning(`Duplicate scan: ${data.attendee} (${data.ticket_type}) already checked in.`)
+        })
+})
+
+onUnmounted(() => {
+    window.Echo.leave(`checkin.${props.event.uuid}`)
+})
 </script>
 
 <template>
@@ -62,11 +110,19 @@ function toggleCamera(): void {
         <Head :title="`Check-In — ${event.title}`" />
 
         <div class="flex flex-col gap-6 p-6 h-full">
-            <div>
-                <h1 class="text-2xl font-semibold tracking-tight">Check-In</h1>
-                <p class="text-sm text-muted-foreground mt-1">
-                    {{ event.title }}
-                </p>
+            <div class="flex items-start justify-between">
+                <div>
+                    <h1 class="text-2xl font-semibold tracking-tight">Check-In</h1>
+                    <p class="text-sm text-muted-foreground mt-1">
+                        {{ event.title }}
+                    </p>
+                </div>
+                <div class="text-right">
+                    <p class="text-3xl font-bold tabular-nums">
+                        {{ checkedInCount }}<span class="text-muted-foreground font-normal text-xl"> / {{ totalTicketsCount }}</span>
+                    </p>
+                    <p class="text-xs text-muted-foreground uppercase tracking-wide mt-0.5">Checked In</p>
+                </div>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1">
@@ -153,67 +209,91 @@ function toggleCamera(): void {
                     </div>
                 </div>
 
-                <div class="rounded-xl border bg-card overflow-hidden flex flex-col">
-                    <div
-                        v-if="!scanResult"
-                        class="flex-1 flex flex-col items-center justify-center gap-4 p-8 text-center"
-                    >
-                        <div class="size-16 rounded-full bg-muted flex items-center justify-center">
-                            <ScanLine class="size-7 text-muted-foreground" />
-                        </div>
-                        <div>
-                            <p class="font-medium text-foreground">Awaiting scan</p>
-                            <p class="text-sm text-muted-foreground mt-1">
-                                Scan a QR code or enter a booking reference to check in an attendee.
-                            </p>
-                        </div>
-                    </div>
-
-                    <div
-                        v-else-if="scanResult.success"
-                        class="flex-1 flex flex-col items-center justify-center gap-6 p-8 text-center bg-green-50 dark:bg-green-950/20"
-                    >
-                        <CheckCircle2 class="size-16 text-green-500" />
-                        <div class="space-y-1">
-                            <p class="text-2xl font-semibold text-green-700 dark:text-green-400">
-                                Check-In Successful
-                            </p>
-                            <p class="text-sm text-green-600/80 dark:text-green-500/80">
-                                {{ scanResult.message }}
-                            </p>
-                        </div>
+                <div class="flex flex-col gap-4">
+                    <div class="rounded-xl border bg-card overflow-hidden flex flex-col min-h-48">
                         <div
-                            v-if="scanResult.attendee_name"
-                            class="w-full max-w-xs rounded-lg border border-green-200 dark:border-green-800 bg-white dark:bg-green-950/40 p-4 space-y-1"
+                            v-if="!scanResult"
+                            class="flex-1 flex flex-col items-center justify-center gap-4 p-8 text-center"
                         >
-                            <p class="text-xs uppercase tracking-wide text-green-600/70 dark:text-green-500/70">
-                                Attendee
-                            </p>
-                            <p class="font-semibold text-green-800 dark:text-green-300">
-                                {{ scanResult.attendee_name }}
-                            </p>
-                            <p
-                                v-if="scanResult.ticket_type"
-                                class="text-sm text-green-600 dark:text-green-400"
+                            <div class="size-16 rounded-full bg-muted flex items-center justify-center">
+                                <ScanLine class="size-7 text-muted-foreground" />
+                            </div>
+                            <div>
+                                <p class="font-medium text-foreground">Awaiting scan</p>
+                                <p class="text-sm text-muted-foreground mt-1">
+                                    Scan a QR code or enter a booking reference to check in an attendee.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div
+                            v-else-if="scanResult.success"
+                            class="flex-1 flex flex-col items-center justify-center gap-6 p-8 text-center bg-green-50 dark:bg-green-950/20"
+                        >
+                            <CheckCircle2 class="size-16 text-green-500" />
+                            <div class="space-y-1">
+                                <p class="text-2xl font-semibold text-green-700 dark:text-green-400">
+                                    Check-In Successful
+                                </p>
+                                <p class="text-sm text-green-600/80 dark:text-green-500/80">
+                                    {{ scanResult.message }}
+                                </p>
+                            </div>
+                            <div
+                                v-if="scanResult.attendee_name"
+                                class="w-full max-w-xs rounded-lg border border-green-200 dark:border-green-800 bg-white dark:bg-green-950/40 p-4 space-y-1"
                             >
-                                {{ scanResult.ticket_type }}
-                            </p>
+                                <p class="text-xs uppercase tracking-wide text-green-600/70 dark:text-green-500/70">
+                                    Attendee
+                                </p>
+                                <p class="font-semibold text-green-800 dark:text-green-300">
+                                    {{ scanResult.attendee_name }}
+                                </p>
+                                <p
+                                    v-if="scanResult.ticket_type"
+                                    class="text-sm text-green-600 dark:text-green-400"
+                                >
+                                    {{ scanResult.ticket_type }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div
+                            v-else
+                            class="flex-1 flex flex-col items-center justify-center gap-6 p-8 text-center bg-destructive/5"
+                        >
+                            <XCircle class="size-16 text-destructive" />
+                            <div class="space-y-1">
+                                <p class="text-2xl font-semibold text-destructive">
+                                    Check-In Failed
+                                </p>
+                                <p class="text-sm text-destructive/70">
+                                    {{ scanResult.message }}
+                                </p>
+                            </div>
                         </div>
                     </div>
 
                     <div
-                        v-else
-                        class="flex-1 flex flex-col items-center justify-center gap-6 p-8 text-center bg-destructive/5"
+                        v-if="liveFeed.length > 0"
+                        class="rounded-xl border bg-card overflow-hidden"
                     >
-                        <XCircle class="size-16 text-destructive" />
-                        <div class="space-y-1">
-                            <p class="text-2xl font-semibold text-destructive">
-                                Check-In Failed
-                            </p>
-                            <p class="text-sm text-destructive/70">
-                                {{ scanResult.message }}
-                            </p>
+                        <div class="px-4 py-3 border-b">
+                            <p class="text-xs font-medium uppercase tracking-wide text-muted-foreground">Live Feed</p>
                         </div>
+                        <ul class="divide-y max-h-64 overflow-y-auto">
+                            <li
+                                v-for="(entry, index) in liveFeed"
+                                :key="index"
+                                class="flex items-center gap-3 px-4 py-3"
+                            >
+                                <CheckCircle2 class="size-4 text-green-500 shrink-0" />
+                                <div class="min-w-0 flex-1">
+                                    <p class="text-sm font-medium truncate">{{ entry.attendee }}</p>
+                                    <p class="text-xs text-muted-foreground">{{ entry.ticketType }}</p>
+                                </div>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </div>

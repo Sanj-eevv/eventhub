@@ -1,3 +1,4 @@
+import './echo'
 import { createInertiaApp, usePage } from "@inertiajs/vue3";
 import { createApp, h, watch } from "vue";
 import "../css/app.css";

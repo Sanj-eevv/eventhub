@@ -3,7 +3,10 @@
 declare(strict_types=1);
 
 use App\Enums\TicketStatus;
+use App\Events\DuplicateScanAttempted;
+use App\Events\TicketCheckedIn;
 use App\Models\Organization;
+use Illuminate\Support\Facades\Event;
 use Tests\Traits\CreatesEvents;
 use Tests\Traits\CreatesOrders;
 use Tests\Traits\CreatesUsers;
@@ -97,4 +100,41 @@ it('returns 404 for an invalid booking reference', function (): void {
             'booking_reference' => 'EVT-INVALID',
         ])
         ->assertNotFound();
+});
+
+it('broadcasts TicketCheckedIn event on successful check-in', function (): void {
+    Event::fake();
+
+    [$event, $ticketType] = $this->createPublishedEventWithTicketType();
+    $customer = $this->createUser();
+    $order = $this->createPaidOrder($customer, $event, $ticketType);
+    $ticket = $order->tickets()->first();
+
+    $this->actingAs($this->createAdmin())
+        ->postJson(route('dashboard.events.check-in.scan', $event), [
+            'booking_reference' => $ticket->booking_reference,
+        ])
+        ->assertSuccessful();
+
+    Event::assertDispatched(TicketCheckedIn::class, fn (TicketCheckedIn $broadcastEvent): bool => $broadcastEvent->ticket->is($ticket)
+            && $broadcastEvent->event->is($event));
+});
+
+it('broadcasts DuplicateScanAttempted when ticket already used', function (): void {
+    Event::fake();
+
+    [$event, $ticketType] = $this->createPublishedEventWithTicketType();
+    $customer = $this->createUser();
+    $order = $this->createPaidOrder($customer, $event, $ticketType);
+    $ticket = $order->tickets()->first();
+    $ticket->update(['status' => TicketStatus::Used]);
+
+    $this->actingAs($this->createAdmin())
+        ->postJson(route('dashboard.events.check-in.scan', $event), [
+            'booking_reference' => $ticket->booking_reference,
+        ])
+        ->assertStatus(422);
+
+    Event::assertDispatched(DuplicateScanAttempted::class, fn (DuplicateScanAttempted $broadcastEvent): bool => $broadcastEvent->ticket->is($ticket)
+            && $broadcastEvent->event->is($event));
 });

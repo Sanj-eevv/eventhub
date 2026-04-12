@@ -22,6 +22,8 @@ final class CheckInController extends Controller
 
         return $this->inertiaResponse->render('Dashboard/CheckIn/Index', [
             'event' => EventResource::make($event),
+            'initialCheckedIn' => $event->tickets()->used()->count(),
+            'totalTickets' => $event->tickets()->count(),
         ]);
     }
 }

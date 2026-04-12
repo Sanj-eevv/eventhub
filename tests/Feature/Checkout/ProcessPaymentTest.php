@@ -5,6 +5,9 @@ declare(strict_types=1);
 use App\Contracts\PaymentGateway;
 use App\Enums\OrderStatus;
 use App\Enums\TicketStatus;
+use App\Events\OrderCompleted;
+use App\Events\OrderStatusChanged;
+use Illuminate\Support\Facades\Event;
 use Tests\Fakes\FakePaymentGateway;
 use Tests\Traits\CreatesEvents;
 use Tests\Traits\CreatesOrders;
@@ -85,4 +88,32 @@ it('redirects guests to login', function (): void {
 
     $this->post(route('checkout.pay', ['order' => $order->uuid]))
         ->assertRedirect(route('auth.login'));
+});
+
+it('broadcasts OrderCompleted when payment succeeds', function (): void {
+    Event::fake();
+
+    $user = $this->createUser();
+    [$event] = $this->createPublishedEventWithTicketType();
+    $order = $this->createReservedOrder($user, $event);
+    $order->update(['stripe_payment_intent_id' => 'pi_test_123']);
+
+    $this->actingAs($user)
+        ->post(route('checkout.pay', ['order' => $order->uuid]));
+
+    Event::assertDispatched(OrderCompleted::class, fn (OrderCompleted $e): bool => $e->order->is($order));
+});
+
+it('broadcasts OrderStatusChanged when order is paid', function (): void {
+    Event::fake();
+
+    $user = $this->createUser();
+    [$event] = $this->createPublishedEventWithTicketType();
+    $order = $this->createReservedOrder($user, $event);
+    $order->update(['stripe_payment_intent_id' => 'pi_test_123']);
+
+    $this->actingAs($user)
+        ->post(route('checkout.pay', ['order' => $order->uuid]));
+
+    Event::assertDispatched(OrderStatusChanged::class, fn (OrderStatusChanged $e): bool => $e->order->is($order) && 'paid' === $e->order->status->value);
 });

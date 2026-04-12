@@ -8,10 +8,12 @@ use App\Enums\ActivityEvent;
 use App\Enums\OrderStatus;
 use App\Enums\RefundStatus;
 use App\Enums\TicketStatus;
+use App\Events\OrderCancelled;
 use App\Exceptions\InvalidStatusTransitionException;
 use App\Models\Order;
 use App\Models\User;
 use Carbon\CarbonImmutable;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Filesystem\FilesystemManager;
 
@@ -19,6 +21,7 @@ final class CancelPaidOrderAction
 {
     public function __construct(
         private readonly DatabaseManager $databaseManager,
+        private readonly Dispatcher $dispatcher,
         private readonly FilesystemManager $filesystemManager,
         private readonly RecordActivityAction $recordActivityAction,
     ) {}
@@ -44,5 +47,8 @@ final class CancelPaidOrderAction
         $this->filesystemManager->disk('local')->deleteDirectory("tickets/{$order->uuid}");
 
         $this->recordActivityAction->execute(ActivityEvent::OrderCancelled, $order, $causer);
+
+        $order->loadMissing('event');
+        $this->dispatcher->dispatch(new OrderCancelled($order, $order->event));
     }
 }

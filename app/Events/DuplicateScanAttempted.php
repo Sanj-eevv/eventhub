@@ -4,39 +4,41 @@ declare(strict_types=1);
 
 namespace App\Events;
 
-use App\Models\Organization;
+use App\Models\Event;
+use App\Models\Ticket;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-final class OrganizationRejected implements ShouldBroadcast
+final class DuplicateScanAttempted implements ShouldBroadcast
 {
     use Dispatchable;
     use InteractsWithSockets;
     use SerializesModels;
 
     public function __construct(
-        public readonly Organization $organization,
-        public readonly bool $notify = true,
+        public readonly Ticket $ticket,
+        public readonly Event $event,
     ) {}
 
     public function broadcastOn(): array
     {
-        return [new PrivateChannel('admin-approvals')];
+        return [new PrivateChannel('checkin.'.$this->event->uuid)];
     }
 
     public function broadcastWith(): array
     {
         return [
-            'organization_uuid' => $this->organization->uuid,
-            'title' => $this->organization->title,
+            'ticket_uuid' => $this->ticket->uuid,
+            'attendee' => $this->ticket->order->user->name,
+            'ticket_type' => $this->ticket->ticketType->name,
         ];
     }
 
     public function broadcastAs(): string
     {
-        return 'organization.rejected';
+        return 'ticket.duplicate-scan';
     }
 }

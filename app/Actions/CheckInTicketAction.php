@@ -7,15 +7,20 @@ namespace App\Actions;
 use App\Enums\ActivityEvent;
 use App\Enums\EventStatus;
 use App\Enums\TicketStatus;
+use App\Events\TicketCheckedIn;
 use App\Exceptions\InvalidStatusTransitionException;
 use App\Models\Ticket;
 use App\Models\User;
 use Carbon\CarbonImmutable;
+use Illuminate\Contracts\Events\Dispatcher;
 use RuntimeException;
 
 final class CheckInTicketAction
 {
-    public function __construct(private readonly RecordActivityAction $recordActivityAction) {}
+    public function __construct(
+        private readonly Dispatcher $dispatcher,
+        private readonly RecordActivityAction $recordActivityAction,
+    ) {}
 
     public function execute(Ticket $ticket, User $scanner): Ticket
     {
@@ -36,6 +41,8 @@ final class CheckInTicketAction
         ]);
 
         $this->recordActivityAction->execute(ActivityEvent::TicketCheckedIn, $ticket, $scanner);
+
+        $this->dispatcher->dispatch(new TicketCheckedIn($ticket, $ticket->event));
 
         return $ticket;
     }
