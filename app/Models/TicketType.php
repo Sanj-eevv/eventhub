@@ -33,7 +33,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property CarbonImmutable|null $sale_ends_at
  * @property CarbonImmutable|null $created_at
  * @property CarbonImmutable|null $updated_at
- * @property-read \Illuminate\Support\Facades\Event $event
+ * @property-read Event $event
  * @property-read Collection<int, Ticket> $tickets
  */
 #[ScopedBy(SortByOrderScope::class)]

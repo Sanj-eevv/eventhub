@@ -33,7 +33,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property CarbonImmutable|null $updated_at
  * @property-read Order $order
  * @property-read TicketType $ticketType
- * @property-read \Illuminate\Support\Facades\Event $event
+ * @property-read Event $event
  * @property-read User $user
  * @property-read User|null $checkedInBy
  *

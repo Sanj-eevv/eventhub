@@ -44,7 +44,7 @@ use Illuminate\Support\Collection;
  * @property-read int|null $notifications_count
  * @property-read Organization|null $organization
  * @property-read Role $role
- * @property-read Collection<int, \Illuminate\Support\Facades\Event> $events
+ * @property-read Collection<int, Event> $events
  * @property-read int|null $events_count
  *
  * @method static UserFactory factory( $count = null, $state = [] )

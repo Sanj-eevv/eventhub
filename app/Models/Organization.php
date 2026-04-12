@@ -32,7 +32,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property CarbonImmutable|null $updated_at
  * @property-read Collection<int, User> $users
  * @property-read int|null $users_count
- * @property-read Collection<int, \Illuminate\Support\Facades\Event> $events
+ * @property-read Collection<int, Event> $events
  * @property-read int|null $events_count
  *
  * @method static OrganizationFactory factory($count = null, $state = [])

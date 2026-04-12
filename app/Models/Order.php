@@ -39,7 +39,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property CarbonImmutable|null $created_at
  * @property CarbonImmutable|null $updated_at
  * @property-read User $user
- * @property-read \Illuminate\Support\Facades\Event $event
+ * @property-read Event $event
  * @property-read Collection<int, Ticket> $tickets
  *
  * @method static OrderFactory factory($count = null, $state = [])
