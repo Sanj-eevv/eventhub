@@ -11,6 +11,7 @@ use Illuminate\Validation\Rule;
 
 final class OrganizationRequest extends FormRequest
 {
+    /** @return array<string, mixed> */
     public function rules(): array
     {
         return [

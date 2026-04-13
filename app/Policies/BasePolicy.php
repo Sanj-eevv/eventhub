@@ -18,6 +18,7 @@ abstract class BasePolicy
         return $user->hasAnyRole(PreservedRoleList::SuperAdmin) ? true : null;
     }
 
+    /** @return string[] */
     protected function attendeeAbilities(): array
     {
         return [];

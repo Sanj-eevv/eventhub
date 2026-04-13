@@ -34,7 +34,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 #[Fillable(['name', 'description'])]
 final class Permission extends Model
 {
-    /** @return BelongsToMany<Role, Permission> */
+    /** @return BelongsToMany<Role, $this> */
     public function roles(): BelongsToMany
     {
         return $this->belongsToMany(Role::class, 'roles_permissions');

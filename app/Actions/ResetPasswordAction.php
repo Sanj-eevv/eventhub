@@ -17,6 +17,7 @@ final readonly class ResetPasswordAction
         private Hasher $hasher,
     ) {}
 
+    /** @param array<string, mixed> $data */
     public function __invoke(array $data): string
     {
         return $this->passwordBroker->reset(

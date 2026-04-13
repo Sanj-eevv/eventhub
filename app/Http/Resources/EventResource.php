@@ -11,6 +11,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 /** @mixin Event */
 final class EventResource extends JsonResource
 {
+    /** @return array<string, mixed> */
     public function toArray(Request $request): array
     {
         return [

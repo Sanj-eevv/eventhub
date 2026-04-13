@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Gate;
 /** @mixin Role */
 final class IndexResource extends JsonResource
 {
+    /** @return array<string, mixed> */
     public function toArray(Request $request): array
     {
         return [

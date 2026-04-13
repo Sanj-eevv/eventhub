@@ -11,6 +11,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 /** @mixin SettingsData */
 final class SettingResource extends JsonResource
 {
+    /** @return array<string, mixed> */
     public function toArray(Request $request): array
     {
         return [

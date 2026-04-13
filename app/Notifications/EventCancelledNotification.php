@@ -16,6 +16,7 @@ final class EventCancelledNotification extends Notification implements ShouldQue
 
     public function __construct(private readonly Event $event) {}
 
+    /** @return string[] */
     public function via(object $notifiable): array
     {
         return ['mail', 'database'];
@@ -30,6 +31,7 @@ final class EventCancelledNotification extends Notification implements ShouldQue
             ->line('If you purchased tickets, your order has been voided. Please contact support regarding any refund questions.');
     }
 
+    /** @return array<string, mixed> */
     public function toArray(object $notifiable): array
     {
         return [

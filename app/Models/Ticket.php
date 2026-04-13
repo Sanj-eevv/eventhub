@@ -59,31 +59,31 @@ final class Ticket extends Model
     /** @use HasFactory<TicketFactory> */
     use HasFactory;
 
-    /** @return BelongsTo<Order, Ticket> */
+    /** @return BelongsTo<Order, $this> */
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
     }
 
-    /** @return BelongsTo<TicketType, Ticket> */
+    /** @return BelongsTo<TicketType, $this> */
     public function ticketType(): BelongsTo
     {
         return $this->belongsTo(TicketType::class);
     }
 
-    /** @return BelongsTo<Event, Ticket> */
+    /** @return BelongsTo<Event, $this> */
     public function event(): BelongsTo
     {
         return $this->belongsTo(Event::class);
     }
 
-    /** @return BelongsTo<User, Ticket> */
+    /** @return BelongsTo<User, $this> */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    /** @return BelongsTo<User, Ticket> */
+    /** @return BelongsTo<User, $this> */
     public function checkedInBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'checked_in_by');

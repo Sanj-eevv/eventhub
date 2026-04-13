@@ -16,6 +16,7 @@ final class PaymentFailedNotification extends Notification implements ShouldQueu
 
     public function __construct(private readonly Order $order) {}
 
+    /** @return string[] */
     public function via(object $notifiable): array
     {
         return ['mail', 'database'];
@@ -31,6 +32,7 @@ final class PaymentFailedNotification extends Notification implements ShouldQueu
             ->action('View Order', route('orders.show', $this->order));
     }
 
+    /** @return array<string, mixed> */
     public function toArray(object $notifiable): array
     {
         return [

@@ -27,6 +27,12 @@ if ( ! function_exists('formatUserTime')) {
 }
 
 if ( ! function_exists('omit')) {
+    /**
+     * @param string|string[] $keys
+     * @param array<string, mixed> $data
+     *
+     * @return array<string, mixed>
+     */
     function omit(string|array $keys, array $data): array
     {
         foreach (Arr::wrap($keys) as $key) {

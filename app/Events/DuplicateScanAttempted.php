@@ -26,6 +26,7 @@ final class DuplicateScanAttempted implements ShouldBroadcast
         return [new PrivateChannel('checkin.'.$this->ticket->event->uuid)];
     }
 
+    /** @return array<string, mixed> */
     public function broadcastWith(): array
     {
         return [

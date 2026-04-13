@@ -13,6 +13,7 @@ use Illuminate\Validation\Rules\Password;
 
 final class OrganizationRegisterRequest extends FormRequest
 {
+    /** @return array<string, mixed> */
     public function rules(): array
     {
         return [

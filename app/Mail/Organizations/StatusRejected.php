@@ -35,6 +35,7 @@ final class StatusRejected extends Mailable implements ShouldQueue
         );
     }
 
+    /** @return array<mixed> */
     public function attachments(): array
     {
         return [];

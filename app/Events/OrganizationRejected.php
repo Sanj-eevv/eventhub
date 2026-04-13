@@ -27,6 +27,7 @@ final class OrganizationRejected implements ShouldBroadcast
         return [new PrivateChannel('admin-approvals')];
     }
 
+    /** @return array<string, mixed> */
     public function broadcastWith(): array
     {
         return [

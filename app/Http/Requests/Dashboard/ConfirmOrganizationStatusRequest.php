@@ -8,6 +8,7 @@ use Illuminate\Foundation\Http\FormRequest;
 
 final class ConfirmOrganizationStatusRequest extends FormRequest
 {
+    /** @return array<string, mixed> */
     public function rules(): array
     {
         return [

@@ -19,7 +19,7 @@ final readonly class EventData
         public string $address,
         public string $zip,
         public ?string $map_url,
-        /** @param TicketTypeData[] $ticket_types */
+        /** @var TicketTypeData[] $ticket_types */
         public array $ticket_types,
     ) {}
 }

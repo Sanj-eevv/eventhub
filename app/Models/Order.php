@@ -68,19 +68,19 @@ final class Order extends Model
     /** @use HasFactory<OrderFactory> */
     use HasFactory;
 
-    /** @return BelongsTo<User, Order> */
+    /** @return BelongsTo<User, $this> */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    /** @return BelongsTo<Event, Order> */
+    /** @return BelongsTo<Event, $this> */
     public function event(): BelongsTo
     {
         return $this->belongsTo(Event::class);
     }
 
-    /** @return HasMany<Ticket, Order> */
+    /** @return HasMany<Ticket, $this> */
     public function tickets(): HasMany
     {
         return $this->hasMany(Ticket::class);

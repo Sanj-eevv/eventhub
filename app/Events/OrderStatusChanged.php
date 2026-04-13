@@ -24,6 +24,7 @@ final class OrderStatusChanged implements ShouldBroadcast
         return [new PrivateChannel('order.'.$this->order->uuid)];
     }
 
+    /** @return array<string, mixed> */
     public function broadcastWith(): array
     {
         return [

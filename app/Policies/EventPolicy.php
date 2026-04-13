@@ -125,6 +125,7 @@ final class EventPolicy extends BasePolicy
         return $this->withinOrganization($user, $event);
     }
 
+    /** @return string[] */
     protected function attendeeAbilities(): array
     {
         return ['reserve'];

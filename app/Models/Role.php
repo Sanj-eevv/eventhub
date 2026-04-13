@@ -76,13 +76,13 @@ final class Role extends Model
         return 'slug';
     }
 
-    /** @return HasMany<User, Role> */
+    /** @return HasMany<User, $this> */
     public function users(): HasMany
     {
         return $this->hasMany(User::class);
     }
 
-    /** @return BelongsToMany<Permission, Role> */
+    /** @return BelongsToMany<Permission, $this> */
     public function permissions(): BelongsToMany
     {
         return $this->belongsToMany(Permission::class, 'roles_permissions');

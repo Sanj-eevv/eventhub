@@ -16,6 +16,7 @@ final class EventReminderNotification extends Notification implements ShouldQueu
 
     public function __construct(private readonly Event $event) {}
 
+    /** @return string[] */
     public function via(object $notifiable): array
     {
         return ['mail', 'database'];
@@ -31,6 +32,7 @@ final class EventReminderNotification extends Notification implements ShouldQueu
             ->action('View Order', route('orders.index'));
     }
 
+    /** @return array<string, mixed> */
     public function toArray(object $notifiable): array
     {
         return [

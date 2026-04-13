@@ -26,6 +26,7 @@ final class OrderCancelled implements ShouldBroadcast
         return [new PrivateChannel('event.'.$this->order->event->uuid)];
     }
 
+    /** @return array<string, mixed> */
     public function broadcastWith(): array
     {
         return [

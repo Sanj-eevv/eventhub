@@ -13,12 +13,15 @@ use Illuminate\Database\Eloquent\Builder;
  */
 abstract class AppBuilder extends Builder
 {
+    /** @var string[] */
     protected array $allowedSortColumns = [];
 
+    /** @var array<string, string> */
     protected array $sortColumnMap = [];
 
     protected ?string $defaultSortColumn = null;
 
+    /** @param array<mixed>|null $columns */
     final public function sortBy(?array $columns): static
     {
         $filtered = collect($columns)

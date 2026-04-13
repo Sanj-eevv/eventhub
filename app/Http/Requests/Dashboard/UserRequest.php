@@ -13,6 +13,7 @@ use Illuminate\Validation\Rules\Password;
 
 final class UserRequest extends FormRequest
 {
+    /** @return array<string, mixed> */
     public function rules(Request $request): array
     {
         $user = $this->route('user');

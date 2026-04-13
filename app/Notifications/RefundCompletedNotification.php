@@ -20,6 +20,7 @@ final class RefundCompletedNotification extends Notification implements ShouldQu
         private readonly int $refundAmount,
     ) {}
 
+    /** @return string[] */
     public function via(object $notifiable): array
     {
         return ['mail', 'database'];
@@ -37,6 +38,7 @@ final class RefundCompletedNotification extends Notification implements ShouldQu
             ->action('View Order', route('orders.show', $this->order));
     }
 
+    /** @return array<string, mixed> */
     public function toArray(object $notifiable): array
     {
         return [

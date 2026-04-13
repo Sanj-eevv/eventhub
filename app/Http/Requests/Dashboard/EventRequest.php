@@ -18,6 +18,7 @@ use Illuminate\Validation\Validator;
 
 final class EventRequest extends FormRequest
 {
+    /** @return array<string, mixed> */
     public function rules(): array
     {
         $dateFormat = 'date_format:'.DateFormat::DATETIME_LOCAL;

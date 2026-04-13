@@ -11,8 +11,10 @@ use Illuminate\Contracts\Validation\ValidationRule;
 
 final class EndsOnDifferentCalendarDay implements DataAwareRule, ValidationRule
 {
+    /** @var array<string, mixed> */
     private array $data = [];
 
+    /** @param array<string, mixed> $data */
     public function setData(array $data): static
     {
         $this->data = $data;

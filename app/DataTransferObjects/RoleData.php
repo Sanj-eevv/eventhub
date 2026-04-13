@@ -9,6 +9,7 @@ final readonly class RoleData
     public function __construct(
         public string $name,
         public string $description,
+        /** @var string[]|null */
         public ?array $permissions = null,
     ) {}
 }

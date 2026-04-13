@@ -78,19 +78,19 @@ final class User extends Authenticatable implements Authorizable, MustVerifyEmai
         $this->notify(new QueueableVerifyEmail());
     }
 
-    /** @return HasMany<Event, User> */
+    /** @return HasMany<Event, $this> */
     public function events(): HasMany
     {
         return $this->hasMany(Event::class);
     }
 
-    /** @return BelongsTo<Organization, User> */
+    /** @return BelongsTo<Organization, $this> */
     public function organization(): BelongsTo
     {
         return $this->belongsTo(Organization::class);
     }
 
-    /** @return BelongsTo<Role, User> */
+    /** @return BelongsTo<Role, $this> */
     public function role(): BelongsTo
     {
         return $this->belongsTo(Role::class);
@@ -99,6 +99,7 @@ final class User extends Authenticatable implements Authorizable, MustVerifyEmai
     /** @return Collection<int, string> */
     public function getAllPermissions(): Collection
     {
+        /** @var Collection<int, string> */
         return once(fn (): Collection => $this->role->permissions->pluck('name'));
     }
 

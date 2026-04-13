@@ -15,6 +15,7 @@ final readonly class SettingsData
         public Percentage $refundPercentage = new Percentage(100),
     ) {}
 
+    /** @param array<string, mixed> $data */
     public static function fromArray(array $data): self
     {
         return new self(
@@ -35,6 +36,7 @@ final readonly class SettingsData
         );
     }
 
+    /** @return array<string, mixed> */
     public function toArray(): array
     {
         return [

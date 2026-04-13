@@ -34,6 +34,7 @@ final class GetDashboardStatsAction
         )->count();
     }
 
+    /** @return array<int, array<string, mixed>> */
     public function recentCancelledOrders(User $user): array
     {
         return $this->scopeForUser(

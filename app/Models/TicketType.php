@@ -63,13 +63,13 @@ final class TicketType extends Model
         return 'name';
     }
 
-    /** @return BelongsTo<Event, TicketType> */
+    /** @return BelongsTo<Event, $this> */
     public function event(): BelongsTo
     {
         return $this->belongsTo(Event::class);
     }
 
-    /** @return HasMany<Ticket, TicketType> */
+    /** @return HasMany<Ticket, $this> */
     public function tickets(): HasMany
     {
         return $this->hasMany(Ticket::class);

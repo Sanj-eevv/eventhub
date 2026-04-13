@@ -9,6 +9,7 @@ use Illuminate\Foundation\Http\FormRequest;
 
 final class UpdateSettingRequest extends FormRequest
 {
+    /** @return array<string, mixed> */
     public function rules(): array
     {
         return [

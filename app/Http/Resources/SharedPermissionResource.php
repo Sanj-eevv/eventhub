@@ -45,7 +45,11 @@ final readonly class SharedPermissionResource
         ];
     }
 
-    /** @return array<string, bool> */
+    /**
+     * @param string[] $abilities
+     *
+     * @return array<string, bool>
+     */
     private function checksFor(string $model, array $abilities): array
     {
         return collect($abilities)

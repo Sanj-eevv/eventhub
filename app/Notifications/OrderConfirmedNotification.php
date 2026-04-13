@@ -16,6 +16,7 @@ final class OrderConfirmedNotification extends Notification implements ShouldQue
 
     public function __construct(private readonly Order $order) {}
 
+    /** @return string[] */
     public function via(object $notifiable): array
     {
         return ['mail', 'database'];
@@ -31,6 +32,7 @@ final class OrderConfirmedNotification extends Notification implements ShouldQue
             ->action('View Order', route('orders.show', $this->order));
     }
 
+    /** @return array<string, mixed> */
     public function toArray(object $notifiable): array
     {
         return [

@@ -76,43 +76,43 @@ final class Event extends Model
     use HasSlug;
     use SoftDeletes;
 
-    /** @return HasMany<TicketType, Event> */
+    /** @return HasMany<TicketType, $this> */
     public function ticketTypes(): HasMany
     {
         return $this->hasMany(TicketType::class);
     }
 
-    /** @return HasMany<Order, Event> */
+    /** @return HasMany<Order, $this> */
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class);
     }
 
-    /** @return HasMany<Ticket, Event> */
+    /** @return HasMany<Ticket, $this> */
     public function tickets(): HasMany
     {
         return $this->hasMany(Ticket::class);
     }
 
-    /** @return BelongsTo<User, Event> */
+    /** @return BelongsTo<User, $this> */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    /** @return BelongsTo<Organization, Event> */
+    /** @return BelongsTo<Organization, $this> */
     public function organization(): BelongsTo
     {
         return $this->belongsTo(Organization::class);
     }
 
-    /** @return MorphMany<Media, Event> */
+    /** @return MorphMany<Media, $this> */
     public function media(): MorphMany
     {
         return $this->morphMany(Media::class, 'mediable')->orderBy('sort_order');
     }
 
-    /** @return MorphOne<Media, Event> */
+    /** @return MorphOne<Media, $this> */
     public function coverImage(): MorphOne
     {
         return $this->morphOne(Media::class, 'mediable')->where('is_cover', true);

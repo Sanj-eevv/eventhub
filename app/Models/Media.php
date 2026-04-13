@@ -42,7 +42,7 @@ final class Media extends Model
 {
     use HasAppUuid;
 
-    /** @return MorphTo<Model, Media> */
+    /** @return MorphTo<Model, $this> */
     public function mediable(): MorphTo
     {
         return $this->morphTo();

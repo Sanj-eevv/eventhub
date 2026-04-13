@@ -38,13 +38,13 @@ final class ActivityLog extends Model
 
     public $timestamps = false;
 
-    /** @return MorphTo<Model, ActivityLog> */
+    /** @return MorphTo<Model, $this> */
     public function causer(): MorphTo
     {
         return $this->morphTo();
     }
 
-    /** @return MorphTo<Model, ActivityLog> */
+    /** @return MorphTo<Model, $this> */
     public function subject(): MorphTo
     {
         return $this->morphTo();
