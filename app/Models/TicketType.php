@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Builders\TicketTypeBuilder;
 use App\Models\Scopes\SortByOrderScope;
+use Database\Factories\TicketTypeFactory;
 use App\Traits\HasAppUuid;
 use App\Traits\HasSlug;
 use Carbon\CarbonImmutable;
@@ -53,6 +54,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 final class TicketType extends Model
 {
     use HasAppUuid;
+    /** @use HasFactory<TicketTypeFactory> */
     use HasFactory;
     use HasSlug;
 
@@ -61,11 +63,13 @@ final class TicketType extends Model
         return 'name';
     }
 
+    /** @return BelongsTo<Event, TicketType> */
     public function event(): BelongsTo
     {
         return $this->belongsTo(Event::class);
     }
 
+    /** @return HasMany<Ticket, TicketType> */
     public function tickets(): HasMany
     {
         return $this->hasMany(Ticket::class);

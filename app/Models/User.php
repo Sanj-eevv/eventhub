@@ -48,24 +48,6 @@ use Illuminate\Support\Collection;
  * @property-read int|null $events_count
  *
  * @method static UserFactory factory( $count = null, $state = [] )
- * @method static Builder<static>|User newModelQuery()
- * @method static Builder<static>|User newQuery()
- * @method static Builder<static>|User onlyTrashed()
- * @method static Builder<static>|User query()
- * @method static Builder<static>|User whereCreatedAt( $value )
- * @method static Builder<static>|User whereDeletedAt( $value )
- * @method static Builder<static>|User whereEmail( $value )
- * @method static Builder<static>|User whereEmailVerifiedAt( $value )
- * @method static Builder<static>|User whereId( $value )
- * @method static Builder<static>|User whereName( $value )
- * @method static Builder<static>|User whereOrganizationId( $value )
- * @method static Builder<static>|User wherePassword( $value )
- * @method static Builder<static>|User whereRememberToken( $value )
- * @method static Builder<static>|User whereRoleId( $value )
- * @method static Builder<static>|User whereUpdatedAt( $value )
- * @method static Builder<static>|User whereUuid( $value )
- * @method static Builder<static>|User withTrashed( bool $withTrashed = true )
- * @method static Builder<static>|User withoutTrashed()
  *
  * @mixin Model
  */
@@ -96,16 +78,19 @@ final class User extends Authenticatable implements Authorizable, MustVerifyEmai
         $this->notify(new QueueableVerifyEmail());
     }
 
+    /** @return HasMany<Event, User> */
     public function events(): HasMany
     {
         return $this->hasMany(Event::class);
     }
 
+    /** @return BelongsTo<Organization, User> */
     public function organization(): BelongsTo
     {
         return $this->belongsTo(Organization::class);
     }
 
+    /** @return BelongsTo<Role, User> */
     public function role(): BelongsTo
     {
         return $this->belongsTo(Role::class);
@@ -114,12 +99,12 @@ final class User extends Authenticatable implements Authorizable, MustVerifyEmai
     /** @return Collection<int, string> */
     public function getAllPermissions(): Collection
     {
-        return once(fn () => $this->role->permissions->pluck('name'));
+        return once(fn (): Collection => $this->role->permissions->pluck('name'));
     }
 
     public function hasPermission(BackedEnum $permission): bool
     {
-        return $this->getAllPermissions()->contains($permission->value);
+        return $this->getAllPermissions()->contains(fn (string $name): bool => $name === $permission->value);
     }
 
     public function hasAllPermissions(BackedEnum ...$permissions): bool
@@ -133,7 +118,7 @@ final class User extends Authenticatable implements Authorizable, MustVerifyEmai
     {
         $normalised = collect($permissions)->map(fn (BackedEnum $permission): int|string => $permission->value);
 
-        return $this->getAllPermissions()->intersect($normalised)->isNotEmpty();
+        return $this->getAllPermissions()->intersect($normalised->values())->isNotEmpty();
     }
 
     public function hasAnyRole(PreservedRoleList ...$roles): bool

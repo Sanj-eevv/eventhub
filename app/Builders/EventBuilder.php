@@ -11,6 +11,7 @@ use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\JoinClause;
 
+/** @extends AppBuilder<\App\Models\Event> */
 final class EventBuilder extends AppBuilder
 {
     protected array $allowedSortColumns = ['title', 'organization', 'status', 'starts_at', 'ends_at', 'created_at'];

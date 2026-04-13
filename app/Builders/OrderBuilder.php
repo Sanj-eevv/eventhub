@@ -10,6 +10,7 @@ use App\Models\Event;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 
+/** @extends AppBuilder<\App\Models\Order> */
 final class OrderBuilder extends AppBuilder
 {
     protected array $allowedSortColumns = ['total', 'paid_at', 'created_at'];

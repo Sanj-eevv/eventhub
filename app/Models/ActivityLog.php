@@ -8,7 +8,6 @@ use App\Enums\ActivityEvent;
 use App\Traits\HasAppUuid;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
@@ -36,16 +35,16 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 final class ActivityLog extends Model
 {
     use HasAppUuid;
-    use HasFactory;
-    use HasFactory;
 
     public $timestamps = false;
 
+    /** @return MorphTo<Model, ActivityLog> */
     public function causer(): MorphTo
     {
         return $this->morphTo();
     }
 
+    /** @return MorphTo<Model, ActivityLog> */
     public function subject(): MorphTo
     {
         return $this->morphTo();

@@ -4,9 +4,16 @@ declare(strict_types=1);
 
 namespace App\Http\Resources\Event;
 
+use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @mixin Event
+ *
+ * @property-read string $organization_uuid
+ * @property-read string $organization_title
+ */
 final class IndexResource extends JsonResource
 {
     public function toArray(Request $request): array

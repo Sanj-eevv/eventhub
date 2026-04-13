@@ -4,9 +4,18 @@ declare(strict_types=1);
 
 namespace App\Http\Resources\User;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @mixin User
+ *
+ * @property-read string $role_slug
+ * @property-read string $role_name
+ * @property-read string|null $organization_uuid
+ * @property-read string|null $organization_title
+ */
 final class IndexResource extends JsonResource
 {
     public function toArray(Request $request): array

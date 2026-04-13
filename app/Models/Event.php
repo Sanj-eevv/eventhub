@@ -49,26 +49,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read Media|null $coverImage
  *
  * @method static EventFactory factory($count = null, $state = [])
- * @method static Builder<static>|static newModelQuery()
- * @method static Builder<static>|static newQuery()
- * @method static Builder<static>|static onlyTrashed()
- * @method static Builder<static>|static query()
- * @method static Builder<static>|static whereCreatedAt($value)
- * @method static Builder<static>|static whereDeletedAt($value)
- * @method static Builder<static>|static whereDescription($value)
- * @method static Builder<static>|static whereEndsAt($value)
- * @method static Builder<static>|static whereId($value)
- * @method static Builder<static>|static whereOrganizationId($value)
- * @method static Builder<static>|static whereSlug($value)
- * @method static Builder<static>|static whereStartsAt($value)
- * @method static Builder<static>|static whereStatus($value)
- * @method static Builder<static>|static whereTimezone($value)
- * @method static Builder<static>|static whereTitle($value)
- * @method static Builder<static>|static whereUpdatedAt($value)
- * @method static Builder<static>|static whereUserId($value)
- * @method static Builder<static>|static whereUuid($value)
- * @method static Builder<static>|static withTrashed(bool $withTrashed = true)
- * @method static Builder<static>|static withoutTrashed()
  *
  * @mixin Model
  */
@@ -91,40 +71,48 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 final class Event extends Model
 {
     use HasAppUuid;
+    /** @use HasFactory<EventFactory> */
     use HasFactory;
     use HasSlug;
     use SoftDeletes;
 
+    /** @return HasMany<TicketType, Event> */
     public function ticketTypes(): HasMany
     {
         return $this->hasMany(TicketType::class);
     }
 
+    /** @return HasMany<Order, Event> */
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class);
     }
 
+    /** @return HasMany<Ticket, Event> */
     public function tickets(): HasMany
     {
         return $this->hasMany(Ticket::class);
     }
 
+    /** @return BelongsTo<User, Event> */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
+    /** @return BelongsTo<Organization, Event> */
     public function organization(): BelongsTo
     {
         return $this->belongsTo(Organization::class);
     }
 
+    /** @return MorphMany<Media, Event> */
     public function media(): MorphMany
     {
         return $this->morphMany(Media::class, 'mediable')->orderBy('sort_order');
     }
 
+    /** @return MorphOne<Media, Event> */
     public function coverImage(): MorphOne
     {
         return $this->morphOne(Media::class, 'mediable')->where('is_cover', true);

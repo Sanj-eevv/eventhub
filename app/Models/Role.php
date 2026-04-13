@@ -7,6 +7,8 @@ namespace App\Models;
 use App\Builders\RoleBuilder;
 use App\Enums\PreservedRoleList;
 use App\Traits\HasSlug;
+use Database\Factories\RoleFactory;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\UseEloquentBuilder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -35,24 +37,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read int|null $users_count
  *
  * @method static RoleFactory factory($count = null, $state = [])
- * @method static RoleBuilder<static>|Role newModelQuery()
- * @method static RoleBuilder<static>|Role newQuery()
- * @method static RoleBuilder<static>|Role query()
- * @method static RoleBuilder<static>|Role forIndex()
- * @method static RoleBuilder<static>|Role search(?string $search)
- * @method static RoleBuilder<static>|Role sortBy(?array $columns)
- * @method static RoleBuilder<static>|Role whereCreatedAt($value)
- * @method static RoleBuilder<static>|Role whereDescription($value)
- * @method static RoleBuilder<static>|Role whereId($value)
- * @method static RoleBuilder<static>|Role whereName($value)
- * @method static RoleBuilder<static>|Role wherePreserved($value)
- * @method static RoleBuilder<static>|Role whereSlug($value)
- * @method static RoleBuilder<static>|Role whereUpdatedAt($value)
  *
- * @mixin Eloquent
+ * @mixin Model
  */
 final class Role extends Model
 {
+    /** @use HasFactory<RoleFactory> */
     use HasFactory;
     use HasSlug;
 
@@ -86,11 +76,13 @@ final class Role extends Model
         return 'slug';
     }
 
+    /** @return HasMany<User, Role> */
     public function users(): HasMany
     {
         return $this->hasMany(User::class);
     }
 
+    /** @return BelongsToMany<Permission, Role> */
     public function permissions(): BelongsToMany
     {
         return $this->belongsToMany(Permission::class, 'roles_permissions');

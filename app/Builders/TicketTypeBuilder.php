@@ -6,6 +6,7 @@ namespace App\Builders;
 
 use App\Models\Event;
 
+/** @extends AppBuilder<\App\Models\TicketType> */
 final class TicketTypeBuilder extends AppBuilder
 {
     public function forEvent(Event $event): self

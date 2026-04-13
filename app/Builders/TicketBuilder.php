@@ -8,6 +8,7 @@ use App\Enums\TicketStatus;
 use App\Models\Event;
 use Illuminate\Database\Eloquent\Builder;
 
+/** @extends AppBuilder<\App\Models\Ticket> */
 final class TicketBuilder extends AppBuilder
 {
     public function forEvent(Event $event): self

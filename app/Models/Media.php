@@ -7,7 +7,6 @@ namespace App\Models;
 use App\Traits\HasAppUuid;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Facades\Storage;
@@ -42,9 +41,8 @@ use Illuminate\Support\Facades\Storage;
 final class Media extends Model
 {
     use HasAppUuid;
-    use HasFactory;
-    use HasFactory;
 
+    /** @return MorphTo<Model, Media> */
     public function mediable(): MorphTo
     {
         return $this->morphTo();

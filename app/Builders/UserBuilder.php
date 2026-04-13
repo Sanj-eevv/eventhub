@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\JoinClause;
 
+/** @extends AppBuilder<\App\Models\User> */
 final class UserBuilder extends AppBuilder
 {
     protected array $allowedSortColumns = ['name', 'email', 'role_name', 'organization_title', 'created_at'];

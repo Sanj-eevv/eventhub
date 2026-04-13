@@ -65,18 +65,22 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 final class Order extends Model
 {
     use HasAppUuid;
+    /** @use HasFactory<OrderFactory> */
     use HasFactory;
 
+    /** @return BelongsTo<User, Order> */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
+    /** @return BelongsTo<Event, Order> */
     public function event(): BelongsTo
     {
         return $this->belongsTo(Event::class);
     }
 
+    /** @return HasMany<Ticket, Order> */
     public function tickets(): HasMany
     {
         return $this->hasMany(Ticket::class);

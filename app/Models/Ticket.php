@@ -56,28 +56,34 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 final class Ticket extends Model
 {
     use HasAppUuid;
+    /** @use HasFactory<TicketFactory> */
     use HasFactory;
 
+    /** @return BelongsTo<Order, Ticket> */
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
     }
 
+    /** @return BelongsTo<TicketType, Ticket> */
     public function ticketType(): BelongsTo
     {
         return $this->belongsTo(TicketType::class);
     }
 
+    /** @return BelongsTo<Event, Ticket> */
     public function event(): BelongsTo
     {
         return $this->belongsTo(Event::class);
     }
 
+    /** @return BelongsTo<User, Ticket> */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
+    /** @return BelongsTo<User, Ticket> */
     public function checkedInBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'checked_in_by');

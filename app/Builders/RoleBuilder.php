@@ -6,6 +6,7 @@ namespace App\Builders;
 
 use Illuminate\Database\Eloquent\Builder;
 
+/** @extends AppBuilder<\App\Models\Role> */
 final class RoleBuilder extends AppBuilder
 {
     protected array $allowedSortColumns = ['name', 'slug', 'preserved', 'created_at'];

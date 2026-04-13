@@ -6,6 +6,11 @@ namespace App\Builders;
 
 use Illuminate\Database\Eloquent\Builder;
 
+/**
+ * @template TModel of \Illuminate\Database\Eloquent\Model
+ *
+ * @extends Builder<TModel>
+ */
 abstract class AppBuilder extends Builder
 {
     protected array $allowedSortColumns = [];

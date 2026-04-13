@@ -7,6 +7,7 @@ namespace App\Builders;
 use App\Enums\OrganizationStatus;
 use Illuminate\Database\Eloquent\Builder;
 
+/** @extends AppBuilder<\App\Models\Organization> */
 final class OrganizationBuilder extends AppBuilder
 {
     protected array $allowedSortColumns = ['title', 'contact_email', 'status', 'created_at'];
