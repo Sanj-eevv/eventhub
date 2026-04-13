@@ -14,6 +14,7 @@ use App\Models\Ticket;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 final class GetDashboardStatsAction
 {
@@ -46,7 +47,7 @@ final class GetDashboardStatsAction
                 ->limit(5),
             $user,
         )->get()
-            ->map(fn (Order $order): array => [
+            ->map(fn (Order $order, int $key): array => [
                 'uuid' => $order->uuid,
                 'customer_name' => $order->user->name,
                 'customer_email' => $order->user->email,
@@ -174,6 +175,12 @@ final class GetDashboardStatsAction
         ];
     }
 
+    /**
+     * @template TModel of Model
+     *
+     * @param  Builder<TModel>  $query
+     * @return Builder<TModel>
+     */
     private function scopeForUser(Builder $query, User $user): Builder
     {
         if ($user->hasAnyRole(PreservedRoleList::OrganizationAdmin)) {

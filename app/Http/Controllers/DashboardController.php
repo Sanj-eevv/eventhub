@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Actions\GetDashboardStatsAction;
+use App\Models\User;
 use Illuminate\Auth\AuthManager;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -22,6 +23,7 @@ final class DashboardController extends Controller
     {
         $this->authorize('access-dashboard');
 
+        /** @var User $user */
         $user = $this->authManager->user();
 
         return $this->inertiaResponse->render('Dashboard/Index', [
