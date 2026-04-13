@@ -9,15 +9,20 @@ use App\DataTransferObjects\TicketTypeData;
 use App\Enums\TicketStatus;
 use App\Models\Event;
 use App\Models\Organization;
+use App\Models\TicketType;
+use App\Models\User;
 use App\Rules\EndsOnDifferentCalendarDay;
 use App\Support\DateFormat;
 use App\ValueObjects\DateRange;
 use Carbon\CarbonImmutable;
+use Illuminate\Auth\AuthManager;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Validator;
 
 final class EventRequest extends FormRequest
 {
+    public function __construct(private AuthManager $authManager) {}
+
     /** @return array<string, mixed> */
     public function rules(): array
     {
@@ -49,7 +54,8 @@ final class EventRequest extends FormRequest
     public function withValidator(Validator $validator): void
     {
         $validator->after(function (Validator $validator): void {
-            foreach ($this->input('ticket_types', []) as $index => $ticketType) {
+            foreach ($this->array('ticket_types') as $index => $ticketType) {
+                /** @var array{sale_ends_at?: mixed, sale_starts_at?: mixed} $ticketType */
                 if (filled($ticketType['sale_ends_at'] ?? null) && blank($ticketType['sale_starts_at'] ?? null)) {
                     $validator->errors()->add(
                         sprintf('ticket_types.%s.sale_ends_at', $index),
@@ -64,7 +70,7 @@ final class EventRequest extends FormRequest
                 return;
             }
 
-            $submittedUuids = collect($this->input('ticket_types', []))->pluck('uuid');
+            $submittedUuids = collect($this->array('ticket_types'))->pluck('uuid');
 
             $event->ticketTypes()
                 ->whereNotIn('uuid', $submittedUuids)
@@ -104,36 +110,58 @@ final class EventRequest extends FormRequest
 
     public function toDto(): EventData
     {
-        $timezone = $this->validated('timezone');
-        $organizationId = Organization::query()->where('uuid', $this->validated('organization_uuid'))->value('id');
-        $ticketTypes = collect($this->validated('ticket_types'))
+
+        /**
+         * @var array{
+         * timezone: string,
+         * title: string,
+         * description: string,
+         * organization_uuid: string,
+         * venue_name: string,
+         * address: string,
+         * zip: string,
+         * map_url?: string,
+         * starts_at: string,
+         * ends_at: string,
+         * ticket_types: array<int, array{name: string, description: string, price: int, capacity: int, uuid ?: string, max_per_user?: int, sale_starts_at?: string, sale_ends_at?: string}>
+         * } $validatedData
+         */
+        $validatedData = $this->validated();
+        $timezone = $validatedData['timezone'];
+        /** @var int $organizationId */
+        $organizationId = Organization::query()->where('uuid', $validatedData['organization_uuid'])->value('id');
+        $validatedTicketTypes = $validatedData['ticket_types'];
+        $ticketTypes = collect($validatedTicketTypes)
             ->map(fn (array $type, int $index): TicketTypeData => new TicketTypeData(
                 name: $type['name'],
                 description: $type['description'],
                 price: (int) round($type['price'] * 100),
-                capacity: (int) $type['capacity'],
+                capacity: $type['capacity'],
                 sort_order: $index,
                 uuid: $type['uuid'] ?? '',
-                max_per_user: isset($type['max_per_user']) ? (int) $type['max_per_user'] : null,
+                max_per_user: $type['max_per_user'] ?? null,
                 sale_starts_at: isset($type['sale_starts_at']) ? CarbonImmutable::parse($type['sale_starts_at'], $timezone)->utc() : null,
                 sale_ends_at: isset($type['sale_ends_at']) ? CarbonImmutable::parse($type['sale_ends_at'], $timezone)->utc() : null,
             ))
             ->all();
 
+        /** @var User $user */
+        $user = $this->authManager->user();
+
         return new EventData(
-            user_id: $this->user()->id,
+            user_id: $user->id,
             organization_id: $organizationId,
-            title: $this->validated('title'),
-            description: $this->validated('description'),
+            title: $validatedData['title'],
+            description: $validatedData['description'],
             period: new DateRange(
-                start: CarbonImmutable::parse($this->validated('starts_at'), $timezone)->utc(),
-                end: CarbonImmutable::parse($this->validated('ends_at'), $timezone)->utc(),
+                start: CarbonImmutable::parse($validatedData['starts_at'], $timezone)->utc(),
+                end: CarbonImmutable::parse($validatedData['ends_at'], $timezone)->utc(),
             ),
             timezone: $timezone,
-            venue_name: $this->validated('venue_name'),
-            address: $this->validated('address'),
-            zip: $this->validated('zip'),
-            map_url: $this->validated('map_url'),
+            venue_name: $validatedData['venue_name'],
+            address: $validatedData['address'],
+            zip: $validatedData['zip'],
+            map_url: $validatedData['map_url'] ?? '',
             ticket_types: $ticketTypes,
         );
     }
