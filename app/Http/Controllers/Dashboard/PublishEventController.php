@@ -24,7 +24,7 @@ final class PublishEventController extends Controller
     {
         $this->authorize('publish', $event);
 
-        $this->updateEventStatusAction->execute($event, EventStatus::Published, $this->authManager->user());
+        ($this->updateEventStatusAction)($event, EventStatus::Published, $this->authManager->user());
 
         return $this->redirector->back()->with('toast_success', 'Event published successfully.');
     }

@@ -22,7 +22,7 @@ final readonly class CheckInTicketAction
         private RecordActivityAction $recordActivityAction,
     ) {}
 
-    public function execute(Ticket $ticket, User $scanner): Ticket
+    public function __invoke(Ticket $ticket, User $scanner): Ticket
     {
         $ticket->loadMissing('event');
 
@@ -38,7 +38,7 @@ final readonly class CheckInTicketAction
             'checked_in_by' => $scanner->id,
         ]);
 
-        $this->recordActivityAction->execute(ActivityEvent::TicketCheckedIn, $ticket, $scanner);
+        ($this->recordActivityAction)(ActivityEvent::TicketCheckedIn, $ticket, $scanner);
 
         $this->dispatcher->dispatch(new TicketCheckedIn($ticket));
 

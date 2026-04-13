@@ -1,6 +1,6 @@
 ## Mandatory Laravel Code Simplification
 
-- Always run the laravel-simplifier plugin on every Laravel/PHP code snippet you generate to ensure the code is clean, optimized, and follows Laravel best practices.
+- Always run the laravel-simplifier agent on every Laravel/PHP code snippet you generate to ensure the code is clean, optimized, and follows Laravel best practices.
 - Do not write inline or block comments in generated code.
 - Only include DocBlock comments when strictly necessary (e.g., for type hints, generics, or framework conventions).
 

@@ -78,7 +78,7 @@ final class UserController extends Controller
     {
         $this->authorize('create', User::class);
 
-        $this->createUserAction->execute($request->toDto());
+        ($this->createUserAction)($request->toDto());
 
         return $this->redirector->route('dashboard.users.index')->with('toast_success', 'User created successfully.');
     }
@@ -87,7 +87,7 @@ final class UserController extends Controller
     {
         $this->authorize('update', $user);
 
-        $this->updateUserAction->execute($user, $request->toDto());
+        ($this->updateUserAction)($user, $request->toDto());
 
         return $this->redirector->back()->with('toast_success', 'User updated successfully.');
     }
@@ -96,7 +96,7 @@ final class UserController extends Controller
     {
         $this->authorize('delete', $user);
 
-        $this->deleteUserAction->execute($user);
+        ($this->deleteUserAction)($user);
 
         return $this->redirector->back()->with('toast_success', 'User deleted.');
     }

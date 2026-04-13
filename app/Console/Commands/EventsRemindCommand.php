@@ -15,7 +15,7 @@ final class EventsRemindCommand extends Command
 {
     public function handle(SendEventRemindersAction $action): void
     {
-        $action->execute();
+        $action();
         $this->info('Event reminder notifications dispatched.');
     }
 }

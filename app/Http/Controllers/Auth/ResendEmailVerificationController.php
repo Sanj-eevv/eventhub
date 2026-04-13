@@ -31,7 +31,7 @@ final class ResendEmailVerificationController extends Controller
             return $this->redirector->intended($this->urlGenerator->route('home', absolute: false));
         }
 
-        $this->resendVerificationEmailAction->execute($user);
+        ($this->resendVerificationEmailAction)($user);
 
         return $this->redirector->back()->with('status', 'verification-link-sent');
     }

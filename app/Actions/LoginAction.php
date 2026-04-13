@@ -10,7 +10,7 @@ final readonly class LoginAction
 {
     public function __construct(private AuthManager $authManager) {}
 
-    public function execute(array $credentials, bool $remember): bool
+    public function __invoke(array $credentials, bool $remember): bool
     {
         return $this->authManager->attempt($credentials, $remember);
     }

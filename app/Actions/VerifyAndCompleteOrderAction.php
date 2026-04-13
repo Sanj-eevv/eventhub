@@ -15,7 +15,7 @@ final readonly class VerifyAndCompleteOrderAction
         private PaymentGateway $paymentGateway,
     ) {}
 
-    public function execute(Order $order): Order
+    public function __invoke(Order $order): Order
     {
         if (OrderStatus::Reserved !== $order->status || null === $order->stripe_payment_intent_id) {
             return $order;
@@ -24,7 +24,7 @@ final readonly class VerifyAndCompleteOrderAction
         $result = $this->paymentGateway->retrievePaymentIntent($order->stripe_payment_intent_id);
 
         if ('succeeded' === $result->status) {
-            return $this->completeOrderAction->execute($order);
+            return ($this->completeOrderAction)($order);
         }
 
         return $order;

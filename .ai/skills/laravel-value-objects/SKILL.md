@@ -7,12 +7,10 @@ description: Immutable value objects for domain values. Use when working with do
 
 Value objects are **simple, immutable objects** representing domain concepts.
 
-**Related guides:**
-- [DTOs](../laravel-dtos/SKILL.md) - DTOs are for data transfer, value objects for domain concepts
-
 ## When to Use
 
 **Use value objects when:**
+
 - Complex domain value with behavior
 - Immutability required
 - Rich validation logic
@@ -20,9 +18,9 @@ Value objects are **simple, immutable objects** representing domain concepts.
 - Encapsulating domain rules
 
 **Use DTOs when:**
+
 - Transferring data between layers
 - No domain behavior needed
-- See [DTOs](../laravel-dtos/SKILL.md)
 
 ## Simple Value Object
 
@@ -181,6 +179,7 @@ app/Values/
 ## Summary
 
 **Value objects:**
+
 - Are immutable (use `readonly`)
 - Have static factory methods
 - Encapsulate domain logic

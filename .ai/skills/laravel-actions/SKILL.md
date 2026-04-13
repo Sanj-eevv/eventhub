@@ -7,16 +7,12 @@ description: Action-oriented architecture for Laravel. Invokable classes that co
 
 Actions are the **heart of your domain logic**. Every business operation lives in an action.
 
-**Related guides:**
-- [Controllers](../laravel-controllers/SKILL.md) - Controllers delegate to actions
-- [Models](../laravel-models/SKILL.md) - Models accessed by actions
-- [Testing](../laravel-testing/SKILL.md) - Testing with triple-A pattern
-
 ## Philosophy
 
 **Controllers, Jobs, and Listeners contain ZERO domain logic** - they only delegate to actions.
 
 Actions are:
+
 - **Invokable classes** - Single `__invoke()` method
 - **Single responsibility** - Each action does exactly one thing
 - **Composable** - Actions call other actions to build workflows
@@ -186,6 +182,7 @@ class ProcessOrderAction
 **Format:** `{Verb}{Entity}Action`
 
 **Examples:**
+
 - `CreateOrderAction`
 - `UpdateUserProfileAction`
 - `DeleteDocumentAction`
@@ -226,36 +223,9 @@ public function store(
 }
 ```
 
-### Via `resolve()` Helper
-
-```php
-// In controllers
-$order = resolve(CreateOrderAction::class)(
-    user(),
-    CreateOrderData::from($request)
-);
-
-// Inside another action
-$result = resolve(ProcessPaymentAction::class)($order, $paymentData);
-```
-
-**Important:** Use `resolve()` not `app()` for consistency.
-
 ## Database Transactions
 
 **Always wrap data modifications** in transactions:
-
-```php
-public function __invoke(CreateOrderData $data): Order
-{
-    return DB::transaction(function () use ($data) {
-        $order = Order::create($data->toArray());
-        $order->items()->createMany($data->items->toArray());
-
-        return $order;
-    });
-}
-```
 
 ## Error Handling
 
@@ -421,5 +391,3 @@ app/Actions/
     ├── CreateOrderAction.php
     └── UpdateUserAction.php
 ```
-
-See [Multi-tenancy](../laravel-multi-tenancy/SKILL.md) for comprehensive patterns.

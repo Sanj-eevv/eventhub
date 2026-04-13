@@ -41,7 +41,7 @@ final readonly class ReserveTicketsAction
     /**
      * @param  array<int, TicketItemData>  $items
      */
-    public function execute(User $user, Event $event, array $items): Order
+    public function __invoke(User $user, Event $event, array $items): Order
     {
         throw_if(EventStatus::Published !== $event->status, EventNotAvailableException::class);
 

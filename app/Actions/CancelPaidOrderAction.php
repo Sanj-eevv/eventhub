@@ -26,7 +26,7 @@ final readonly class CancelPaidOrderAction
         private RecordActivityAction $recordActivityAction,
     ) {}
 
-    public function execute(Order $order, ?User $causer = null): void
+    public function __invoke(Order $order, ?User $causer = null): void
     {
         if (OrderStatus::Paid !== $order->status) {
             throw new InvalidStatusTransitionException($order->status, OrderStatus::Cancelled);
@@ -46,7 +46,7 @@ final readonly class CancelPaidOrderAction
 
         $this->filesystemManager->disk('local')->deleteDirectory('tickets/'.$order->uuid);
 
-        $this->recordActivityAction->execute(ActivityEvent::OrderCancelled, $order, $causer);
+        ($this->recordActivityAction)(ActivityEvent::OrderCancelled, $order, $causer);
 
         $order->loadMissing('event');
         $this->dispatcher->dispatch(new OrderCancelled($order));

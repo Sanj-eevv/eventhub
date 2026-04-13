@@ -16,7 +16,7 @@ final readonly class HandleStripeWebhookAction
         private RecordActivityAction $recordActivityAction,
     ) {}
 
-    public function execute(Event $event): void
+    public function __invoke(Event $event): void
     {
         match ($event->type) {
             'payment_intent.succeeded' => $this->handlePaymentIntentSucceeded($event->data->object->id),
@@ -35,7 +35,7 @@ final readonly class HandleStripeWebhookAction
             return;
         }
 
-        $this->completeOrderAction->execute($order);
+        ($this->completeOrderAction)($order);
     }
 
     private function handlePaymentIntentFailed(string $paymentIntentId): void
@@ -49,7 +49,7 @@ final readonly class HandleStripeWebhookAction
             return;
         }
 
-        $this->recordActivityAction->execute(ActivityEvent::PaymentFailed, $order);
+        ($this->recordActivityAction)(ActivityEvent::PaymentFailed, $order);
         $order->user->notify(new PaymentFailedNotification($order));
     }
 }

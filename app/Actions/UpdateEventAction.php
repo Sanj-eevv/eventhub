@@ -17,7 +17,7 @@ final readonly class UpdateEventAction
         private DatabaseManager $databaseManager,
     ) {}
 
-    public function execute(Event $event, EventData $data): Event
+    public function __invoke(Event $event, EventData $data): Event
     {
         return $this->databaseManager->transaction(function () use ($event, $data): Event {
             $event->update([

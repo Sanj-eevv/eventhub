@@ -20,7 +20,7 @@ final readonly class ConfirmOrganizationStatusAction
         private RecordActivityAction $recordActivityAction,
     ) {}
 
-    public function execute(Organization $organization, OrganizationStatus $status, bool $notify = true, ?User $causer = null): void
+    public function __invoke(Organization $organization, OrganizationStatus $status, bool $notify = true, ?User $causer = null): void
     {
         if ( ! $organization->status->canTransitionTo($status)) {
             throw new InvalidStatusTransitionException($organization->status, $status);
@@ -40,6 +40,6 @@ final readonly class ConfirmOrganizationStatusAction
         };
 
         $this->dispatcher->dispatch($broadcastEvent);
-        $this->recordActivityAction->execute($activityEvent, $organization, $causer);
+        ($this->recordActivityAction)($activityEvent, $organization, $causer);
     }
 }

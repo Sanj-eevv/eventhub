@@ -8,7 +8,7 @@ use App\Models\User;
 
 final class ResendVerificationEmailAction
 {
-    public function execute(User $user): void
+    public function __invoke(User $user): void
     {
         $user->sendEmailVerificationNotification();
     }

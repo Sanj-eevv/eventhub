@@ -9,7 +9,7 @@ use App\Models\Organization;
 
 final class CreateOrganizationAction
 {
-    public function execute(OrganizationData $data): Organization
+    public function __invoke(OrganizationData $data): Organization
     {
         return Organization::query()->create([
             'title' => $data->title,

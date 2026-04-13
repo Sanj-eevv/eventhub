@@ -12,7 +12,7 @@ final readonly class DeleteRoleAction
 {
     public function __construct(private DatabaseManager $databaseManager) {}
 
-    public function execute(Role $role): void
+    public function __invoke(Role $role): void
     {
         $this->databaseManager->transaction(function () use ($role): void {
             User::withTrashed()->where('role_id', $role->id)->update([

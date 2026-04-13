@@ -32,7 +32,7 @@ final class HandleStripeWebhookController extends Controller
             abort(400);
         }
 
-        $this->handleStripeWebhookAction->execute($event);
+        ($this->handleStripeWebhookAction)($event);
 
         return $this->responseFactory->noContent();
     }

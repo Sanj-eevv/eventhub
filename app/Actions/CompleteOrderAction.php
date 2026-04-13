@@ -26,7 +26,7 @@ final readonly class CompleteOrderAction
         private RecordActivityAction $recordActivityAction,
     ) {}
 
-    public function execute(Order $order): Order
+    public function __invoke(Order $order): Order
     {
         if (OrderStatus::Paid === $order->status) {
             return $order;
@@ -42,7 +42,7 @@ final readonly class CompleteOrderAction
                 ->where('status', TicketStatus::Pending)
                 ->update(['status' => TicketStatus::Active]);
 
-            $this->recordActivityAction->execute(ActivityEvent::OrderCompleted, $order);
+            ($this->recordActivityAction)(ActivityEvent::OrderCompleted, $order);
 
             $order->loadMissing(['user', 'event', 'tickets']);
             $order->user->notify(new OrderConfirmedNotification($order));

@@ -37,7 +37,7 @@ final class SettingController extends Controller
     {
         $this->authorize('update', Setting::class);
 
-        $this->updateSettingsAction->execute($request->toDto());
+        ($this->updateSettingsAction)($request->toDto());
 
         return $this->redirector->back()->with('toast_success', 'Settings saved successfully.');
     }

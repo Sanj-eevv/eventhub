@@ -10,7 +10,7 @@ final readonly class LogoutAction
 {
     public function __construct(private AuthManager $authManager) {}
 
-    public function execute(): void
+    public function __invoke(): void
     {
         $this->authManager->logout();
     }

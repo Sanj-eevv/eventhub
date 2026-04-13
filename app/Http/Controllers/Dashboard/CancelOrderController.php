@@ -26,7 +26,7 @@ final class CancelOrderController extends Controller
     {
         $this->authorize('cancel', $order);
 
-        $this->cancelPaidOrderAction->execute($order, $this->authManager->user());
+        ($this->cancelPaidOrderAction)($order, $this->authManager->user());
 
         $this->dispatcher->dispatch(new ProcessRefundJob($order));
 

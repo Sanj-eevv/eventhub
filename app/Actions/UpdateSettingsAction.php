@@ -13,7 +13,7 @@ final readonly class UpdateSettingsAction
 {
     public function __construct(private CacheRepository $cache) {}
 
-    public function execute(SettingsData $data): void
+    public function __invoke(SettingsData $data): void
     {
         Setting::query()->upsert(
             values: collect($data->toArray())

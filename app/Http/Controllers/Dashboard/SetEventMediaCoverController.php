@@ -22,7 +22,7 @@ final class SetEventMediaCoverController extends Controller
     {
         $this->authorize('update', $event);
 
-        $this->setCoverAction->execute($event, $media);
+        ($this->setCoverAction)($event, $media);
 
         return $this->redirector->back()->with('toast_success', 'Cover image updated successfully.');
     }

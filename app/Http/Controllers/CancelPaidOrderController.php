@@ -31,7 +31,7 @@ final class CancelPaidOrderController extends Controller
 
         throw_if($order->event->starts_at->isBefore(CarbonImmutable::now()->addHours($this->settingsService->get()->cancellationCutoffHours)), HttpException::class, 422, 'The cancellation window for this order has passed.');
 
-        $this->cancelPaidOrderAction->execute($order, $this->authManager->user());
+        ($this->cancelPaidOrderAction)($order, $this->authManager->user());
 
         $this->dispatcher->dispatch(new ProcessRefundJob($order));
 

@@ -8,7 +8,7 @@ use App\Models\Event;
 
 final class DeleteEventAction
 {
-    public function execute(Event $event): void
+    public function __invoke(Event $event): void
     {
         $event->delete();
     }

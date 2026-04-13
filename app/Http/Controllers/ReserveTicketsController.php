@@ -25,8 +25,8 @@ final class ReserveTicketsController extends Controller
     {
         $this->authorize('reserve', $event);
 
-        $order = $this->reserveTicketsAction->execute($this->authManager->user(), $event, $request->toDto());
-        $this->createPaymentIntentAction->execute($order);
+        $order = ($this->reserveTicketsAction)($this->authManager->user(), $event, $request->toDto());
+        ($this->createPaymentIntentAction)($order);
 
         return $this->redirector->route('checkout.show', ['order' => $order->uuid]);
     }

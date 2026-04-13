@@ -67,7 +67,7 @@ final class RoleController extends Controller
     {
         $this->authorize('create', Role::class);
 
-        $this->createRoleAction->execute($request->toDto());
+        ($this->createRoleAction)($request->toDto());
 
         return $this->redirector->route('dashboard.roles.index')->with('toast_success', 'Role created successfully.');
     }
@@ -100,7 +100,7 @@ final class RoleController extends Controller
     {
         $this->authorize('update', $role);
 
-        $this->updateRoleAction->execute($role, $request->toDto());
+        ($this->updateRoleAction)($role, $request->toDto());
 
         return $this->redirector->back()->with('toast_success', 'Role updated successfully.');
     }
@@ -109,7 +109,7 @@ final class RoleController extends Controller
     {
         $this->authorize('delete', $role);
 
-        $this->deleteRoleAction->execute($role);
+        ($this->deleteRoleAction)($role);
 
         return $this->redirector->back()->with('toast_success', 'Role deleted.');
     }

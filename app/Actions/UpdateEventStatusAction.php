@@ -20,7 +20,7 @@ final readonly class UpdateEventStatusAction
         private RecordActivityAction $recordActivityAction,
     ) {}
 
-    public function execute(Event $event, EventStatus $status, ?User $causer = null): Event
+    public function __invoke(Event $event, EventStatus $status, ?User $causer = null): Event
     {
         if ( ! $event->status->canTransitionTo($status)) {
             throw new InvalidStatusTransitionException($event->status, $status);
@@ -32,11 +32,11 @@ final readonly class UpdateEventStatusAction
 
         if (EventStatus::Cancelled === $status) {
             $this->dispatcher->dispatch(new EventCancelled($event));
-            $this->recordActivityAction->execute(ActivityEvent::EventCancelled, $event, $causer);
+            ($this->recordActivityAction)(ActivityEvent::EventCancelled, $event, $causer);
         }
 
         if (EventStatus::Published === $status) {
-            $this->recordActivityAction->execute(ActivityEvent::EventPublished, $event, $causer);
+            ($this->recordActivityAction)(ActivityEvent::EventPublished, $event, $causer);
         }
 
         return $event;

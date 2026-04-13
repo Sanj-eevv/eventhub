@@ -19,6 +19,6 @@ final class ExpireOrderJob implements ShouldQueueAfterCommit
 
     public function handle(ExpireOrderAction $action): void
     {
-        $action->execute($this->order);
+        $action($this->order);
     }
 }

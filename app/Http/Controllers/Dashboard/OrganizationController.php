@@ -69,7 +69,7 @@ final class OrganizationController extends Controller
     {
         $this->authorize('create', Organization::class);
 
-        $this->createOrganizationAction->execute($request->toDto());
+        ($this->createOrganizationAction)($request->toDto());
 
         return $this->redirector->route('dashboard.organizations.index')->with('toast_success', 'Organization created successfully.');
     }
@@ -78,7 +78,7 @@ final class OrganizationController extends Controller
     {
         $this->authorize('update', $organization);
 
-        $this->updateOrganizationAction->execute($organization, $request->toDto());
+        ($this->updateOrganizationAction)($organization, $request->toDto());
 
         return $this->redirector->back()->with('toast_success', 'Organization updated successfully.');
     }
@@ -87,7 +87,7 @@ final class OrganizationController extends Controller
     {
         $this->authorize('delete', $organization);
 
-        $this->deleteOrganizationAction->execute($organization);
+        ($this->deleteOrganizationAction)($organization);
 
         return $this->redirector->back()->with('toast_success', 'Organization deleted successfully.');
     }

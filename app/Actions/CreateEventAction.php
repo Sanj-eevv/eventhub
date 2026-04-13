@@ -13,7 +13,7 @@ final readonly class CreateEventAction
 {
     public function __construct(private DatabaseManager $databaseManager) {}
 
-    public function execute(EventData $data): Event
+    public function __invoke(EventData $data): Event
     {
         return $this->databaseManager->transaction(function () use ($data): Event {
             $event = Event::query()->create([

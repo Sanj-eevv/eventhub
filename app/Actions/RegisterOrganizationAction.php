@@ -17,7 +17,7 @@ final readonly class RegisterOrganizationAction
         private DatabaseManager $databaseManager,
     ) {}
 
-    public function execute(OrganizationData $organizationData, UserData $userData): User
+    public function __invoke(OrganizationData $organizationData, UserData $userData): User
     {
         return $this->databaseManager->transaction(function () use ($organizationData, $userData): User {
             $organization = Organization::query()->create([
@@ -28,7 +28,7 @@ final readonly class RegisterOrganizationAction
                 'status' => $organizationData->status->value,
             ]);
 
-            return $this->createUserAction->execute($userData->withOrganizationUuid($organization->uuid));
+            return ($this->createUserAction)($userData->withOrganizationUuid($organization->uuid));
         });
     }
 }

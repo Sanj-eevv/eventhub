@@ -27,7 +27,7 @@ final class VerifyEmailController extends Controller
         /** @var User $user */
         $user = $this->authManager->user();
 
-        $this->verifyEmailAction->execute($user);
+        ($this->verifyEmailAction)($user);
 
         return $this->redirector->intended($this->urlGenerator->route('home', absolute: false));
     }

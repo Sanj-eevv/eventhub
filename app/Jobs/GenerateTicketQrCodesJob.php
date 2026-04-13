@@ -26,12 +26,12 @@ final class GenerateTicketQrCodesJob implements ShouldQueueAfterCommit
 
     public function handle(GenerateTicketQrCodesAction $action): void
     {
-        $action->execute($this->order);
+        $action($this->order);
     }
 
     public function failed(Throwable $exception, RecordActivityAction $recordActivityAction): void
     {
-        $recordActivityAction->execute(ActivityEvent::QrCodeGenerationFailed, $this->order, properties: [
+        $recordActivityAction(ActivityEvent::QrCodeGenerationFailed, $this->order, properties: [
             'error' => $exception->getMessage(),
         ]);
     }

@@ -12,7 +12,7 @@ final readonly class CreateRoleAction
 {
     public function __construct(private DatabaseManager $databaseManager) {}
 
-    public function execute(RoleData $data): Role
+    public function __invoke(RoleData $data): Role
     {
         return $this->databaseManager->transaction(function () use ($data): Role {
             $role = Role::query()->create([

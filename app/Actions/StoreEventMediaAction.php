@@ -29,7 +29,7 @@ final readonly class StoreEventMediaAction
         private LoggerInterface $logger,
     ) {}
 
-    public function execute(Event $event, UploadedFile $file): Media
+    public function __invoke(Event $event, UploadedFile $file): Media
     {
         $uuid = Str::uuid()->toString();
         $filename = $file->getClientOriginalName();

@@ -8,7 +8,7 @@ use App\Models\User;
 
 final class DeleteUserAction
 {
-    public function execute(User $user): void
+    public function __invoke(User $user): void
     {
         $user->delete();
     }

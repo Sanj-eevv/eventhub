@@ -5,6 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ### Backend
+
 ```bash
 php artisan test              # Run all tests
 php artisan test --filter=TestName  # Run a single test
@@ -15,6 +16,7 @@ php artisan ide-helper:generate  # Regenerate IDE helper files
 ```
 
 ### Frontend
+
 ```bash
 npm run dev    # Start Vite dev server
 npm run build  # Production build
@@ -22,17 +24,18 @@ npx eslint .   # Lint frontend code
 ```
 
 ### Wayfinder (after adding/changing routes)
+
 ```bash
 php artisan wayfinder:generate  # Regenerate type-safe route bindings in resources/js/wayfinder/
 ```
 
 ## Architecture
 
-This is a **Laravel 12 + Vue 3 + Inertia.js** application. The backend serves as an API-like layer using Inertia rather than REST/JSON endpoints.
+This is a **Laravel 13 + Vue 3 + Inertia.js** application. The backend serves as an API-like layer using Inertia rather than REST/JSON endpoints.
 
 ### Backend Layers
 
-**Request flow:** Route → Middleware → Controller → Service → Model → Resource (for response)
+**Request flow:** Route → Middleware → Controller → Actions → Model → Resource (for response)
 
 - **Actions** (`app/Actions/`) — single-responsibility classes for discrete operations (CreateUserAction, LoginAction, etc.)
 - **Services** (`app/Services/`) — business logic (UserService, RoleService, PermissionService, OrganizationService, EventService)
@@ -42,13 +45,14 @@ This is a **Laravel 12 + Vue 3 + Inertia.js** application. The backend serves as
 
 ### RBAC System
 
-Three preserved system roles defined in `PreservedRoleList` enum: `SUPER_ADMIN`, `ADMIN`, `ORGANIZATION_ADMIN`. Permissions follow a `entity:action` format (e.g., `user:create`, `event:edit`) and are defined in enums under `app/Enums/` (EventPermissions, UserPermissions, etc.).
+Three preserved system roles defined in `PreservedRoleList` enum: `Super_admin`, `Admin`, `OrganizationAdmin`. Permissions follow a `entity:action` format (e.g., `user:create`, `event:edit`) and are defined in enums under `app/Enums/` (EventPermissions, UserPermissions, etc.).
 
-Permission loading: `LoadPermissionsMiddleware` caches permissions per request; `HandleInertiaRequests` shares them with the frontend via `SharedPermissionResource`. User model has `hasPermission()`, `hasAnyPermission()`, `hasAnyRole()`, and `getAllPermissions()` methods.
+Permission loading: `LoadPermissionsMiddleware` eager-loads `role.permissions` per request; `HandleInertiaRequests` shares them with the frontend via `SharedPermissionResource`. User model has `hasPermission()`, `hasAnyPermission()`, `hasAnyRole()`, and `getAllPermissions()` methods.
 
 ### Frontend Architecture
 
 Pages live in `resources/js/pages/` and map directly to Inertia responses. Components are organized as:
+
 - `resources/js/components/ui/` — Shadcn-Vue primitives (built on Reka UI), never modified directly
 - `resources/js/components/Dashboard/` — feature-specific components
 - `resources/js/composables/` — Vue composables organized by domain (events/, organizations/, users/, roles/)
@@ -64,12 +68,11 @@ Pages live in `resources/js/pages/` and map directly to Inertia responses. Compo
 ### Key Middleware
 
 - `HandleInertiaRequests` — shares auth user, permissions, sidebar state, and flash messages with all Inertia responses
-- `RoleAccessMiddleware` — restricts dashboard routes to allowed roles
-- `LoadPermissionsMiddleware` — loads and caches user permissions
+- `LoadPermissionsMiddleware` — eager-loads `role.permissions` for the logged in user.
 
 ### Testing
 
-Tests use Pest 4 with the Laravel plugin. The test database is SQLite in-memory. Feature tests are in `tests/Feature/`, unit tests in `tests/Unit/`.
+Tests use Pest 4 with the Laravel plugin. The test database is a MySQL database (`event_test`) configured via `.env.testing`. Feature tests are in `tests/Feature/`, unit tests in `tests/Unit/`.
 
 ### Models & Traits
 
@@ -80,11 +83,31 @@ Rate limiting is configured centrally in `AppServiceProvider::boot()`.
 ===
 
 <laravel-boost-guidelines>
+=== .ai/Caveman rules ===
+
+# Caveman Mode — Always On
+
+MANDATORY. No exceptions. Every single response MUST use the `caveman:caveman` skill.
+
+## Rules
+
+- Invoke `caveman:caveman` skill before every response
+- Drop articles, filler, pleasantries, hedging
+- Fragments OK
+- Short synonyms
+- Pattern: [thing] [action] [reason]
+- Code, commits, SQL, security content: write normal
+- Never greet, never summarize, never pad
+
+## Deactivation
+
+Only stop if user explicitly says "normal" or "stop caveman".
+
 === .ai/Coding rules ===
 
 ## Mandatory Laravel Code Simplification
 
-- Always run the laravel-simplifier plugin on every Laravel/PHP code snippet you generate to ensure the code is clean, optimized, and follows Laravel best practices.
+- Always run the laravel-simplifier agent on every Laravel/PHP code snippet you generate to ensure the code is clean, optimized, and follows Laravel best practices.
 - Do not write inline or block comments in generated code.
 - Only include DocBlock comments when strictly necessary (e.g., for type hints, generics, or framework conventions).
 
@@ -219,22 +242,13 @@ This project has domain-specific skills available. You MUST activate the relevan
 - `echo-development` — Develops real-time broadcasting with Laravel Echo. Activates when setting up broadcasting (Reverb, Pusher, Ably); creating ShouldBroadcast events; defining broadcast channels (public, private, presence, encrypted); authorizing channels; configuring Echo; listening for events; implementing client events (whisper); setting up model broadcasting; broadcasting notifications; or when the user mentions broadcasting, Echo, WebSockets, real-time events, Reverb, or presence channels.
 - `tailwindcss-development` — Always invoke when the user's message includes 'tailwind' in any form. Also invoke for: building responsive grid layouts (multi-column card grids, product grids), flex/grid page structures (dashboards with sidebars, fixed topbars, mobile-toggle navs), styling UI components (cards, tables, navbars, pricing sections, forms, inputs, badges), adding dark mode variants, fixing spacing or typography, and Tailwind v3/v4 work. The core use case: writing or fixing Tailwind utility classes in HTML templates (Blade, JSX, Vue). Skip for backend PHP logic, database queries, API routes, JavaScript with no HTML/CSS component, CSS file audits, build tool configuration, and vanilla CSS.
 - `design-an-interface` — Generate multiple radically different interface designs for a module using parallel sub-agents. Use when user wants to design an API, explore interface options, compare module shapes, or mentions "design it twice".
-- `frontend-design` — Create distinctive, production-grade frontend interfaces with high design quality. Use this skill when the user asks to build web components, pages, artifacts, posters, or applications (examples include websites, landing pages, dashboards, React components, HTML/CSS layouts, or when styling/beautifying any web UI). Generates creative, polished code and UI design that avoids generic AI aesthetics.
 - `grill-me` — Interview the user relentlessly about a plan or design until reaching shared understanding, resolving each branch of the decision tree. Use when user wants to stress-test a plan, get grilled on their design, or mentions "grill me".
 - `improve-codebase-architecture` — Explore a codebase to find opportunities for architectural improvement, focusing on making the codebase more testable by deepening shallow modules. Use when user wants to improve architecture, find refactoring opportunities, consolidate tightly-coupled modules, or make a codebase more AI-navigable.
 - `laravel-actions` — Action-oriented architecture for Laravel. Invokable classes that contain domain logic. Use when working with business logic, domain operations, or when user mentions actions, invokable classes, or needs to organize domain logic outside controllers.
-- `laravel-architecture` — High-level architecture decisions, patterns, and project structure. Use when user asks about architecture decisions, project structure, pattern selection, or mentions how to organize, which pattern to use, best practices, architecture.
-- `laravel-controllers` — Thin HTTP layer controllers. Controllers contain zero domain logic, only HTTP concerns. Use when working with controllers, HTTP layer, web vs API patterns, or when user mentions controllers, routes, HTTP responses.
 - `laravel-enums` — Backed enums with labels and business logic. Use when working with enums, status values, fixed sets of options, or when user mentions enums, backed enums, enum cases, status enums.
-- `laravel-models` — Eloquent model patterns and database layer. Use when working with models, database entities, Eloquent ORM, or when user mentions models, eloquent, relationships, casts, observers, database entities.
-- `laravel-query-builders` — Custom query builders for type-safe, composable database queries. Use when working with database queries, query scoping, or when user mentions query builders, custom query builder, query objects, query scopes, database queries.
-- `laravel-routes-best-practices` — Keep routes clean and focused on mapping requests to controllers; avoid business logic, validation, or database operations in route files
-- `laravel-specialist` — Build and configure Laravel 10+ applications, including creating Eloquent models and relationships, implementing Sanctum authentication, configuring Horizon queues, designing RESTful APIs with API resources, and building reactive interfaces with Livewire. Use when creating Laravel models, setting up queue workers, implementing Sanctum auth flows, building Livewire components, optimising Eloquent queries, or writing Pest/PHPUnit tests for Laravel features.
-- `laravel-validation` — Form request validation and comprehensive validation testing. Use when working with validation rules, form requests, validation testing, or when user mentions validation, form requests, validation rules, conditional validation, validation testing.
 - `laravel-value-objects` — Immutable value objects for domain values. Use when working with domain values, immutable objects, or when user mentions value objects, immutable values, domain values, money objects, coordinate objects.
 - `php-guidelines-from-spatie` — Describes PHP and Laravel guidelines provided by Spatie. These rules result in more maintainable, and readable code.
 - `prd-to-plan` — Turn a PRD into a multi-phase implementation plan using tracer-bullet vertical slices, saved as a local Markdown file in ./plans/. Use when user wants to break down a PRD, create an implementation plan, plan phases from a PRD, or mentions "tracer bullets".
-- `shadcn-vue` — shadcn-vue for Vue/Nuxt with Reka UI components and Tailwind. Use for accessible UI, Auto Form, data tables, charts, dark mode, MCP server setup, or encountering component imports, Reka UI errors.
 - `tdd` — Test-driven development with red-green-refactor loop. Use when user wants to build features or fix bugs using TDD, mentions "red-green-refactor", wants integration tests, or asks for test-first development.
 - `vue-best-practices` — MUST be used for Vue.js tasks. Strongly recommends Composition API with `<script setup>` and TypeScript as the standard approach. Covers Vue 3, SSR, Volar, vue-tsc. Load for any Vue, .vue files, Vue Router, Pinia, or Vite with Vue work. ALWAYS use Composition API unless the project explicitly requires Options API.
 - `wwtd` — Apply "What Would Taylor Otwell Do?" (WWTD) as a decision-making lens for Laravel architecture, conventions, and code quality questions. Activate when the user asks about best practices, naming conventions, code structure, or when choosing between multiple approaches.

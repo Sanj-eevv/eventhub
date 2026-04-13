@@ -43,7 +43,7 @@ final class ScanTicketController extends Controller
         }
 
         try {
-            $ticket = $this->checkInTicketAction->execute($ticket, $this->authManager->user());
+            $ticket = ($this->checkInTicketAction)($ticket, $this->authManager->user());
         } catch (RuntimeException) {
             if (TicketStatus::Used === $ticket->status) {
                 $this->dispatcher->dispatch(new DuplicateScanAttempted($ticket));

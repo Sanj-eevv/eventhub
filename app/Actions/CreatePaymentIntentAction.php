@@ -13,7 +13,7 @@ final readonly class CreatePaymentIntentAction
 {
     public function __construct(private PaymentGateway $paymentGateway) {}
 
-    public function execute(Order $order): PaymentIntentResult
+    public function __invoke(Order $order): PaymentIntentResult
     {
         $result = $this->paymentGateway->createPaymentIntent(new PaymentIntentData(
             amount: $order->total,

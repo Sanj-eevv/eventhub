@@ -34,7 +34,7 @@ final class OrganizationRegisterController extends Controller
 
     public function store(OrganizationRegisterRequest $request): RedirectResponse
     {
-        $user = $this->registerOrganizationAction->execute($request->toOrganizationDto(), $request->toUserDto());
+        $user = ($this->registerOrganizationAction)($request->toOrganizationDto(), $request->toUserDto());
 
         $this->dispatcher->dispatch(new Registered($user));
 

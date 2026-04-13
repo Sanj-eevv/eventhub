@@ -13,7 +13,7 @@ final readonly class CancelReservedOrderAction
 {
     public function __construct(private DatabaseManager $databaseManager) {}
 
-    public function execute(Order $order): void
+    public function __invoke(Order $order): void
     {
         if (OrderStatus::Reserved !== $order->status) {
             throw new InvalidStatusTransitionException($order->status, OrderStatus::Cancelled);

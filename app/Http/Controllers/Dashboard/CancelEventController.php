@@ -24,7 +24,7 @@ final class CancelEventController extends Controller
     {
         $this->authorize('cancel', $event);
 
-        $this->updateEventStatusAction->execute($event, EventStatus::Cancelled, $this->authManager->user());
+        ($this->updateEventStatusAction)($event, EventStatus::Cancelled, $this->authManager->user());
 
         return $this->redirector->back()->with('toast_success', 'Event cancelled.');
     }

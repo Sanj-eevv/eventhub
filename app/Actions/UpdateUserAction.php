@@ -11,7 +11,7 @@ use App\Models\User;
 
 final class UpdateUserAction
 {
-    public function execute(User $user, UserData $data): User
+    public function __invoke(User $user, UserData $data): User
     {
         $role = Role::query()->where('slug', $data->role_slug)->firstOrFail();
         $organization = $data->organization_uuid

@@ -21,7 +21,7 @@ final readonly class ProcessRefundAction
         private RecordActivityAction $recordActivityAction,
     ) {}
 
-    public function execute(Order $order, ?User $causer = null, ?int $refundAmount = null): void
+    public function __invoke(Order $order, ?User $causer = null, ?int $refundAmount = null): void
     {
         $refundAmount ??= $this->settingsService->get()->refundPercentage->applyTo($order->total);
 
@@ -36,7 +36,7 @@ final readonly class ProcessRefundAction
             'refunded_at' => CarbonImmutable::now(),
         ]);
 
-        $this->recordActivityAction->execute(ActivityEvent::RefundProcessed, $order, $causer, [
+        ($this->recordActivityAction)(ActivityEvent::RefundProcessed, $order, $causer, [
             'refund_id' => $refundId,
             'amount' => $refundAmount,
         ]);

@@ -22,7 +22,7 @@ final class UnpublishEventController extends Controller
     {
         $this->authorize('unpublish', $event);
 
-        $this->updateEventStatusAction->execute($event, EventStatus::Draft);
+        ($this->updateEventStatusAction)($event, EventStatus::Draft);
 
         return $this->redirector->back()->with('toast_success', 'Event unpublished.');
     }

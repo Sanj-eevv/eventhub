@@ -25,7 +25,7 @@ final class ApproveOrganizationController extends Controller
     {
         $this->authorize('approve', $organization);
 
-        $this->confirmOrganizationStatusAction->execute(
+        ($this->confirmOrganizationStatusAction)(
             $organization,
             OrganizationStatus::Approved,
             $request->boolean('send_notification', true),

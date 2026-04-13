@@ -9,7 +9,7 @@ use App\Models\Organization;
 
 final class UpdateOrganizationAction
 {
-    public function execute(Organization $organization, OrganizationData $data): Organization
+    public function __invoke(Organization $organization, OrganizationData $data): Organization
     {
         $organization->update([
             'title' => $data->title,

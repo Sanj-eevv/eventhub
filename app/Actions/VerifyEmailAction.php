@@ -12,7 +12,7 @@ final readonly class VerifyEmailAction
 {
     public function __construct(private Dispatcher $dispatcher) {}
 
-    public function execute(User $user): void
+    public function __invoke(User $user): void
     {
         if ($user->hasVerifiedEmail()) {
             return;

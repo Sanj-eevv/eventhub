@@ -28,7 +28,7 @@ final class ProcessRefundJob implements ShouldQueue
 
     public function handle(ProcessRefundAction $action): void
     {
-        $action->execute($this->order, refundAmount: $this->refundAmount);
+        $action($this->order, refundAmount: $this->refundAmount);
     }
 
     public function failed(Throwable $exception): void

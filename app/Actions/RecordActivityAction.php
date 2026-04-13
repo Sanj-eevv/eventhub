@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 
 final class RecordActivityAction
 {
-    public function execute(ActivityEvent $event, Model $subject, ?User $causer = null, array $properties = []): void
+    public function __invoke(ActivityEvent $event, Model $subject, ?User $causer = null, array $properties = []): void
     {
         ActivityLog::query()->create([
             'event' => $event,

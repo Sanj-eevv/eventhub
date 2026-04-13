@@ -78,7 +78,7 @@ final class EventController extends Controller
     {
         $this->authorize('create', Event::class);
 
-        $event = $this->createEventAction->execute($request->toDto());
+        $event = ($this->createEventAction)($request->toDto());
 
         return $this->redirector->route('dashboard.events.edit', ['event' => $event, 'focus' => 'media'])->with('toast_success', 'Event created successfully.');
     }
@@ -110,7 +110,7 @@ final class EventController extends Controller
     {
         $this->authorize('update', $event);
 
-        $this->updateEventAction->execute($event, $request->toDto());
+        ($this->updateEventAction)($event, $request->toDto());
 
         return $this->redirector->back()->with('toast_success', 'Event updated successfully.');
     }
@@ -119,7 +119,7 @@ final class EventController extends Controller
     {
         $this->authorize('delete', $event);
 
-        $this->deleteEventAction->execute($event);
+        ($this->deleteEventAction)($event);
 
         return $this->redirector->back()->with('toast_success', 'Event deleted.');
     }

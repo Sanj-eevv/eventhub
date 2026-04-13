@@ -14,7 +14,7 @@ final readonly class GenerateTicketQrCodesAction
 {
     public function __construct(private FilesystemManager $filesystemManager) {}
 
-    public function execute(Order $order): void
+    public function __invoke(Order $order): void
     {
         $order->loadMissing('tickets');
 

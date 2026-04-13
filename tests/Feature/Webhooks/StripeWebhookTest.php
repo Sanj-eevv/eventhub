@@ -37,7 +37,7 @@ it('completes a reserved order when payment_intent.succeeded is received', funct
         'data' => ['object' => ['id' => 'pi_test_succeeded_123']],
     ]);
 
-    resolve(HandleStripeWebhookAction::class)->execute($stripeEvent);
+    resolve(HandleStripeWebhookAction::class)($stripeEvent);
 
     expect($order->fresh()->status)->toBe(OrderStatus::Paid);
 });
@@ -57,7 +57,7 @@ it('activates tickets when payment_intent.succeeded is received', function (): v
         'data' => ['object' => ['id' => 'pi_test_activate_123']],
     ]);
 
-    resolve(HandleStripeWebhookAction::class)->execute($stripeEvent);
+    resolve(HandleStripeWebhookAction::class)($stripeEvent);
 
     $ticket = $order->tickets()->first();
 
@@ -79,7 +79,7 @@ it('sends an order confirmation notification when payment_intent.succeeded is re
         'data' => ['object' => ['id' => 'pi_test_notify_123']],
     ]);
 
-    resolve(HandleStripeWebhookAction::class)->execute($stripeEvent);
+    resolve(HandleStripeWebhookAction::class)($stripeEvent);
 
     Notification::assertSentTo($user, OrderConfirmedNotification::class);
 });
@@ -99,7 +99,7 @@ it('dispatches GenerateTicketQrCodesJob when payment_intent.succeeded is receive
         'data' => ['object' => ['id' => 'pi_test_qr_123']],
     ]);
 
-    resolve(HandleStripeWebhookAction::class)->execute($stripeEvent);
+    resolve(HandleStripeWebhookAction::class)($stripeEvent);
 
     Queue::assertPushed(GenerateTicketQrCodesJob::class);
 });
@@ -111,7 +111,7 @@ it('silently ignores payment_intent.succeeded for an unknown payment intent', fu
         'data' => ['object' => ['id' => 'pi_unknown_xyz']],
     ]);
 
-    expect(fn () => resolve(HandleStripeWebhookAction::class)->execute($stripeEvent))->not->toThrow(Throwable::class);
+    expect(fn () => resolve(HandleStripeWebhookAction::class)($stripeEvent))->not->toThrow(Throwable::class);
 });
 
 it('is idempotent when payment_intent.succeeded is received for an already paid order', function (): void {
@@ -129,7 +129,7 @@ it('is idempotent when payment_intent.succeeded is received for an already paid 
         'data' => ['object' => ['id' => 'pi_test_idempotent_123']],
     ]);
 
-    resolve(HandleStripeWebhookAction::class)->execute($stripeEvent);
+    resolve(HandleStripeWebhookAction::class)($stripeEvent);
 
     Notification::assertNothingSent();
 });
@@ -148,7 +148,7 @@ it('records activity and notifies user when payment_intent.payment_failed is rec
         'data' => ['object' => ['id' => 'pi_test_failed_123']],
     ]);
 
-    resolve(HandleStripeWebhookAction::class)->execute($stripeEvent);
+    resolve(HandleStripeWebhookAction::class)($stripeEvent);
 
     Notification::assertSentTo($user, PaymentFailedNotification::class);
     $this->assertDatabaseHas('activity_logs', ['event' => 'order.payment_failed']);
@@ -161,7 +161,7 @@ it('silently ignores payment_intent.payment_failed for an unknown payment intent
         'data' => ['object' => ['id' => 'pi_unknown_abc']],
     ]);
 
-    expect(fn () => resolve(HandleStripeWebhookAction::class)->execute($stripeEvent))->not->toThrow(Throwable::class);
+    expect(fn () => resolve(HandleStripeWebhookAction::class)($stripeEvent))->not->toThrow(Throwable::class);
 });
 
 it('silently ignores unknown webhook event types', function (): void {
@@ -171,5 +171,5 @@ it('silently ignores unknown webhook event types', function (): void {
         'data' => ['object' => ['id' => 'cus_test']],
     ]);
 
-    expect(fn () => resolve(HandleStripeWebhookAction::class)->execute($stripeEvent))->not->toThrow(Throwable::class);
+    expect(fn () => resolve(HandleStripeWebhookAction::class)($stripeEvent))->not->toThrow(Throwable::class);
 });

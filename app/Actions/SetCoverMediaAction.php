@@ -12,7 +12,7 @@ final readonly class SetCoverMediaAction
 {
     public function __construct(private DatabaseManager $databaseManager) {}
 
-    public function execute(Event $event, Media $media): void
+    public function __invoke(Event $event, Media $media): void
     {
         $this->databaseManager->transaction(function () use ($event, $media): void {
             $event->media()->update(['is_cover' => false]);

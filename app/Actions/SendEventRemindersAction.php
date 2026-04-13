@@ -11,7 +11,7 @@ use Carbon\CarbonImmutable;
 
 final class SendEventRemindersAction
 {
-    public function execute(): void
+    public function __invoke(): void
     {
         $windowStart = CarbonImmutable::now()->addHours(23);
         $windowEnd = CarbonImmutable::now()->addHours(25);

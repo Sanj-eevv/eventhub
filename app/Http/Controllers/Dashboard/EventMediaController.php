@@ -25,7 +25,7 @@ final class EventMediaController extends Controller
     {
         $this->authorize('update', $event);
 
-        $this->storeAction->execute($event, $request->file('file'));
+        ($this->storeAction)($event, $request->file('file'));
 
         return $this->redirector->back()->with('toast_success', 'Media uploaded successfully.');
     }
@@ -34,7 +34,7 @@ final class EventMediaController extends Controller
     {
         $this->authorize('update', $event);
 
-        $this->destroyAction->execute($event, $media);
+        ($this->destroyAction)($event, $media);
 
         return $this->redirector->back()->with('toast_success', 'Media deleted.');
     }

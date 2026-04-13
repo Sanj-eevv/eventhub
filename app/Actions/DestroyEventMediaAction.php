@@ -16,7 +16,7 @@ final readonly class DestroyEventMediaAction
         private DatabaseManager $databaseManager,
     ) {}
 
-    public function execute(Event $event, Media $media): void
+    public function __invoke(Event $event, Media $media): void
     {
         $this->databaseManager->transaction(function () use ($event, $media): void {
             $wasCover = $media->is_cover;

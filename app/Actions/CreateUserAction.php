@@ -14,7 +14,7 @@ final readonly class CreateUserAction
 {
     public function __construct(private Hasher $hash) {}
 
-    public function execute(UserData $userData): User
+    public function __invoke(UserData $userData): User
     {
         $role = Role::query()->where('slug', $userData->role_slug)->firstOrFail();
         $organization = $userData->organization_uuid

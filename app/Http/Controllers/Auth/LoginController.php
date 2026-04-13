@@ -29,7 +29,7 @@ final class LoginController extends Controller
 
     public function store(LoginRequest $loginRequest): RedirectResponse
     {
-        if ($this->loginAction->execute($loginRequest->validated(), $loginRequest->boolean('remember'))) {
+        if (($this->loginAction)($loginRequest->validated(), $loginRequest->boolean('remember'))) {
             $loginRequest->session()->regenerate();
 
             return $this->redirector->intended($this->urlGenerator->route('home', absolute: false));

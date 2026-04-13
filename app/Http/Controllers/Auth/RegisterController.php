@@ -34,7 +34,7 @@ final class RegisterController extends Controller
 
     public function store(RegisterRequest $request): RedirectResponse
     {
-        $user = $this->createUserAction->execute($request->toDto());
+        $user = ($this->createUserAction)($request->toDto());
 
         $this->dispatcher->dispatch(new Registered($user));
 

@@ -25,7 +25,7 @@ final class RejectOrganizationController extends Controller
     {
         $this->authorize('reject', $organization);
 
-        $this->confirmOrganizationStatusAction->execute(
+        ($this->confirmOrganizationStatusAction)(
             $organization,
             OrganizationStatus::Rejected,
             $request->boolean('send_notification', true),

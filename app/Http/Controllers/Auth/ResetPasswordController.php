@@ -33,7 +33,7 @@ final class ResetPasswordController extends Controller
 
     public function store(ResetPasswordRequest $request): RedirectResponse
     {
-        $status = $this->resetPasswordAction->execute($request->validated());
+        $status = ($this->resetPasswordAction)($request->validated());
 
         if (PasswordBroker::PASSWORD_RESET === $status) {
             return $this->redirector->route('auth.login')->with('status', __($status));

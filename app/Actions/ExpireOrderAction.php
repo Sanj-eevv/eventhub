@@ -12,7 +12,7 @@ final readonly class ExpireOrderAction
 {
     public function __construct(private DatabaseManager $databaseManager) {}
 
-    public function execute(Order $order): void
+    public function __invoke(Order $order): void
     {
         if (OrderStatus::Reserved !== $order->status) {
             return;

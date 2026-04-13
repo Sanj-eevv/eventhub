@@ -20,7 +20,7 @@ final class ProcessPaymentController extends Controller
     {
         $this->authorize('view', $order);
 
-        $this->verifyAndCompleteOrderAction->execute($order);
+        ($this->verifyAndCompleteOrderAction)($order);
 
         return $this->redirector->route('checkout.confirmation', ['order' => $order->uuid]);
     }
