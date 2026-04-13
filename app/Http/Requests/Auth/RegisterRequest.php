@@ -23,12 +23,10 @@ final class RegisterRequest extends FormRequest
 
     public function toDto(): UserData
     {
-        $validated = $this->validated();
-
         return new UserData(
-            name: (string) $validated['name'],
-            email: (string) $validated['email'],
-            password: (string) $validated['password'],
+            name: $this->string('name')->value(),
+            email: $this->string('email')->value(),
+            password: $this->string('password')->value(),
             role_slug: PreservedRoleList::User->value,
         );
     }

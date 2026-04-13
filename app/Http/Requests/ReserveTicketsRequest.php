@@ -19,7 +19,7 @@ final class ReserveTicketsRequest extends FormRequest
         ];
     }
 
-    /** @return TicketItemData[] */
+    /** @return array<int, TicketItemData> */
     public function toDto(): array
     {
         /** @var array<int, array{ticket_type_uuid: string, quantity: int}> $items */

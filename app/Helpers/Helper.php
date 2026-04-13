@@ -11,7 +11,7 @@ if ( ! function_exists('userTime')) {
     {
         $carbon = is_string($dateTime) ? Date::parse($dateTime) : Date::instance($dateTime);
 
-        $tz = $timezone ?? (string) config('app.timezone');
+        $tz = $timezone ?? (string) (config('app.timezone'));
 
         return $carbon->timezone($tz);
     }

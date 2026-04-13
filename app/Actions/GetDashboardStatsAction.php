@@ -105,12 +105,12 @@ final class GetDashboardStatsAction
             $query->forOrganization($user->organization_id);
         }
 
-        /** @var stdClass|null $stats */
+        /** @var stdClass $stats */
         $stats = $query->toBase()->selectRaw('COALESCE(SUM(total), 0) as revenue, MAX(currency) as currency')->first();
 
         return [
-            'amount' => (int) ($stats?->revenue ?? 0),
-            'currency' => (string) ($stats?->currency ?? 'USD'),
+            'amount' => (int) ($stats->revenue),
+            'currency' => (string) ($stats->currency ?? 'USD'),
         ];
     }
 

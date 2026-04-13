@@ -29,25 +29,21 @@ final class OrganizationRegisterRequest extends FormRequest
 
     public function toOrganizationDto(): OrganizationData
     {
-        $validated = $this->validated();
-
         return new OrganizationData(
-            title: (string) $validated['title'],
-            description: (string) $validated['description'],
-            contact_address: (string) $validated['contact_address'],
-            contact_email: (string) $validated['contact_email'],
+            title: $this->string('title')->value(),
+            description: $this->string('description')->value(),
+            contact_address: $this->string('contact_address')->value(),
+            contact_email: $this->string('contact_email')->value(),
             status: OrganizationStatus::Pending,
         );
     }
 
     public function toUserDto(): UserData
     {
-        $validated = $this->validated();
-
         return new UserData(
-            name: (string) $validated['name'],
-            email: (string) $validated['email'],
-            password: (string) $validated['password'],
+            name: $this->string('name')->value(),
+            email: $this->string('email')->value(),
+            password: $this->string('password')->value(),
             role_slug: PreservedRoleList::OrganizationAdmin->value,
         );
     }

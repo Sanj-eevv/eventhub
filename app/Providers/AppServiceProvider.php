@@ -119,7 +119,11 @@ final class AppServiceProvider extends ServiceProvider
     private function configureUrls(): void
     {
         URL::forceScheme('https');
-        ResetPassword::createUrlUsing(fn (User $user, string $token) => URL::route('auth.password.reset', ['token' => $token, 'email' => $user->email]));
+        ResetPassword::createUrlUsing(function (mixed $notifiable, string $token): string {
+            $email = $notifiable instanceof User ? $notifiable->email : '';
+
+            return URL::route('auth.password.reset', ['token' => $token, 'email' => $email]);
+        });
         VerifyEmail::createUrlUsing(fn (User $notifiable): string => URL::temporarySignedRoute(
             'auth.verification.verify',
             CarbonImmutable::now()->addMinutes(60),

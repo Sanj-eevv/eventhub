@@ -16,7 +16,7 @@ final class TicketTypeFactory extends Factory
 {
     public function definition(): array
     {
-        $name = $this->faker->words(3, true);
+        $name = implode(' ', $this->faker->words(3));
         $saleStartsAt = $this->faker->dateTimeBetween('-1 month', '+1 month');
         $saleEndsAt = $this->faker->dateTimeBetween($saleStartsAt, '+3 months');
 

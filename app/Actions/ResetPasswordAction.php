@@ -20,7 +20,7 @@ final readonly class ResetPasswordAction
     /** @param array<string, mixed> $data */
     public function __invoke(array $data): string|false
     {
-        return $this->passwordBroker->reset(
+        $result = $this->passwordBroker->reset(
             $data,
             function (User $user, #[SensitiveParameter] string $newPassword): void {
                 $user->password = $this->hasher->make($newPassword);
@@ -28,5 +28,7 @@ final readonly class ResetPasswordAction
                 $user->save();
             },
         );
+
+        return is_string($result) ? $result : false;
     }
 }

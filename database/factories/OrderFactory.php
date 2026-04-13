@@ -44,7 +44,7 @@ final class OrderFactory extends Factory
     public function expired(): static
     {
         return $this->state(fn (): array => [
-            'status' => OrderStatus::Expired,
+            'status' => OrderStatus::Reserved,
             'expires_at' => CarbonImmutable::now()->subMinutes(15),
         ]);
     }

@@ -17,3 +17,8 @@ parameters:
     level: max
 
     tmpDir: /tmp/phpstan
+
+    ignoreErrors:
+        -   # Stripe PHP SDK stubs define an overly strict sealed array shape; our usage is correct per the Stripe API
+            identifier: argument.type
+            path: app/Payments/StripePaymentGateway.php

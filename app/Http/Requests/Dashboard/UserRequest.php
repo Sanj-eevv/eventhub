@@ -35,10 +35,10 @@ final class UserRequest extends FormRequest
         $organizationUuid = $this->validated('organization');
 
         return new UserData(
-            name: (string) $this->validated('name'),
-            email: (string) $this->validated('email'),
+            name: $this->string('name')->value(),
+            email: $this->string('email')->value(),
             password: is_string($password) ? $password : null,
-            role_slug: (string) $this->validated('role'),
+            role_slug: $this->string('role')->value(),
             organization_uuid: is_string($organizationUuid) ? $organizationUuid : null,
         );
     }

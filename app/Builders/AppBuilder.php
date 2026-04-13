@@ -33,11 +33,7 @@ abstract class AppBuilder extends Builder
                 : $this;
         }
 
-        $filtered->each(function (mixed $sortItem): void {
-            if ( ! is_array($sortItem)) {
-                return;
-            }
-
+        $filtered->each(function (array $sortItem): void {
             $this->orderBy(
                 (string) ($this->sortColumnMap[$sortItem['id']] ?? $sortItem['id']),
                 filter_var($sortItem['desc'], FILTER_VALIDATE_BOOLEAN) ? 'desc' : 'asc',

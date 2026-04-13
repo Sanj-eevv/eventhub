@@ -39,7 +39,7 @@ final class PermissionSeeder extends Seeder
             $permissions = Permission::query()->pluck('id', 'name');
 
             $idsFor = fn (array $cases): array => $permissions
-                ->only(collect($cases)->map(fn (BackedEnum $case): int|string => $case->value)->all())
+                ->only(collect($cases)->map(fn (mixed $case): int|string => $case instanceof BackedEnum ? $case->value : '')->all())
                 ->values()
                 ->all();
 

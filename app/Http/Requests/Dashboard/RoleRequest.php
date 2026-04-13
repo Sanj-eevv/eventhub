@@ -25,9 +25,9 @@ final class RoleRequest extends FormRequest
         $rawPermissions = $this->validated('permissions');
 
         return new RoleData(
-            name: (string) $this->validated('name'),
-            description: (string) $this->validated('description'),
-            permissions: is_array($rawPermissions) ? array_map('intval', $rawPermissions) : null,
+            name: $this->string('name')->value(),
+            description: $this->string('description')->value(),
+            permissions: is_array($rawPermissions) ? collect($rawPermissions)->map(fn (mixed $value): int => (int) $value)->all() : null,
         );
     }
 }

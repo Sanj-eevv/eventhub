@@ -11,6 +11,7 @@ use App\Http\Resources\EventResource;
 use App\Models\Event;
 use App\Models\Order;
 use Illuminate\Auth\AuthManager;
+use Illuminate\Database\Eloquent\Builder;
 use Inertia\Response;
 use Inertia\ResponseFactory;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -51,10 +52,10 @@ final class BrowseEventController extends Controller
         $user = $this->authManager->user();
 
         $event->load([
-            'ticketTypes' => fn ($query) => $query
+            'ticketTypes' => fn (Builder $query) => $query
                 ->withCount([
-                    'tickets' => fn ($query) => $query->where('status', '!=', TicketStatus::Cancelled),
-                    ...($user ? ['tickets as user_tickets_count' => fn ($query) => $query
+                    'tickets' => fn (Builder $q) => $q->where('status', '!=', TicketStatus::Cancelled),
+                    ...($user ? ['tickets as user_tickets_count' => fn (Builder $q) => $q
                         ->where('user_id', $user->id)
                         ->whereIn('status', [TicketStatus::Pending, TicketStatus::Active]),
                     ] : []),
@@ -73,7 +74,7 @@ final class BrowseEventController extends Controller
 
         return $this->inertiaResponse->render('Events/Show', [
             'event' => EventResource::make($event),
-            'activeOrder' => $activeOrder ? ['uuid' => $activeOrder->uuid, 'expires_at' => $activeOrder->expires_at->toISOString()] : null,
+            'activeOrder' => $activeOrder ? ['uuid' => $activeOrder->uuid, 'expires_at' => $activeOrder->expires_at?->toISOString()] : null,
         ]);
     }
 }

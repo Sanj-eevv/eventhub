@@ -19,7 +19,7 @@ final readonly class GenerateTicketQrCodesAction
         $order->loadMissing('tickets');
 
         $order->tickets->each(function (Ticket $ticket) use ($order): void {
-            $svg = (string) QrCode::format('svg')->generate($ticket->booking_reference);
+            $svg = (string) (QrCode::format('svg')->generate($ticket->booking_reference) ?? '');
             $path = sprintf('tickets/%s/%s.svg', $order->uuid, $ticket->uuid);
 
             if ( ! $this->filesystemManager->disk('local')->put($path, $svg)) {

@@ -35,7 +35,7 @@ final class ScanTicketController extends Controller
 
         $ticket = Ticket::query()
             ->forEvent($event)
-            ->byBookingReference((string) $request->validated('booking_reference'))
+            ->byBookingReference($request->string('booking_reference')->value())
             ->with(['event', 'ticketType'])
             ->first();
 
