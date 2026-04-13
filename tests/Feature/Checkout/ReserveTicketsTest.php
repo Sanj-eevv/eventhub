@@ -205,5 +205,5 @@ it('broadcasts OrderReserved after tickets are reserved', function (): void {
         'items' => [['ticket_type_uuid' => $ticketType->uuid, 'quantity' => 1]],
     ])->assertRedirect();
 
-    Event::assertDispatched(OrderReserved::class, fn (OrderReserved $e): bool => $e->event->is($event));
+    Event::assertDispatched(OrderReserved::class, fn (OrderReserved $e): bool => $e->order->event->is($event));
 });

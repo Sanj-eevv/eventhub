@@ -12,6 +12,7 @@ use App\Models\Event;
 use App\Models\Order;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Inertia\Response;
 use Inertia\ResponseFactory;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -47,12 +48,14 @@ final class BrowseEventController extends Controller
 
     public function show(Event $event): Response
     {
-        throw_if(EventStatus::Published !== $event->status, NotFoundHttpException::class);
+        if (EventStatus::Published !== $event->status) {
+            throw new NotFoundHttpException();
+        }
 
         $user = $this->authManager->user();
 
         $event->load([
-            'ticketTypes' => fn (Builder $query) => $query
+            'ticketTypes' => fn (HasMany $query) => $query
                 ->withCount([
                     'tickets' => fn (Builder $q) => $q->where('status', '!=', TicketStatus::Cancelled),
                     ...($user ? ['tickets as user_tickets_count' => fn (Builder $q) => $q

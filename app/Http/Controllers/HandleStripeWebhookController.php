@@ -23,10 +23,11 @@ final class HandleStripeWebhookController extends Controller
     public function __invoke(Request $request): Response
     {
         try {
+            $secret = $this->config->get('services.stripe.webhook_secret', '');
             $event = Webhook::constructEvent(
                 $request->getContent(),
                 $request->header('Stripe-Signature', ''),
-                (string) ($this->config->get('services.stripe.webhook_secret', '')),
+                is_string($secret) ? $secret : '',
             );
         } catch (SignatureVerificationException) {
             abort(400);

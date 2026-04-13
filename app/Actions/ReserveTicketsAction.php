@@ -43,9 +43,13 @@ final readonly class ReserveTicketsAction
      */
     public function __invoke(User $user, Event $event, array $items): Order
     {
-        throw_if(EventStatus::Published !== $event->status, EventNotAvailableException::class);
+        if (EventStatus::Published !== $event->status) {
+            throw new EventNotAvailableException();
+        }
 
-        throw_if(Order::query()->forUser($user)->forEvent($event)->activeReservation()->exists(), ActiveReservationExistsException::class);
+        if (Order::query()->forUser($user)->forEvent($event)->activeReservation()->exists()) {
+            throw new ActiveReservationExistsException();
+        }
 
         $attempts = 0;
 
@@ -64,22 +68,30 @@ final readonly class ReserveTicketsAction
 
                         $saleEndsAt = $ticketType->sale_ends_at ?? $event->ends_at;
 
-                        throw_if($ticketType->sale_starts_at && $now->isBefore($ticketType->sale_starts_at), TicketSaleNotOpenException::class, $ticketType);
+                        if ($ticketType->sale_starts_at && $now->isBefore($ticketType->sale_starts_at)) {
+                            throw new TicketSaleNotOpenException($ticketType);
+                        }
 
-                        throw_if($now->isAfter($saleEndsAt), TicketSaleClosedException::class, $ticketType);
+                        if ($now->isAfter($saleEndsAt)) {
+                            throw new TicketSaleClosedException($ticketType);
+                        }
 
                         $soldCount = $ticketType->tickets()
                             ->whereIn('status', [TicketStatus::Pending, TicketStatus::Active])
                             ->count();
 
-                        throw_if($soldCount + $item->quantity > $ticketType->capacity, InsufficientTicketCapacityException::class, $ticketType);
+                        if ($soldCount + $item->quantity > $ticketType->capacity) {
+                            throw new InsufficientTicketCapacityException($ticketType);
+                        }
 
                         $userCount = $ticketType->tickets()
                             ->where('user_id', $user->id)
                             ->whereIn('status', [TicketStatus::Pending, TicketStatus::Active])
                             ->count();
 
-                        throw_if(null !== $ticketType->max_per_user && $userCount + $item->quantity > $ticketType->max_per_user, TicketLimitExceededException::class, $ticketType);
+                        if (null !== $ticketType->max_per_user && $userCount + $item->quantity > $ticketType->max_per_user) {
+                            throw new TicketLimitExceededException($ticketType);
+                        }
 
                         return ['ticketType' => $ticketType, 'quantity' => $item->quantity];
                     });
@@ -118,7 +130,9 @@ final readonly class ReserveTicketsAction
 
                 return $order;
             } catch (UniqueConstraintViolationException $exception) {
-                throw_if(++$attempts >= 3, $exception);
+                if (++$attempts >= 3) {
+                    throw $exception;
+                }
             }
         }
     }

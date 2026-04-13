@@ -47,7 +47,9 @@ final readonly class StoreEventMediaAction
             $this->databaseManager->beginTransaction();
             $count = $event->media()->lockForUpdate()->count();
 
-            throw_if($count >= self::MAX_FILES, MediaLimitExceededException::class, self::MAX_FILES);
+            if ($count >= self::MAX_FILES) {
+                throw new MediaLimitExceededException(self::MAX_FILES);
+            }
 
             $media = $event->media()->create([
                 'uuid' => $uuid,

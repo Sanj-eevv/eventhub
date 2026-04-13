@@ -13,7 +13,11 @@ final class PaymentServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->app->singleton(StripeClient::class, fn (): StripeClient => new StripeClient((string) (config('services.stripe.secret', ''))));
+        $this->app->singleton(StripeClient::class, function (): StripeClient {
+            $secret = config('services.stripe.secret', '');
+
+            return new StripeClient(is_string($secret) ? $secret : '');
+        });
 
         $this->app->bind(PaymentGateway::class, StripePaymentGateway::class);
     }

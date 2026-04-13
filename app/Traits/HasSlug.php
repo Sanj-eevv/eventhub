@@ -13,7 +13,8 @@ trait HasSlug
     {
         static::creating(function (Model $model): void {
             $sluggableColumn = static::getSluggableColumn();
-            $slug = Str::slug((string) ($model->getAttribute($sluggableColumn)));
+            $rawValue = $model->getAttribute($sluggableColumn);
+            $slug = Str::slug(is_string($rawValue) ? $rawValue : '');
             $initialSlug = $slug;
             $iteration = 0;
             $slugColumnName = static::getSlugColumnName();

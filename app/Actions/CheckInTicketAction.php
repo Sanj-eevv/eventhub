@@ -26,7 +26,9 @@ final readonly class CheckInTicketAction
     {
         $ticket->loadMissing('event');
 
-        throw_if(EventStatus::Published !== $ticket->event->status, RuntimeException::class, 'Check-in is only available for published events.');
+        if (EventStatus::Published !== $ticket->event->status) {
+            throw new RuntimeException('Check-in is only available for published events.');
+        }
 
         if ( ! $ticket->status->canTransitionTo(TicketStatus::Used)) {
             throw new InvalidStatusTransitionException($ticket->status, TicketStatus::Used);

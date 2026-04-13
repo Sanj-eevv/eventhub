@@ -25,7 +25,7 @@ final class TicketTypeResource extends JsonResource
             'max_per_user' => $this->max_per_user,
             'effective_max_per_user' => $this->when(
                 $request->user() && null !== $this->max_per_user,
-                fn (): int => max(0, (int) $this->max_per_user - (int) ($this->user_tickets_count ?? 0))
+                fn (): int => max(0, (int) $this->max_per_user - (is_int($this->user_tickets_count) ? $this->user_tickets_count : 0))
             ),
             'sort_order' => $this->sort_order,
             'sale_starts_at' => $this->sale_starts_at?->toISOString(),

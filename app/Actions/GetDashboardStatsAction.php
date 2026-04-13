@@ -109,8 +109,8 @@ final class GetDashboardStatsAction
         $stats = $query->toBase()->selectRaw('COALESCE(SUM(total), 0) as revenue, MAX(currency) as currency')->first();
 
         return [
-            'amount' => (int) ($stats->revenue),
-            'currency' => (string) ($stats->currency ?? 'USD'),
+            'amount' => is_numeric($stats->revenue) ? (int) $stats->revenue : 0,
+            'currency' => is_string($stats->currency) ? $stats->currency : 'USD',
         ];
     }
 

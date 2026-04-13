@@ -68,3 +68,7 @@ arch('enums are backed enums')
     ->ignoring([
         PreservedRoleList::class,
     ]);
+
+arch('no throw_if or throw_unless helpers used')
+    ->expect('App')
+    ->not->toUse(['throw_if', 'throw_unless']);

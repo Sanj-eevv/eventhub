@@ -6,10 +6,10 @@ namespace App\Models;
 
 use App\Builders\TicketTypeBuilder;
 use App\Models\Scopes\SortByOrderScope;
-use Database\Factories\TicketTypeFactory;
 use App\Traits\HasAppUuid;
 use App\Traits\HasSlug;
 use Carbon\CarbonImmutable;
+use Database\Factories\TicketTypeFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Attributes\UseEloquentBuilder;
@@ -36,6 +36,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property CarbonImmutable|null $updated_at
  * @property-read Event $event
  * @property-read Collection<int, Ticket> $tickets
+ * @property-read int|null $user_tickets_count
  */
 #[ScopedBy(SortByOrderScope::class)]
 #[UseEloquentBuilder(TicketTypeBuilder::class)]
@@ -54,8 +55,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 final class TicketType extends Model
 {
     use HasAppUuid;
+
     /** @use HasFactory<TicketTypeFactory> */
     use HasFactory;
+
     use HasSlug;
 
     public static function getSluggableColumn(): string

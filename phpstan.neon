@@ -22,3 +22,21 @@ parameters:
         -   # Stripe PHP SDK stubs define an overly strict sealed array shape; our usage is correct per the Stripe API
             identifier: argument.type
             path: app/Payments/StripePaymentGateway.php
+
+        -   # QrCode::generate() PHPDoc resolves HtmlString relative to the package namespace, creating a phantom class;
+            # the actual runtime type is \Illuminate\Support\HtmlString which implements Stringable, making (string) safe
+            identifier: cast.string
+            path: app/Actions/GenerateTicketQrCodesAction.php
+
+        -   # Same phantom class issue from QrCode package PHPDoc; $svg is always string at runtime
+            identifier: argument.type
+            path: app/Actions/GenerateTicketQrCodesAction.php
+
+        -   # Larastan cannot model custom Eloquent builder types inside with() closures;
+            # the closure correctly receives OrderBuilder at runtime via Eloquent's relation proxy
+            identifier: argument.type
+            path: app/Actions/SendEventRemindersAction.php
+
+        -   # Faker's words() PHPDoc returns string|array due to the $asText overload; words(3) without asText=true always returns array at runtime
+            identifier: argument.type
+            path: database/factories/TicketTypeFactory.php

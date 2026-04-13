@@ -29,7 +29,9 @@ final class CancelPaidOrderController extends Controller
     {
         $this->authorize('cancel', $order);
 
-        throw_if($order->event->starts_at->isBefore(CarbonImmutable::now()->addHours($this->settingsService->get()->cancellationCutoffHours)), HttpException::class, 422, 'The cancellation window for this order has passed.');
+        if ($order->event->starts_at->isBefore(CarbonImmutable::now()->addHours($this->settingsService->get()->cancellationCutoffHours))) {
+            throw new HttpException(422, 'The cancellation window for this order has passed.');
+        }
 
         ($this->cancelPaidOrderAction)($order, $this->authManager->user());
 

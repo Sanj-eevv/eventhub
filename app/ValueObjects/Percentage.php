@@ -12,7 +12,9 @@ final readonly class Percentage
 
     public static function fromInt(int $value): self
     {
-        throw_if($value < 0 || $value > 100, InvalidArgumentException::class, sprintf('Percentage must be between 0 and 100, got %d.', $value));
+        if ($value < 0 || $value > 100) {
+            throw new InvalidArgumentException(sprintf('Percentage must be between 0 and 100, got %d.', $value));
+        }
 
         return new self($value);
     }

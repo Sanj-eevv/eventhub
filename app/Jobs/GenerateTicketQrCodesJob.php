@@ -11,14 +11,14 @@ use App\Models\Order;
 use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\Attributes\Backoff;
-use Illuminate\Queue\Attributes\Tries;
 use Throwable;
 
 #[Backoff(30)]
-#[Tries(3)]
 final class GenerateTicketQrCodesJob implements ShouldQueueAfterCommit
 {
     use Queueable;
+
+    public int $tries = 3;
 
     public bool $deleteWhenMissingModels = true;
 

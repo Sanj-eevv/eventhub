@@ -21,7 +21,9 @@ final class CheckoutConfirmationController extends Controller
     {
         $this->authorize('view', $order);
 
-        throw_unless(in_array($order->status, [OrderStatus::Reserved, OrderStatus::Paid], true), NotFoundHttpException::class);
+        if ( ! in_array($order->status, [OrderStatus::Reserved, OrderStatus::Paid], true)) {
+            throw new NotFoundHttpException();
+        }
 
         $order->load(['tickets.ticketType', 'event']);
 
