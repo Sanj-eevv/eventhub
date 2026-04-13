@@ -20,7 +20,7 @@ final class UserResource extends JsonResource
             'name' => $this->name,
             'email' => $this->email,
             'email_verified' => (bool) $this->email_verified_at,
-            'created_at' => $this->created_at->toISOString(),
+            'created_at' => $this->created_at?->toISOString(),
             'role' => RoleShowResource::make($this->whenLoaded('role')),
             'organization' => OrganizationResource::make($this->whenLoaded('organization')),
         ];

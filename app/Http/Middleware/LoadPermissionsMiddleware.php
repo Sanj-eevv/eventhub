@@ -16,6 +16,7 @@ final class LoadPermissionsMiddleware
             $request->user()->load('role.permissions');
         }
 
+        /** @var Response */
         return $next($request);
     }
 }

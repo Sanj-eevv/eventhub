@@ -23,12 +23,12 @@ final readonly class SharedPermissionResource
 
     /**
      * @return array{
-     *     organization: array{viewAny: bool, create: bool, update: bool, delete: bool},
-     *     user: array{viewAny: bool, create: bool, update: bool, delete: bool},
-     *     role: array{viewAny: bool, create: bool, update: bool, delete: bool},
-     *     event: array{viewAny: bool, create: bool, update: bool, delete: bool, publish: bool, cancel: bool, checkIn: bool, reserve: bool},
-     *     order: array{viewAny: bool, cancel: bool},
-     *     setting: array{update: bool},
+     *     organization: array<string, bool>,
+     *     user: array<string, bool>,
+     *     role: array<string, bool>,
+     *     event: array<string, bool>,
+     *     order: array<string, bool>,
+     *     setting: array<string, bool>,
      *     dashboard: array{access: bool},
      * }
      */
@@ -46,8 +46,7 @@ final readonly class SharedPermissionResource
     }
 
     /**
-     * @param string[] $abilities
-     *
+     * @param  string[]  $abilities
      * @return array<string, bool>
      */
     private function checksFor(string $model, array $abilities): array

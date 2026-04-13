@@ -16,6 +16,7 @@ final class PermissionService
             ? $role->permissions
             : Permission::query()->select('id', 'name', 'description')->get();
 
+        /** @var array<string, list<array{id: int, name: string, description: string}>> */
         return $permissions->mapToGroups(function (Permission $permission): array {
             [$entity, $action] = explode(':', $permission->name, 2);
 

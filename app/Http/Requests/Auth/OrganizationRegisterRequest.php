@@ -32,10 +32,10 @@ final class OrganizationRegisterRequest extends FormRequest
         $validated = $this->validated();
 
         return new OrganizationData(
-            title: $validated['title'],
-            description: $validated['description'],
-            contact_address: $validated['contact_address'],
-            contact_email: $validated['contact_email'],
+            title: (string) $validated['title'],
+            description: (string) $validated['description'],
+            contact_address: (string) $validated['contact_address'],
+            contact_email: (string) $validated['contact_email'],
             status: OrganizationStatus::Pending,
         );
     }
@@ -45,9 +45,9 @@ final class OrganizationRegisterRequest extends FormRequest
         $validated = $this->validated();
 
         return new UserData(
-            name: $validated['name'],
-            email: $validated['email'],
-            password: $validated['password'],
+            name: (string) $validated['name'],
+            email: (string) $validated['email'],
+            password: (string) $validated['password'],
             role_slug: PreservedRoleList::OrganizationAdmin->value,
         );
     }

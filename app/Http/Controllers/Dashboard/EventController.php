@@ -15,6 +15,7 @@ use App\Http\Resources\EventResource;
 use App\Http\Resources\Organization\PickerResource as OrganizationPickerResource;
 use App\Models\Event;
 use App\Models\Organization;
+use App\Models\User;
 use DateTimeZone;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Http\RedirectResponse;
@@ -38,8 +39,8 @@ final class EventController extends Controller
     {
         $this->authorize('viewAny', Event::class);
 
-        $search = $request->input('search');
-        $status = $request->input('status');
+        $search = $request->string('search')->toString() ?: null;
+        $status = $request->string('status')->toString() ?: null;
         $sortBy = $request->array('sort_by');
 
         /** @var User $user */

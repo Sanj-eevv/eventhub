@@ -19,8 +19,8 @@ final readonly class HandleStripeWebhookAction
     public function __invoke(Event $event): void
     {
         match ($event->type) {
-            'payment_intent.succeeded' => $this->handlePaymentIntentSucceeded($event->data->object->id),
-            'payment_intent.payment_failed' => $this->handlePaymentIntentFailed($event->data->object->id),
+            'payment_intent.succeeded' => $this->handlePaymentIntentSucceeded((string) $event->data->object->id),
+            'payment_intent.payment_failed' => $this->handlePaymentIntentFailed((string) $event->data->object->id),
             default => null,
         };
     }

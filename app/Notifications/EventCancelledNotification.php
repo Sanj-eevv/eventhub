@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Notifications;
 
 use App\Models\Event;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -22,6 +23,7 @@ final class EventCancelledNotification extends Notification implements ShouldQue
         return ['mail', 'database'];
     }
 
+    /** @param User $notifiable */
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage())

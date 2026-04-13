@@ -27,8 +27,8 @@ final class IndexResource extends JsonResource
             'venue_name' => $this->venue_name,
             'address' => $this->address,
             'starts_at' => $this->starts_at->toISOString(),
-            'ends_at' => $this->ends_at?->toISOString(),
-            'created_at' => $this->created_at->toISOString(),
+            'ends_at' => $this->ends_at->toISOString(),
+            'created_at' => $this->created_at?->toISOString(),
         ];
     }
 }

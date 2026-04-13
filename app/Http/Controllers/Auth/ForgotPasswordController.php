@@ -30,7 +30,7 @@ final class ForgotPasswordController extends Controller
 
     public function store(SendPasswordResetEmailRequest $request): RedirectResponse
     {
-        ($this->sendPasswordResetEmailAction)($request->input('email'));
+        ($this->sendPasswordResetEmailAction)($request->string('email')->toString());
 
         return $this->redirector->back()->with('status', 'If an account with that email exists, we will send a password reset link.');
     }

@@ -7,10 +7,11 @@ namespace App\Builders;
 use App\Enums\OrderStatus;
 use App\Enums\PreservedRoleList;
 use App\Models\Event;
+use App\Models\Order;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 
-/** @extends AppBuilder<\App\Models\Order> */
+/** @extends AppBuilder<Order> */
 final class OrderBuilder extends AppBuilder
 {
     protected array $allowedSortColumns = ['total', 'paid_at', 'created_at'];
@@ -61,7 +62,7 @@ final class OrderBuilder extends AppBuilder
         return $this->where('status', OrderStatus::Cancelled);
     }
 
-    public function forOrganization(int $organizationId): self
+    public function forOrganization(?int $organizationId): self
     {
         return $this->whereHas('event', fn (Builder $query) => $query->where('organization_id', $organizationId));
     }

@@ -38,7 +38,7 @@ final class UserController extends Controller
     {
         $this->authorize('viewAny', User::class);
 
-        $search = $request->input('search');
+        $search = $request->string('search')->toString() ?: null;
         $sortBy = $request->array('sort_by');
 
         /** @var User $authUser */

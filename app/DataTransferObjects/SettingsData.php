@@ -18,6 +18,7 @@ final readonly class SettingsData
     /** @param array<string, mixed> $data */
     public static function fromArray(array $data): self
     {
+        /** @var array<string, scalar> $data */
         return new self(
             ticketReservationMinutes: (int) ($data['ticket_reservation_minutes'] ?? 15),
             cancellationCutoffHours: (int) ($data['cancellation_cutoff_hours'] ?? 24),
@@ -27,7 +28,8 @@ final readonly class SettingsData
 
     public static function fromDatabase(): self
     {
-        $rows = Setting::query()->pluck('value', 'key');
+        /** @var array<string, scalar> $rows */
+        $rows = Setting::query()->pluck('value', 'key')->all();
 
         return new self(
             ticketReservationMinutes: (int) ($rows['ticket_reservation_minutes'] ?? 15),

@@ -18,7 +18,7 @@ final readonly class ResetPasswordAction
     ) {}
 
     /** @param array<string, mixed> $data */
-    public function __invoke(array $data): string
+    public function __invoke(array $data): string|false
     {
         return $this->passwordBroker->reset(
             $data,

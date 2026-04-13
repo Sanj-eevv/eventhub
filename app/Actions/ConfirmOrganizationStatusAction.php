@@ -37,6 +37,7 @@ final readonly class ConfirmOrganizationStatusAction
                 new OrganizationRejected($organization, $notify),
                 ActivityEvent::OrganizationRejected,
             ],
+            default => throw new InvalidStatusTransitionException($organization->status, $status),
         };
 
         $this->dispatcher->dispatch($broadcastEvent);

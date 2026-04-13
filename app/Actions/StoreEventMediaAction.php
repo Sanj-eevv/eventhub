@@ -15,6 +15,7 @@ use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 use Throwable;
 
 final readonly class StoreEventMediaAction
@@ -36,7 +37,11 @@ final readonly class StoreEventMediaAction
         $extension = $file->extension();
         $originalPath = sprintf('media/%s/%s.%s', $event->uuid, $uuid, $extension);
 
-        $this->filesystem->writeStream($originalPath, fopen($file->getRealPath(), 'r'));
+        $stream = fopen($file->getRealPath(), 'r');
+        if (false === $stream) {
+            throw new RuntimeException("Failed to open file stream for [{$file->getRealPath()}].");
+        }
+        $this->filesystem->writeStream($originalPath, $stream);
 
         try {
             $this->databaseManager->beginTransaction();

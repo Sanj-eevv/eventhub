@@ -24,7 +24,7 @@ final readonly class CreateUserAction
         return User::query()->create([
             'name' => $userData->name,
             'email' => $userData->email,
-            'password' => $this->hash->make($userData->password),
+            'password' => $this->hash->make((string) $userData->password),
             'role_id' => $role->id,
             'organization_id' => $organization?->id,
         ]);

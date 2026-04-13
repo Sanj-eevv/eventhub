@@ -34,7 +34,7 @@ final class RoleController extends Controller
     {
         $this->authorize('viewAny', Role::class);
 
-        $search = $request->input('search');
+        $search = $request->string('search')->toString() ?: null;
         $sortBy = $request->array('sort_by');
         $roles = Role::query()
             ->forIndex()

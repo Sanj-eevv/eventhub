@@ -12,6 +12,7 @@ use App\Http\Requests\Dashboard\ScanTicketRequest;
 use App\Http\Resources\TicketResource;
 use App\Models\Event;
 use App\Models\Ticket;
+use App\Models\User;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Routing\ResponseFactory;
@@ -34,7 +35,7 @@ final class ScanTicketController extends Controller
 
         $ticket = Ticket::query()
             ->forEvent($event)
-            ->byBookingReference($request->validated('booking_reference'))
+            ->byBookingReference((string) $request->validated('booking_reference'))
             ->with(['event', 'ticketType'])
             ->first();
 
@@ -43,7 +44,9 @@ final class ScanTicketController extends Controller
         }
 
         try {
-            $ticket = ($this->checkInTicketAction)($ticket, $this->authManager->user());
+            /** @var User $scanner */
+            $scanner = $this->authManager->user();
+            $ticket = ($this->checkInTicketAction)($ticket, $scanner);
         } catch (RuntimeException) {
             if (TicketStatus::Used === $ticket->status) {
                 $this->dispatcher->dispatch(new DuplicateScanAttempted($ticket));

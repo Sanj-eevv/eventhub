@@ -6,9 +6,10 @@ namespace App\Builders;
 
 use App\Enums\TicketStatus;
 use App\Models\Event;
+use App\Models\Ticket;
 use Illuminate\Database\Eloquent\Builder;
 
-/** @extends AppBuilder<\App\Models\Ticket> */
+/** @extends AppBuilder<Ticket> */
 final class TicketBuilder extends AppBuilder
 {
     public function forEvent(Event $event): self
@@ -36,7 +37,7 @@ final class TicketBuilder extends AppBuilder
         return $this->whereIn('status', [TicketStatus::Active, TicketStatus::Used]);
     }
 
-    public function forOrganization(int $organizationId): self
+    public function forOrganization(?int $organizationId): self
     {
         return $this->whereHas('event', fn (Builder $query) => $query->where('organization_id', $organizationId));
     }

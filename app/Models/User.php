@@ -117,7 +117,7 @@ final class User extends Authenticatable implements Authorizable, MustVerifyEmai
 
     public function hasAnyPermission(BackedEnum ...$permissions): bool
     {
-        $normalised = collect($permissions)->map(fn (BackedEnum $permission): int|string => $permission->value);
+        $normalised = collect($permissions)->map(fn (BackedEnum $permission): string => (string) $permission->value);
 
         return $this->getAllPermissions()->intersect($normalised->values())->isNotEmpty();
     }

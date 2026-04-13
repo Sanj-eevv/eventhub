@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 use App\Enums\OrderStatus;
 use App\Http\Resources\OrderResource;
 use App\Models\Order;
+use App\Models\User;
 use App\Services\SettingsService;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\AuthManager;
@@ -24,8 +25,11 @@ final class MyOrderController extends Controller
 
     public function index(Request $request): Response
     {
+        /** @var User $user */
+        $user = $this->authManager->user();
+
         $orders = Order::query()
-            ->forUser($this->authManager->user())
+            ->forUser($user)
             ->with(['event', 'tickets.ticketType'])
             ->latest()
             ->paginate(perPage: 10, page: $request->integer('page', 1));

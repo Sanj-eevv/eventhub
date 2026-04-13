@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\NotificationResource;
+use App\Models\User;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Http\Request;
 use Inertia\Response;
@@ -20,7 +21,10 @@ final class NotificationsController extends Controller
 
     public function __invoke(Request $request): Response
     {
-        $notifications = $this->authManager->user()
+        /** @var User $user */
+        $user = $this->authManager->user();
+
+        $notifications = $user
             ->notifications()
             ->latest()
             ->paginate(perPage: 15, page: $request->integer('page', 1));

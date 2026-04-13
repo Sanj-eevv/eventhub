@@ -26,9 +26,9 @@ final class RegisterRequest extends FormRequest
         $validated = $this->validated();
 
         return new UserData(
-            name: $validated['name'],
-            email: $validated['email'],
-            password: $validated['password'],
+            name: (string) $validated['name'],
+            email: (string) $validated['email'],
+            password: (string) $validated['password'],
             role_slug: PreservedRoleList::User->value,
         );
     }

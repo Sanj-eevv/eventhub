@@ -6,12 +6,13 @@ namespace App\Builders;
 
 use App\Enums\EventStatus;
 use App\Enums\PreservedRoleList;
+use App\Models\Event;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\JoinClause;
 
-/** @extends AppBuilder<\App\Models\Event> */
+/** @extends AppBuilder<Event> */
 final class EventBuilder extends AppBuilder
 {
     protected array $allowedSortColumns = ['title', 'organization', 'status', 'starts_at', 'ends_at', 'created_at'];
@@ -75,7 +76,7 @@ final class EventBuilder extends AppBuilder
         return $this->where('events.status', EventStatus::Cancelled);
     }
 
-    public function forOrganization(int $organizationId): self
+    public function forOrganization(?int $organizationId): self
     {
         return $this->where('events.organization_id', $organizationId);
     }

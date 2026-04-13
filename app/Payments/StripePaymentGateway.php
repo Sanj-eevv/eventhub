@@ -26,7 +26,7 @@ final readonly class StripePaymentGateway implements PaymentGateway
 
         return new PaymentIntentResult(
             payment_intent_id: $intent->id,
-            client_secret: $intent->client_secret,
+            client_secret: (string) $intent->client_secret,
             status: $intent->status,
         );
     }
@@ -37,7 +37,7 @@ final readonly class StripePaymentGateway implements PaymentGateway
 
         return new PaymentIntentResult(
             payment_intent_id: $intent->id,
-            client_secret: $intent->client_secret,
+            client_secret: (string) $intent->client_secret,
             status: $intent->status,
         );
     }

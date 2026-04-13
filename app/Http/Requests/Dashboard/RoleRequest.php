@@ -22,10 +22,12 @@ final class RoleRequest extends FormRequest
 
     public function toDto(): RoleData
     {
+        $rawPermissions = $this->validated('permissions');
+
         return new RoleData(
-            name: $this->validated('name'),
-            description: $this->validated('description'),
-            permissions: $this->validated('permissions'),
+            name: (string) $this->validated('name'),
+            description: (string) $this->validated('description'),
+            permissions: is_array($rawPermissions) ? array_map('intval', $rawPermissions) : null,
         );
     }
 }

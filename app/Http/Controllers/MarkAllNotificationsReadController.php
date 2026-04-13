@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Redirector;
@@ -17,7 +18,10 @@ final class MarkAllNotificationsReadController extends Controller
 
     public function __invoke(): RedirectResponse
     {
-        $this->authManager->user()->unreadNotifications()->update(['read_at' => now()]);
+        /** @var User $user */
+        $user = $this->authManager->user();
+
+        $user->unreadNotifications()->update(['read_at' => now()]);
 
         return $this->redirector->back();
     }

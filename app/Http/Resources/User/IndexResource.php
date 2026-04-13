@@ -27,7 +27,7 @@ final class IndexResource extends JsonResource
             'email' => $this->email,
             'role' => ['slug' => $this->role_slug, 'name' => $this->role_name],
             'organization' => $this->organization_uuid ? ['uuid' => $this->organization_uuid, 'title' => $this->organization_title] : null,
-            'created_at' => $this->created_at->toISOString(),
+            'created_at' => $this->created_at?->toISOString(),
         ];
     }
 }

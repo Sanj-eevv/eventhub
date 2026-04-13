@@ -6,6 +6,7 @@ namespace App\Rules;
 
 use Carbon\CarbonImmutable;
 use Closure;
+use DateTimeInterface;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ValidationRule;
 
@@ -25,12 +26,12 @@ final class EndsOnDifferentCalendarDay implements DataAwareRule, ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         $startsAt = $this->data['starts_at'] ?? null;
-        if ( ! $startsAt) {
+        if ( ! is_string($startsAt) && ! $startsAt instanceof DateTimeInterface) {
             return;
         }
 
         $startDate = CarbonImmutable::parse($startsAt)->toDateString();
-        $endDate = CarbonImmutable::parse($value)->toDateString();
+        $endDate = CarbonImmutable::parse(is_string($value) || $value instanceof DateTimeInterface ? $value : null)->toDateString();
         if ($endDate <= $startDate) {
             $fail('The event must end on a different calendar day than it starts (minimum 1 day).');
         }

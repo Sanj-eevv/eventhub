@@ -20,7 +20,7 @@ final class IndexResource extends JsonResource
             'total' => $this->total,
             'currency' => $this->currency,
             'paid_at' => $this->paid_at?->toISOString(),
-            'created_at' => $this->created_at->toISOString(),
+            'created_at' => $this->created_at?->toISOString(),
             'event' => $this->whenLoaded('event', fn (): array => ['title' => $this->event->title]),
             'user' => $this->whenLoaded('user', fn (): array => ['name' => $this->user->name, 'email' => $this->user->email]),
         ];

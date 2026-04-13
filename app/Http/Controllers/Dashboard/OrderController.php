@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Order\IndexResource;
 use App\Http\Resources\OrderResource;
 use App\Models\Order;
+use App\Models\User;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Http\Request;
 use Inertia\Response;
@@ -24,9 +25,10 @@ final class OrderController extends Controller
     {
         $this->authorize('viewAny', Order::class);
 
-        $search = $request->input('search');
+        $search = $request->string('search')->toString() ?: null;
         $sortBy = $request->array('sort_by');
 
+        /** @var User $user */
         $user = $this->authManager->user();
 
         $orders = Order::query()

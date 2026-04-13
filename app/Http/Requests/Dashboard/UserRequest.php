@@ -31,12 +31,15 @@ final class UserRequest extends FormRequest
 
     public function toDto(): UserData
     {
+        $password = $this->validated('password');
+        $organizationUuid = $this->validated('organization');
+
         return new UserData(
-            name: $this->validated('name'),
-            email: $this->validated('email'),
-            password: $this->validated('password'),
-            role_slug: $this->validated('role'),
-            organization_uuid: $this->validated('organization'),
+            name: (string) $this->validated('name'),
+            email: (string) $this->validated('email'),
+            password: is_string($password) ? $password : null,
+            role_slug: (string) $this->validated('role'),
+            organization_uuid: is_string($organizationUuid) ? $organizationUuid : null,
         );
     }
 }

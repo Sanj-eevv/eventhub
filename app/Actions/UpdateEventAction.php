@@ -67,6 +67,7 @@ final readonly class UpdateEventAction
         }
     }
 
+    /** @return array<string, mixed> */
     private function ticketTypeAttributes(TicketTypeData $ticketType): array
     {
         return [

@@ -26,7 +26,7 @@ final readonly class ProcessRefundAction
         $refundAmount ??= $this->settingsService->get()->refundPercentage->applyTo($order->total);
 
         $refundId = $this->paymentGateway->refundPaymentIntent(
-            $order->stripe_payment_intent_id,
+            (string) $order->stripe_payment_intent_id,
             $refundAmount,
         );
 

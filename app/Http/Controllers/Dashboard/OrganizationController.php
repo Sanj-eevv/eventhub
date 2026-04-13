@@ -32,8 +32,8 @@ final class OrganizationController extends Controller
     {
         $this->authorize('viewAny', Organization::class);
 
-        $search = $request->input('search');
-        $status = $request->input('status');
+        $search = $request->string('search')->toString() ?: null;
+        $status = $request->string('status')->toString() ?: null;
         $sortBy = $request->array('sort_by');
 
         $organizations = Organization::query()

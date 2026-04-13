@@ -9,13 +9,11 @@ use Illuminate\Support\Facades\Date;
 if ( ! function_exists('userTime')) {
     function userTime(DateTimeInterface|string $dateTime, ?string $timezone = null): CarbonInterface
     {
-        if (is_string($dateTime)) {
-            $dateTime = Date::parse($dateTime);
-        }
+        $carbon = is_string($dateTime) ? Date::parse($dateTime) : Date::instance($dateTime);
 
-        $tz = $timezone ? auth()->user()?->timezone : config('app.timezone');
+        $tz = $timezone ?? (string) config('app.timezone');
 
-        return $dateTime->timezone($tz);
+        return $carbon->timezone($tz);
     }
 }
 
@@ -28,9 +26,8 @@ if ( ! function_exists('formatUserTime')) {
 
 if ( ! function_exists('omit')) {
     /**
-     * @param string|string[] $keys
-     * @param array<string, mixed> $data
-     *
+     * @param  string|string[]  $keys
+     * @param  array<string, mixed>  $data
      * @return array<string, mixed>
      */
     function omit(string|array $keys, array $data): array

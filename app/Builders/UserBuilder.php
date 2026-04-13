@@ -9,7 +9,7 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\JoinClause;
 
-/** @extends AppBuilder<\App\Models\User> */
+/** @extends AppBuilder<User> */
 final class UserBuilder extends AppBuilder
 {
     protected array $allowedSortColumns = ['name', 'email', 'role_name', 'organization_title', 'created_at'];
@@ -34,7 +34,7 @@ final class UserBuilder extends AppBuilder
             });
     }
 
-    public function forOrganization(int $organizationId): self
+    public function forOrganization(?int $organizationId): self
     {
         return $this->where('users.organization_id', $organizationId);
     }

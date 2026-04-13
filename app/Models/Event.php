@@ -40,6 +40,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property CarbonImmutable|null $deleted_at
  * @property CarbonImmutable|null $created_at
  * @property CarbonImmutable|null $updated_at
+ * @property-read int|null $tickets_count
+ * @property-read int|null $checked_in_count
  * @property-read Organization $organization
  * @property-read User $user
  * @property-read Collection<int, TicketType> $ticketTypes
@@ -71,8 +73,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 final class Event extends Model
 {
     use HasAppUuid;
+
     /** @use HasFactory<EventFactory> */
     use HasFactory;
+
     use HasSlug;
     use SoftDeletes;
 

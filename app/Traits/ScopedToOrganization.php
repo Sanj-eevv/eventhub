@@ -8,7 +8,7 @@ use App\Models\User;
 
 trait ScopedToOrganization
 {
-    protected function withinOrganization(User $user, mixed $resource): bool
+    protected function withinOrganization(User $user, object $resource): bool
     {
         return $user->organization_id === $resource->organization_id;
     }

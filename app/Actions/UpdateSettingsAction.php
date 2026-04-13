@@ -17,7 +17,7 @@ final readonly class UpdateSettingsAction
     {
         Setting::query()->upsert(
             values: collect($data->toArray())
-                ->map(fn (int $value, string $key): array => ['key' => $key, 'value' => $value])
+                ->map(fn (mixed $value, string $key): array => ['key' => $key, 'value' => $value])
                 ->values()
                 ->all(),
             uniqueBy: ['key'],

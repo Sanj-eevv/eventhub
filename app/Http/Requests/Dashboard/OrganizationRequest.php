@@ -26,11 +26,11 @@ final class OrganizationRequest extends FormRequest
     public function toDto(): OrganizationData
     {
         return new OrganizationData(
-            title: $this->validated('title'),
-            description: $this->validated('description'),
-            contact_address: $this->validated('contact_address'),
-            contact_email: $this->validated('contact_email'),
-            status: OrganizationStatus::from($this->validated('status')),
+            title: (string) $this->validated('title'),
+            description: (string) $this->validated('description'),
+            contact_address: (string) $this->validated('contact_address'),
+            contact_email: (string) $this->validated('contact_email'),
+            status: OrganizationStatus::from((string) $this->validated('status')),
         );
     }
 }
